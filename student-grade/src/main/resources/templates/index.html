@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý điểm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2 id="pageTitle">Hệ thống Quản lý điểm Sinh viên</h2>
+
+    <form action="/add" method="POST">
+        <div class="form-group">
+            <label>Tên sinh viên:</label>
+            <input type="text" id="nameInput" name="name" required />
+        </div>
+        <div class="form-group">
+            <label>Điểm (0-10):</label>
+            <input type="number" id="scoreInput" step="0.1" name="score" required />
+        </div>
+        <button type="submit" id="submitBtn">Thêm sinh viên</button>
+    </form>
+
+    <table id="studentTable">
+        <tr>
+            <th>ID</th>
+            <th>Tên sinh viên</th>
+            <th>Điểm</th>
+            <th>Xếp loại</th>
+        </tr>
+        {#for student in students}
+        <tr class="student-row">
+            <td>{student.id}</td>
+            <td>{student.name}</td>
+            <td>{student.score}</td>
+            <td class="student-grade"><strong>{student.grade}</strong></td>
+        </tr>
+        {/for}
+    </table>
+</body>
+
+</html>

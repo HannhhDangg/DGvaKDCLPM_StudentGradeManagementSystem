@@ -1,0 +1,3 @@
+com\example\studentgrade\ui\SeleniumUITest.class
+com\example\studentgrade\service\StudentServiceTest.class
+META-INF\panache-archive.marker

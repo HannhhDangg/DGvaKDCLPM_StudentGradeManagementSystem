@@ -1,0 +1,5 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+StudentServiceTest (QuarkusTest),com.example.studentgrade.controller,StudentController,26,11,0,0,8,2,1,2,1,2
+StudentServiceTest (QuarkusTest),com.example.studentgrade.service,StudentService,11,42,0,12,3,12,1,8,1,2
+StudentServiceTest (QuarkusTest),com.example.studentgrade.repository,StudentRepository,0,3,0,0,0,1,0,1,0,1
+StudentServiceTest (QuarkusTest),com.example.studentgrade.model,Student,28,3,0,0,12,1,8,1,8,1
