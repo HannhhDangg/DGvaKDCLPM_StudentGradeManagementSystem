@@ -6,30 +6,47 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+import java.util.List;
+
 @ApplicationScoped
 public class StudentService {
 
     @Inject
     StudentRepository repository;
 
-    public String calculateGrade(double score) {
-        if (score < 0 || score > 10) {
-            throw new IllegalArgumentException("Điểm không hợp lệ, phải từ 0 đến 10");
-        }
-        if (score >= 8.5)
-            return "A";
-        if (score >= 7.0)
-            return "B";
-        if (score >= 5.5)
-            return "C";
-        if (score >= 4.0)
-            return "D";
-        return "F";
+    public List<Student> getAllUsers() {
+        return repository.listAll();
+    }
+
+    public List<Student> searchUsers(String keyword) {
+        String searchPattern = "%" + keyword.toLowerCase() + "%";
+        return repository.find(
+                "lower(lastName) like ?1 or lower(firstName) like ?2 or lower(username) like ?3 or lower(email) like ?4",
+                searchPattern, searchPattern, searchPattern, searchPattern).list();
     }
 
     @Transactional
-    public void saveStudent(Student student) {
-        student.setGrade(calculateGrade(student.getScore()));
-        repository.persist(student);
+    public void saveUser(Student user) {
+        repository.persist(user);
+    }
+
+    @Transactional
+    public void updateUser(Long id, Student updatedData) {
+        Student user = repository.findById(id);
+        if (user != null) {
+            user.setFirstName(updatedData.getFirstName());
+            user.setLastName(updatedData.getLastName());
+            user.setEmail(updatedData.getEmail());
+            user.setRole(updatedData.getRole());
+        }
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        repository.deleteById(id);
+    }
+
+    public long getTotalUsers() {
+        return repository.count();
     }
 }

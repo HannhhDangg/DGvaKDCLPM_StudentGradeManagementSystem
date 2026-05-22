@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClassroomResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">StudentServiceTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.service</a> &gt; <span class="el_source">ClassroomResource.java</span></div><h1>ClassroomResource.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.service;
+
+import com.example.studentgrade.model.Classroom;
+import io.quarkus.qute.Location;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import java.net.URI;
+import java.util.List;
+
+@Path(&quot;/classes&quot;)
+@Produces(MediaType.TEXT_HTML)
+<span class="nc" id="L19">public class ClassroomResource {</span>
+
+    @Inject
+    EntityManager em;
+
+    @Inject
+    @Location(&quot;classes&quot;)
+    Template classesTemplate;
+
+    @GET
+    public TemplateInstance getClassesPage() {
+<span class="nc" id="L30">        List&lt;Classroom&gt; classes = em.createQuery(&quot;SELECT c FROM Classroom c&quot;, Classroom.class).getResultList();</span>
+<span class="nc" id="L31">        return classesTemplate.data(&quot;classes&quot;, classes);</span>
+    }
+
+    @POST
+    @Path(&quot;/add&quot;)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Transactional
+    public Response addClassroom(@FormParam(&quot;name&quot;) String name,
+            @FormParam(&quot;description&quot;) String description) {
+<span class="nc" id="L40">        Classroom classroom = new Classroom();</span>
+<span class="nc" id="L41">        classroom.setName(name);</span>
+<span class="nc" id="L42">        classroom.setDescription(description);</span>
+<span class="nc" id="L43">        em.persist(classroom);</span>
+
+<span class="nc" id="L45">        return Response.seeOther(URI.create(&quot;/classes&quot;)).build();</span>
+    }
+
+    @POST
+    @Path(&quot;/delete/{id}&quot;)
+    @Transactional
+    public Response deleteClassroom(@PathParam(&quot;id&quot;) Long id) {
+<span class="nc" id="L52">        Classroom classroom = em.find(Classroom.class, id);</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if (classroom != null) {</span>
+<span class="nc" id="L54">            em.remove(classroom);</span>
+        }
+<span class="nc" id="L56">        return Response.seeOther(URI.create(&quot;/classes&quot;)).build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

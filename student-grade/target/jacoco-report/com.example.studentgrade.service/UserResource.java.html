@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">StudentServiceTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.service</a> &gt; <span class="el_source">UserResource.java</span></div><h1>UserResource.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.service;
+
+import com.example.studentgrade.model.Student;
+import io.quarkus.qute.Location;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import java.net.URI;
+import java.util.List;
+
+@Path(&quot;/users&quot;)
+@Produces(MediaType.TEXT_HTML)
+<span class="nc" id="L17">public class UserResource {</span>
+
+    @Inject
+    @Location(&quot;index&quot;)
+    Template indexTemplate;
+
+    @Inject
+    StudentService userService;
+
+    @GET
+    public TemplateInstance getUsers(@QueryParam(&quot;search&quot;) String search) {
+        List&lt;Student&gt; users;
+<span class="nc bnc" id="L29" title="All 4 branches missed.">        if (search != null &amp;&amp; !search.trim().isEmpty()) {</span>
+<span class="nc" id="L30">            users = userService.searchUsers(search);</span>
+        } else {
+<span class="nc" id="L32">            users = userService.getAllUsers();</span>
+        }
+        // Trả biến &quot;users&quot; về cho Qute template render
+<span class="nc" id="L35">        return indexTemplate.data(&quot;users&quot;, users).data(&quot;search&quot;, search).data(&quot;error&quot;, null);</span>
+    }
+
+    @POST
+    @Path(&quot;/add&quot;)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response addUser(@FormParam(&quot;lastName&quot;) String lastName,
+            @FormParam(&quot;firstName&quot;) String firstName,
+            @FormParam(&quot;username&quot;) String username,
+            @FormParam(&quot;email&quot;) String email,
+            @FormParam(&quot;role&quot;) String role,
+            @FormParam(&quot;password&quot;) String password) {
+        try {
+<span class="nc" id="L48">            Student user = new Student();</span>
+<span class="nc" id="L49">            user.setLastName(lastName);</span>
+<span class="nc" id="L50">            user.setFirstName(firstName);</span>
+<span class="nc" id="L51">            user.setUsername(username);</span>
+<span class="nc" id="L52">            user.setEmail(email);</span>
+<span class="nc" id="L53">            user.setRole(role);</span>
+<span class="nc" id="L54">            user.setPassword(password); // Thực tế cần sử dụng Bcrypt để mã hóa trước khi lưu</span>
+
+<span class="nc" id="L56">            userService.saveUser(user);</span>
+<span class="nc" id="L57">            return Response.seeOther(URI.create(&quot;/users&quot;)).build();</span>
+<span class="nc" id="L58">        } catch (Exception e) {</span>
+<span class="nc" id="L59">            return Response.ok(indexTemplate.data(&quot;users&quot;, userService.getAllUsers())</span>
+<span class="nc" id="L60">                    .data(&quot;search&quot;, &quot;&quot;)</span>
+<span class="nc" id="L61">                    .data(&quot;error&quot;, &quot;Lỗi khi thêm người dùng: Mời kiểm tra lại.&quot;)).build();</span>
+        }
+    }
+
+    @POST
+    @Path(&quot;/delete/{id}&quot;)
+    public Response deleteUser(@PathParam(&quot;id&quot;) Long id) {
+<span class="nc" id="L68">        userService.deleteUser(id);</span>
+<span class="nc" id="L69">        return Response.seeOther(URI.create(&quot;/users&quot;)).build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

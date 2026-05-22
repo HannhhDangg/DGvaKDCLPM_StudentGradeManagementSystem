@@ -1,70 +1,235 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý điểm</title>
+    <title>Quản lý Người dùng - Hệ thống Đào tạo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
         }
 
-        table {
-            border-collapse: collapse;
-            width: 60%;
-            margin-top: 20px;
+        .sidebar {
+            min-height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 10px;
+        .sidebar a {
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 20px;
+            display: block;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #34495e;
+            color: #fff;
+            border-left: 4px solid #3498db;
+        }
+
+        .sidebar i {
+            margin-right: 12px;
+            width: 20px;
             text-align: center;
         }
 
-        th {
-            background-color: #007bff;
-            color: white;
+        .main-content {
+            padding: 30px;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, .075);
+            border: none;
+            border-radius: 8px;
+        }
+
+        .table th {
+            font-weight: 600;
+            color: #495057;
         }
     </style>
 </head>
 
 <body>
-    <h2 id="pageTitle">Hệ thống Quản lý điểm Sinh viên</h2>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar d-none d-md-block">
+                <h4 class="text-center mb-4 pb-3 border-bottom border-secondary">
+                    <i class="fas fa-graduation-cap text-info"></i> EduManage
+                </h4>
+                <a href="/dashboard"><i class="fas fa-chart-pie"></i> Tổng quan</a>
+                <a href="/users" class="active"><i class="fas fa-users-cog"></i> Quản lý Người dùng</a>
+                <a href="/subjects"><i class="fas fa-book"></i> Quản lý Môn học</a>
+                <a href="/login" class="text-danger mt-5 border-top border-secondary pt-3"><i
+                        class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+            </div>
 
-    <form action="/add" method="POST">
-        <div class="form-group">
-            <label>Tên sinh viên:</label>
-            <input type="text" id="nameInput" name="name" required />
-        </div>
-        <div class="form-group">
-            <label>Điểm (0-10):</label>
-            <input type="number" id="scoreInput" step="0.1" name="score" required />
-        </div>
-        <button type="submit" id="submitBtn">Thêm sinh viên</button>
-    </form>
+            <!-- Main Content -->
+            <div class="col-md-10 main-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="h3"><i class="fas fa-users text-primary me-2"></i>Danh sách Người dùng</h2>
+                    <div class="user-info">
+                        <span class="text-muted">Xin chào,</span> <strong>Admin</strong>
+                    </div>
+                </div>
 
-    <table id="studentTable">
-        <tr>
-            <th>ID</th>
-            <th>Tên sinh viên</th>
-            <th>Điểm</th>
-            <th>Xếp loại</th>
-        </tr>
-        {#for student in students}
-        <tr class="student-row">
-            <td>{student.id}</td>
-            <td>{student.name}</td>
-            <td>{student.score}</td>
-            <td class="student-grade"><strong>{student.grade}</strong></td>
-        </tr>
-        {/for}
-    </table>
+                {#if error}
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="fas fa-exclamation-circle me-1"></i> {error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {/if}
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-4">
+                            <form action="/users" method="get" class="d-flex w-50">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i
+                                            class="fas fa-search text-muted"></i></span>
+                                    <input type="text" name="search" class="form-control border-start-0"
+                                        placeholder="Tìm kiếm tên, username, email..." value="{search}">
+                                    <button type="submit" class="btn btn-outline-secondary">Tìm kiếm</button>
+                                </div>
+                            </form>
+                            <button id="openAddModalBtn" class="btn btn-primary shadow-sm" data-bs-toggle="modal"
+                                data-bs-target="#addModal">
+                                <i class="fas fa-plus-circle me-1"></i> Thêm người dùng
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Họ và Tên</th>
+                                        <th>Tên đăng nhập</th>
+                                        <th>Email</th>
+                                        <th>Vai trò</th>
+                                        <th class="text-center">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Lưu ý: Cần update Backend Controller để trả về biến 'users' thay vì 'students' -->
+                                    {#for user in users}
+                                    <tr class="user-row">
+                                        <td>{user.id}</td>
+                                        <td class="fw-bold">{user.lastName} {user.firstName}</td>
+                                        <td>{user.username}</td>
+                                        <td>{user.email}</td>
+                                        <td>
+                                            {#if user.role == 'ADMIN'}
+                                            <span class="badge bg-danger rounded-pill"><i class="fas fa-shield-alt"></i>
+                                                Admin</span>
+                                            {#else if user.role == 'TEACHER'}
+                                            <span class="badge bg-info text-dark rounded-pill"><i
+                                                    class="fas fa-chalkboard-teacher"></i> Giáo viên</span>
+                                            {#else}
+                                            <span class="badge bg-success rounded-pill"><i
+                                                    class="fas fa-user-graduate"></i> Sinh viên</span>
+                                            {/if}
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-primary" title="Sửa thông tin"
+                                                data-bs-toggle="modal" data-bs-target="#updateModal{user.id}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" title="Cài đặt mật khẩu"
+                                                data-bs-toggle="modal" data-bs-target="#passwordModal{user.id}">
+                                                <i class="fas fa-key"></i>
+                                            </button>
+                                            <form action="/users/delete/{user.id}" method="post"
+                                                style="display:inline;">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa"
+                                                    onclick="return confirm('Bạn có chắc muốn xóa người dùng này?')">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {/for}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Thêm Người Dùng Mới -->
+    <div class="modal fade" id="addModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form action="/users/add" method="post">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Thêm người dùng mới</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Họ và Tên đệm</label>
+                                <input type="text" name="lastName" class="form-control" required
+                                    placeholder="Ví dụ: Nguyễn Văn">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Tên</label>
+                                <input type="text" name="firstName" class="form-control" required
+                                    placeholder="Ví dụ: A">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Tên đăng nhập (Username)</label>
+                                <input type="text" name="username" class="form-control" required
+                                    placeholder="nguyenvana">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" name="email" class="form-control" required
+                                    placeholder="email@domain.com">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Vai trò (Role)</label>
+                                <select name="role" class="form-select" required>
+                                    <option value="" disabled selected>-- Chọn vai trò --</option>
+                                    <option value="STUDENT">Sinh viên</option>
+                                    <option value="TEACHER">Giáo viên / Giảng viên</option>
+                                    <option value="ADMIN">Quản trị viên (Admin)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Mật khẩu</label>
+                                <input type="password" name="password" class="form-control" required
+                                    placeholder="Nhập mật khẩu...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Lưu thông
+                            tin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

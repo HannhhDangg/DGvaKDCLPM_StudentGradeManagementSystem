@@ -6,31 +6,48 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+import java.util.List;
+
 @ApplicationScoped
-<span class="fc" id="L10">public class StudentService {</span>
+<span class="fc" id="L12">public class StudentService {</span>
 
     @Inject
     StudentRepository repository;
 
-    public String calculateGrade(double score) {
-<span class="fc bfc" id="L16" title="All 4 branches covered.">        if (score &lt; 0 || score &gt; 10) {</span>
-<span class="fc" id="L17">            throw new IllegalArgumentException(&quot;Điểm không hợp lệ, phải từ 0 đến 10&quot;);</span>
-        }
-<span class="fc bfc" id="L19" title="All 2 branches covered.">        if (score &gt;= 8.5)</span>
-<span class="fc" id="L20">            return &quot;A&quot;;</span>
-<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (score &gt;= 7.0)</span>
-<span class="fc" id="L22">            return &quot;B&quot;;</span>
-<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (score &gt;= 5.5)</span>
-<span class="fc" id="L24">            return &quot;C&quot;;</span>
-<span class="fc bfc" id="L25" title="All 2 branches covered.">        if (score &gt;= 4.0)</span>
-<span class="fc" id="L26">            return &quot;D&quot;;</span>
-<span class="fc" id="L27">        return &quot;F&quot;;</span>
+    public List&lt;Student&gt; getAllUsers() {
+<span class="nc" id="L18">        return repository.listAll();</span>
+    }
+
+    public List&lt;Student&gt; searchUsers(String keyword) {
+<span class="nc" id="L22">        String searchPattern = &quot;%&quot; + keyword.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L23">        return repository.find(</span>
+                &quot;lower(lastName) like ?1 or lower(firstName) like ?2 or lower(username) like ?3 or lower(email) like ?4&quot;,
+<span class="nc" id="L25">                searchPattern, searchPattern, searchPattern, searchPattern).list();</span>
     }
 
     @Transactional
-    public void saveStudent(Student student) {
-<span class="nc" id="L32">        student.setGrade(calculateGrade(student.getScore()));</span>
-<span class="nc" id="L33">        repository.persist(student);</span>
-<span class="nc" id="L34">    }</span>
+    public void saveUser(Student user) {
+<span class="fc" id="L30">        repository.persist(user);</span>
+<span class="fc" id="L31">    }</span>
+
+    @Transactional
+    public void updateUser(Long id, Student updatedData) {
+<span class="nc" id="L35">        Student user = repository.findById(id);</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (user != null) {</span>
+<span class="nc" id="L37">            user.setFirstName(updatedData.getFirstName());</span>
+<span class="nc" id="L38">            user.setLastName(updatedData.getLastName());</span>
+<span class="nc" id="L39">            user.setEmail(updatedData.getEmail());</span>
+<span class="nc" id="L40">            user.setRole(updatedData.getRole());</span>
+        }
+<span class="nc" id="L42">    }</span>
+
+    @Transactional
+    public void deleteUser(Long id) {
+<span class="nc" id="L46">        repository.deleteById(id);</span>
+<span class="nc" id="L47">    }</span>
+
+    public long getTotalUsers() {
+<span class="fc" id="L50">        return repository.count();</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

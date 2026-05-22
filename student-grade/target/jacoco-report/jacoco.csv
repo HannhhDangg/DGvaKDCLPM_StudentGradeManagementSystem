@@ -1,5 +1,12 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-StudentServiceTest (QuarkusTest),com.example.studentgrade.controller,StudentController,26,11,0,0,8,2,1,2,1,2
-StudentServiceTest (QuarkusTest),com.example.studentgrade.service,StudentService,11,42,0,12,3,12,1,8,1,2
-StudentServiceTest (QuarkusTest),com.example.studentgrade.repository,StudentRepository,0,3,0,0,0,1,0,1,0,1
-StudentServiceTest (QuarkusTest),com.example.studentgrade.model,Student,28,3,0,0,12,1,8,1,8,1
+StudentServiceTest (QuarkusTest),com.example.studentgrade.controller,StudentController,109,0,16,0,18,0,15,0,7,0
+StudentServiceTest (QuarkusTest),com.example.studentgrade.service,SubjectResource,56,0,2,0,13,0,5,0,4,0
+StudentServiceTest (QuarkusTest),com.example.studentgrade.service,ClassroomResource,53,0,2,0,12,0,5,0,4,0
+StudentServiceTest (QuarkusTest),com.example.studentgrade.service,UserResource,88,0,4,0,20,0,6,0,4,0
+StudentServiceTest (QuarkusTest),com.example.studentgrade.service,StudentService,63,12,2,0,13,4,5,3,4,3
+StudentServiceTest (QuarkusTest),com.example.studentgrade.repository,StudentRepository,32,3,4,0,4,1,4,1,2,1
+StudentServiceTest (QuarkusTest),com.example.studentgrade.model,Student,31,27,0,0,10,13,9,7,9,7
+StudentServiceTest (QuarkusTest),com.example.studentgrade.model,Enrollment,21,3,0,0,9,1,6,1,6,1
+StudentServiceTest (QuarkusTest),com.example.studentgrade.model,Subject,28,3,0,0,12,1,8,1,8,1
+StudentServiceTest (QuarkusTest),com.example.studentgrade.model,Classroom,28,3,0,0,12,1,8,1,8,1
+StudentServiceTest (QuarkusTest),com.example.studentgrade.model,Grade,35,3,0,0,15,1,10,1,10,1

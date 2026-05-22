@@ -4,8 +4,21 @@ import com.example.studentgrade.model.Student;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.util.List;
+
 @ApplicationScoped
-<span class="fc" id="L8">public class StudentRepository implements PanacheRepository&lt;Student&gt; {</span>
+<span class="fc" id="L10">public class StudentRepository implements PanacheRepository&lt;Student&gt; {</span>
     // PanacheRepository tự động cung cấp các hàm find, persist, listAll...
+
+    public List&lt;Student&gt; searchByName(String keyword) {
+<span class="nc bnc" id="L14" title="All 4 branches missed.">        if (keyword == null || keyword.trim().isEmpty()) {</span>
+<span class="nc" id="L15">            return listAll();</span>
+        }
+<span class="nc" id="L17">        return list(&quot;LOWER(name) LIKE LOWER(?1)&quot;, &quot;%&quot; + keyword + &quot;%&quot;);</span>
+    }
+
+    public Student findByUsername(String username) {
+<span class="nc" id="L21">        return find(&quot;username&quot;, username).firstResult();</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

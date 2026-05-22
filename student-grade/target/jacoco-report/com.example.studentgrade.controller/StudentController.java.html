@@ -3,43 +3,93 @@
 import com.example.studentgrade.model.Student;
 import com.example.studentgrade.repository.StudentRepository;
 import com.example.studentgrade.service.StudentService;
+import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
+import io.smallrye.common.annotation.Blocking;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Collections;
 
 @Path(&quot;/&quot;)
-<span class="fc" id="L15">public class StudentController {</span>
+@Blocking // BẮT BUỘC PHẢI CÓ ĐỂ TRÁNH LỖI CRASH KHI ĐỌC DATABASE
+<span class="nc" id="L19">public class StudentController {</span>
 
     @Inject
-    Template index;
+    @Location(&quot;login&quot;)
+    Template login;
+    @Inject
+    @Location(&quot;dashboard&quot;)
+    Template dashboard;
+    @Inject
+    @Location(&quot;teacher&quot;)
+    Template teacher; // Cần tạo file teacher.html
+    @Inject
+    @Location(&quot;student&quot;)
+    Template student; // Cần tạo file student.html
+
     @Inject
     StudentService studentService;
     @Inject
     StudentRepository repository;
 
     @GET
+    public Response root() {
+<span class="nc" id="L41">        return Response.seeOther(URI.create(&quot;/login&quot;)).build();</span>
+    }
+
+    @GET
+    @Path(&quot;/login&quot;)
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance getIndexPage() {
-<span class="fc" id="L27">        return index.data(&quot;students&quot;, repository.listAll());</span>
+    public TemplateInstance getLoginPage(@QueryParam(&quot;error&quot;) String error) {
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        return login.data(&quot;error&quot;, error != null);</span>
     }
 
     @POST
-    @Path(&quot;/add&quot;)
+    @Path(&quot;/login&quot;)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response addStudent(@FormParam(&quot;name&quot;) String name, @FormParam(&quot;score&quot;) double score) {
-        try {
-<span class="nc" id="L35">            Student s = new Student();</span>
-<span class="nc" id="L36">            s.setName(name);</span>
-<span class="nc" id="L37">            s.setScore(score);</span>
-<span class="nc" id="L38">            studentService.saveStudent(s);</span>
-<span class="nc" id="L39">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L40">            System.err.println(&quot;Lỗi thêm sinh viên (Dữ liệu không hợp lệ): &quot; + e.getMessage());</span>
-<span class="nc" id="L41">        }</span>
-<span class="nc" id="L42">        return Response.seeOther(URI.create(&quot;/&quot;)).build();</span>
+    public Response doLogin(@FormParam(&quot;username&quot;) String username, @FormParam(&quot;password&quot;) String password) {
+        // Kiểm tra tài khoản trong Database
+<span class="nc" id="L56">        Student user = repository.findByUsername(username);</span>
+<span class="nc bnc" id="L57" title="All 4 branches missed.">        if (user != null &amp;&amp; user.getPassword().equals(password)) {</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">            if (&quot;ADMIN&quot;.equals(user.getRole()))</span>
+<span class="nc" id="L59">                return Response.seeOther(URI.create(&quot;/dashboard&quot;)).build();</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (&quot;TEACHER&quot;.equals(user.getRole()))</span>
+<span class="nc" id="L61">                return Response.seeOther(URI.create(&quot;/teacher&quot;)).build();</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">            if (&quot;STUDENT&quot;.equals(user.getRole()))</span>
+<span class="nc" id="L63">                return Response.seeOther(URI.create(&quot;/student&quot;)).build();</span>
+        }
+
+        // Cửa hậu (Backdoor) cho Admin phòng trường hợp DB trống
+<span class="nc bnc" id="L67" title="All 4 branches missed.">        if (&quot;Admin&quot;.equals(username) &amp;&amp; &quot;123456&quot;.equals(password)) {</span>
+<span class="nc" id="L68">            return Response.seeOther(URI.create(&quot;/dashboard&quot;)).build();</span>
+        }
+<span class="nc" id="L70">        return Response.seeOther(URI.create(&quot;/login?error=true&quot;)).build();</span>
+    }
+
+    @GET
+    @Path(&quot;/dashboard&quot;)
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance getDashboard() {
+<span class="nc" id="L77">        return dashboard.data(&quot;total&quot;, studentService.getTotalUsers())</span>
+<span class="nc" id="L78">                .data(&quot;average&quot;, &quot;0.00&quot;).data(&quot;passRatio&quot;, &quot;0.0&quot;).data(&quot;grades&quot;, Collections.emptyMap());</span>
+    }
+
+    @GET
+    @Path(&quot;/teacher&quot;)
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance getTeacherDashboard() {
+<span class="nc" id="L85">        return teacher.data(&quot;dummy&quot;, &quot;Data&quot;);</span>
+    }
+
+    @GET
+    @Path(&quot;/student&quot;)
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance getStudentDashboard() {
+<span class="nc" id="L92">        return student.data(&quot;dummy&quot;, &quot;Data&quot;);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

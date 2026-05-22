@@ -1,5 +1,12 @@
 com\example\studentgrade\model\Student.class
+com\example\studentgrade\service\UserResource.class
+com\example\studentgrade\model\Classroom.class
+com\example\studentgrade\service\ClassroomResource.class
+com\example\studentgrade\model\Subject.class
 com\example\studentgrade\repository\StudentRepository.class
+com\example\studentgrade\service\SubjectResource.class
+com\example\studentgrade\model\Grade.class
 META-INF\panache-archive.marker
 com\example\studentgrade\controller\StudentController.class
+com\example\studentgrade\model\Enrollment.class
 com\example\studentgrade\service\StudentService.class

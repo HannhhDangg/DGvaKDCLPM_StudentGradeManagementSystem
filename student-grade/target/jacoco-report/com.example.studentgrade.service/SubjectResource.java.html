@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SubjectResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">StudentServiceTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.service</a> &gt; <span class="el_source">SubjectResource.java</span></div><h1>SubjectResource.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.service;
+
+import com.example.studentgrade.model.Subject;
+import io.quarkus.qute.Location;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import java.net.URI;
+import java.util.List;
+
+@Path(&quot;/subjects&quot;)
+@Produces(MediaType.TEXT_HTML)
+<span class="nc" id="L19">public class SubjectResource {</span>
+
+    @Inject
+    EntityManager em;
+
+    @Inject
+    @Location(&quot;subjects&quot;)
+    Template subjectsTemplate;
+
+    @GET
+    public TemplateInstance getSubjectsPage() {
+<span class="nc" id="L30">        List&lt;Subject&gt; subjects = em.createQuery(&quot;SELECT s FROM Subject s&quot;, Subject.class).getResultList();</span>
+<span class="nc" id="L31">        return subjectsTemplate.data(&quot;subjects&quot;, subjects);</span>
+    }
+
+    @POST
+    @Path(&quot;/add&quot;)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Transactional
+    public Response addSubject(@FormParam(&quot;code&quot;) String code,
+            @FormParam(&quot;name&quot;) String name,
+            @FormParam(&quot;description&quot;) String description) {
+<span class="nc" id="L41">        Subject subject = new Subject();</span>
+<span class="nc" id="L42">        subject.setCode(code);</span>
+<span class="nc" id="L43">        subject.setName(name);</span>
+<span class="nc" id="L44">        subject.setDescription(description);</span>
+<span class="nc" id="L45">        em.persist(subject);</span>
+
+<span class="nc" id="L47">        return Response.seeOther(URI.create(&quot;/subjects&quot;)).build();</span>
+    }
+
+    @POST
+    @Path(&quot;/delete/{id}&quot;)
+    @Transactional
+    public Response deleteSubject(@PathParam(&quot;id&quot;) Long id) {
+<span class="nc" id="L54">        Subject subject = em.find(Subject.class, id);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (subject != null) {</span>
+<span class="nc" id="L56">            em.remove(subject);</span>
+        }
+<span class="nc" id="L58">        return Response.seeOther(URI.create(&quot;/subjects&quot;)).build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
