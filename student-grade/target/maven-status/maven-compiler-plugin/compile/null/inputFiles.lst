@@ -5,6 +5,7 @@ D:\Student grade management system\student-grade\src\main\java\com\example\stude
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\model\Student.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\model\Subject.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\repository\StudentRepository.java
+D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\repository\SubjectRepository.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\service\ClassroomResource.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\service\StudentService.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\service\SubjectResource.java

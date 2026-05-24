@@ -3,12 +3,10 @@ package com.example.studentgrade.service;
 import com.example.studentgrade.model.Student;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
-import io.quarkus.qute.TemplateInstance;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
 import java.net.URI;
 import java.util.List;
 
@@ -16,10 +14,10 @@ import java.util.List;
 @Produces(MediaType.TEXT_HTML)
 public class UserResource {
 
+    // Gọi đến file users.html mới
     @Inject
-    @Location("index")
-    Template indexTemplate;
-
+    @Location("users")
+    Template usersTemplate;
     @Inject
     StudentService userService;
 
@@ -31,8 +29,14 @@ public class UserResource {
         } else {
             users = userService.getAllUsers();
         }
-        // Trả biến "users" về cho Qute template render
-        return indexTemplate.data("users", users).data("search", search).data("error", null).render();
+
+        String safeSearch = search == null ? "" : search;
+
+        return usersTemplate
+                .data("users", users)
+                .data("search", safeSearch)
+                .data("error", "") // Tránh lỗi Null trong template
+                .render();
     }
 
     @POST
@@ -51,14 +55,16 @@ public class UserResource {
             user.setUsername(username);
             user.setEmail(email);
             user.setRole(role);
-            user.setPassword(password); // Thực tế cần sử dụng Bcrypt để mã hóa trước khi lưu
+            user.setPassword(password);
 
             userService.saveUser(user);
             return Response.seeOther(URI.create("/users")).build();
         } catch (Exception e) {
-            return Response.ok(indexTemplate.data("users", userService.getAllUsers())
+            return Response.ok(usersTemplate
+                    .data("users", userService.getAllUsers())
                     .data("search", "")
-                    .data("error", "Lỗi khi thêm người dùng: Mời kiểm tra lại.").render()).build();
+                    .data("error", "Lỗi khi thêm người dùng. Vui lòng kiểm tra lại.")
+                    .render()).build();
         }
     }
 

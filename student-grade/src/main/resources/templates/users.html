@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Môn học — EduManage</title>
+    <title>Người dùng — EduManage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap"
         rel="stylesheet">
@@ -19,7 +19,9 @@
             --border: #e5e7eb;
             --bg: #f1f5f9;
             --card-bg: #ffffff;
+            --success: #059669;
             --danger: #dc2626;
+            --info: #0891b2;
         }
 
         * {
@@ -158,8 +160,65 @@
             font-weight: 600;
         }
 
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--brand);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
         .content {
             padding: 28px 32px;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 16px;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            max-width: 380px;
+        }
+
+        .search-wrap svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-muted);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 0 12px 0 38px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--card-bg);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .search-input:focus {
+            border-color: var(--brand);
         }
 
         .btn-primary {
@@ -173,9 +232,11 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            transition: background 0.15s;
             display: inline-flex;
             align-items: center;
             gap: 7px;
+            text-decoration: none;
         }
 
         .btn-primary:hover {
@@ -195,6 +256,28 @@
             border: 1px solid var(--border);
             border-radius: 14px;
             overflow: hidden;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--danger);
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-danger svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            flex-shrink: 0;
         }
 
         table {
@@ -230,19 +313,40 @@
         td {
             padding: 14px 16px;
             font-size: 14px;
+            color: var(--text);
         }
 
-        .code-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            background: #f0f4ff;
-            border: 1px solid #c7d7fd;
-            border-radius: 6px;
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
-            color: var(--brand);
-            font-family: monospace;
-            letter-spacing: 0.05em;
+        }
+
+        .badge-admin {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .badge-teacher {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-student {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .badge svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
         }
 
         .actions {
@@ -275,7 +379,7 @@
 
         .btn-icon:hover {
             border-color: var(--brand);
-            background: #eff6ff;
+            background: var(--brand-light);
         }
 
         .btn-icon:hover svg {
@@ -291,9 +395,19 @@
             stroke: var(--danger);
         }
 
+        .fw-medium {
+            font-weight: 500;
+        }
+
+        /* MODAL */
+        .modal-backdrop.show {
+            background: rgba(15, 23, 42, 0.5);
+        }
+
         .modal-content {
             border: none;
             border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
 
         .modal-header {
@@ -301,7 +415,7 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .modal-title {
+        .modal-header .modal-title {
             font-size: 16px;
             font-weight: 600;
         }
@@ -325,6 +439,7 @@
             display: block;
             font-size: 13px;
             font-weight: 600;
+            color: var(--text);
             margin-bottom: 6px;
         }
 
@@ -345,10 +460,8 @@
             border-color: var(--brand);
         }
 
-        textarea.form-control {
-            height: 90px;
-            padding: 12px 14px;
-            resize: vertical;
+        select.form-control {
+            cursor: pointer;
         }
 
         .btn-secondary {
@@ -387,10 +500,17 @@
             fill: none;
             stroke-width: 2.5;
         }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
     </style>
 </head>
 
 <body>
+
     <aside class="sidebar">
         <div class="sidebar-brand">
             <span>EduManage</span>
@@ -407,7 +527,7 @@
                 </svg>
                 Tổng quan
             </a>
-            <a href="/users" class="nav-link">
+            <a href="/users" class="nav-link active">
                 <svg viewBox="0 0 24 24">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
@@ -416,7 +536,7 @@
                 </svg>
                 Người dùng
             </a>
-            <a href="/subjects" class="nav-link active">
+            <a href="/subjects" class="nav-link">
                 <svg viewBox="0 0 24 24">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
@@ -438,45 +558,109 @@
 
     <div class="main">
         <div class="topbar">
-            <h1>Danh sách môn học</h1>
-            <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
-                <svg viewBox="0 0 24 24">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                Thêm môn học
-            </button>
+            <h1>Quản lý Người dùng</h1>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:14px;color:var(--text-muted);">Xin chào, <strong
+                        style="color:var(--text);">Admin</strong></span>
+                <div class="avatar">A</div>
+            </div>
         </div>
 
         <div class="content">
+            {#if error}
+            <div class="alert-danger">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                {error}
+            </div>
+            {/if}
+
+            <div class="toolbar">
+                <form action="/users" method="get" style="flex:1;max-width:380px;">
+                    <div class="search-wrap">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input type="text" name="search" class="search-input"
+                            placeholder="Tìm kiếm tên, username, email..." value="{search}">
+                    </div>
+                </form>
+                <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Thêm người dùng
+                </button>
+            </div>
+
             <div class="card">
                 <table>
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Mã môn</th>
-                            <th>Tên môn học</th>
-                            <th>Mô tả</th>
+                            <th>Họ và tên</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
                             <th style="text-align:right;">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {#for subject in subjects}
+                        {#for user in users}
                         <tr>
-                            <td style="color:var(--text-muted);font-size:13px;">#{subject.id}</td>
-                            <td><span class="code-badge">{subject.code}</span></td>
-                            <td style="font-weight:500;">{subject.name}</td>
-                            <td style="color:var(--text-muted);">{subject.description}</td>
+                            <td style="color:var(--text-muted);font-size:13px;">#{user.id}</td>
+                            <td class="fw-medium">{user.lastName} {user.firstName}</td>
+                            <td style="color:var(--text-muted);">{user.username}</td>
+                            <td style="color:var(--text-muted);">{user.email}</td>
+                            <td>
+                                {#if user.role == 'ADMIN'}
+                                <span class="badge badge-admin">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                    Admin
+                                </span>
+                                {#else if user.role == 'TEACHER'}
+                                <span class="badge badge-teacher">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                                    </svg>
+                                    Giáo viên
+                                </span>
+                                {#else}
+                                <span class="badge badge-student">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                                    </svg>
+                                    Sinh viên
+                                </span>
+                                {/if}
+                            </td>
                             <td>
                                 <div class="actions">
-                                    <button class="btn-icon" title="Sửa">
+                                    <button class="btn-icon" title="Sửa thông tin" data-bs-toggle="modal"
+                                        data-bs-target="#updateModal{user.id}">
                                         <svg viewBox="0 0 24 24">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                         </svg>
                                     </button>
-                                    <form action="/subjects/delete/{subject.id}" method="post" style="display:inline;"
-                                        onsubmit="return confirm('Xóa môn học này?')">
+                                    <button class="btn-icon" title="Đặt lại mật khẩu" data-bs-toggle="modal"
+                                        data-bs-target="#passwordModal{user.id}">
+                                        <svg viewBox="0 0 24 24">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                        </svg>
+                                    </button>
+                                    <form action="/users/delete/{user.id}" method="post" style="display:inline;"
+                                        onsubmit="return confirm('Xóa người dùng này?')">
                                         <button type="submit" class="btn-icon danger" title="Xóa">
                                             <svg viewBox="0 0 24 24">
                                                 <polyline points="3 6 5 6 21 6" />
@@ -497,27 +681,54 @@
         </div>
     </div>
 
-    <!-- Modal Thêm môn học -->
-    <div class="modal fade" id="addSubjectModal" tabindex="-1">
-        <div class="modal-dialog">
+    <!-- Modal Thêm người dùng -->
+    <div class="modal fade" id="addModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="/subjects/add" method="post">
+                <form action="/users/add" method="post">
                     <div class="modal-header">
-                        <h5 class="modal-title">Thêm môn học mới</h5>
+                        <h5 class="modal-title">Thêm người dùng mới</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label class="form-label">Mã môn học</label>
-                            <input type="text" name="code" class="form-control" required placeholder="VD: INT101">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Họ và tên đệm</label>
+                                <input type="text" name="lastName" class="form-control" required
+                                    placeholder="Nguyễn Văn">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tên</label>
+                                <input type="text" name="firstName" class="form-control" required placeholder="A">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Tên môn học</label>
-                            <input type="text" name="name" class="form-control" required placeholder="VD: Toán rời rạc">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Tên đăng nhập</label>
+                                <input type="text" name="username" class="form-control" required
+                                    placeholder="nguyenvana">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" required
+                                    placeholder="email@domain.com">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Mô tả</label>
-                            <textarea name="description" class="form-control" placeholder="Mô tả tóm tắt..."></textarea>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Vai trò</label>
+                                <select name="role" class="form-control" required>
+                                    <option value="" disabled selected>-- Chọn vai trò --</option>
+                                    <option value="STUDENT">Sinh viên</option>
+                                    <option value="TEACHER">Giáo viên</option>
+                                    <option value="ADMIN">Admin</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mật khẩu</label>
+                                <input type="password" name="password" class="form-control" required
+                                    placeholder="••••••••">
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -535,6 +746,7 @@
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
