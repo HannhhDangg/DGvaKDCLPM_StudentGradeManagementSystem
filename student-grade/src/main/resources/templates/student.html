@@ -3,124 +3,551 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Sinh viên - Hệ thống Đào tạo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả học tập - EduManage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --brand: #1a56db;
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --sidebar-text: #94a3b8;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --danger: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
         }
 
         .sidebar {
-            min-height: 100vh;
-            background-color: #2c3e50;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 28px 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .sidebar-brand span {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
             color: white;
-            padding-top: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            font-weight: 400;
         }
 
-        .sidebar a {
-            color: #bdc3c7;
-            text-decoration: none;
-            padding: 12px 20px;
+        .sidebar-brand small {
             display: block;
-            border-left: 4px solid transparent;
-            transition: all 0.3s ease;
+            font-size: 11px;
+            color: var(--sidebar-text);
+            margin-top: 2px;
         }
 
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: #34495e;
-            color: #fff;
-            border-left: 4px solid #3498db;
+        nav {
+            padding: 12px 0;
+            flex: 1;
         }
 
-        .sidebar i {
-            margin-right: 12px;
-            width: 20px;
-            text-align: center;
+        .nav-section {
+            padding: 16px 20px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #475569;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
-        .main-content {
-            padding: 30px;
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            flex-shrink: 0;
+        }
+
+        .nav-link:hover {
+            background: var(--sidebar-hover);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: var(--sidebar-hover);
+            color: white;
+            border-left-color: var(--brand);
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #f87171;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .logout-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .main {
+            margin-left: 240px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--brand);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 28px 32px;
         }
 
         .card {
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, .075);
-            border: none;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 12px 24px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: left;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.1s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        td {
+            padding: 14px 24px;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .code-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #f0f4ff;
+            border: 1px solid #c7d7fd;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--brand);
+            font-family: monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.good {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge.na {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .badge.bad {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge.average {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .semester-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        /* Profile Modal Styles */
+        .user-badge {
+            cursor: pointer;
+            padding: 4px 8px;
             border-radius: 8px;
+            transition: background 0.15s;
+        }
+
+        .user-badge:hover {
+            background: #f1f5f9;
+        }
+
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--brand);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 auto 16px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .avatar-preview:hover {
+            opacity: 0.8;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 16px;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            background: #f8fafc;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 42px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 0 14px;
+            font-size: 14px;
+        }
+
+        .btn-submit {
+            height: 38px;
+            background: var(--brand);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 18px;
+            font-size: 14px;
+            font-weight: 600;
         }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <div class="col-md-2 sidebar d-none d-md-block">
-                <h4 class="text-center mb-4 pb-3 border-bottom border-secondary">
-                    <i class="fas fa-graduation-cap text-info"></i> EduManage
-                </h4>
-                <a href="/student" class="active"><i class="fas fa-chart-bar"></i> Kết quả học tập</a>
-                <a href="#"><i class="fas fa-chalkboard"></i> Lớp học đang tham gia</a>
-                <a href="#"><i class="fas fa-file-alt"></i> Bảng điểm chi tiết</a>
-                <a href="/login" class="text-danger mt-5 border-top border-secondary pt-3">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                </a>
-            </div>
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span>EduManage</span>
+            <small>Hệ thống Quản lý Đào tạo</small>
+        </div>
+        <nav>
+            <div class="nav-section">Sinh viên</div>
+            <a href="/student" class="nav-link active">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                </svg>
+                Kết quả học tập
+            </a>
+            <a href="/student/classes" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Lớp đang tham gia
+            </a>
+            <a href="/student/transcript" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+                Bảng điểm chi tiết
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/login" class="logout-btn">
+                <svg viewBox="0 0 24 24" stroke-linecap="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Đăng xuất
+            </a>
+        </div>
+    </aside>
 
-            <div class="col-md-10 main-content">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="h3"><i class="fas fa-user-graduate text-success me-2"></i>Cổng Thông Tin Sinh Viên</h2>
-                    <div class="user-info">
-                        <span class="text-muted">Xin chào,</span> <strong>Sinh Viên</strong>
+    <div class="main">
+        <div class="topbar">
+            <h1>Kết quả học tập</h1>
+            <div class="user-badge" title="{user.lastName} {user.firstName} - {user.email}" data-bs-toggle="modal"
+                data-bs-target="#profileModal">
+                <span style="font-size:14px;color:var(--text-muted);">Xin chào,</span>
+                <span style="font-size:14px;font-weight:600;">{user.firstName}</span>
+                {#if user.avatar}
+                <img src="{user.avatar}" class="avatar" style="object-fit: cover;" alt="avatar">
+                {#else}
+                <div class="avatar">{user.firstName.charAt(0)}</div>
+                {/if}
+            </div>
+        </div>
+
+        <div class="content">
+            {#for semester in semesters}
+            <div class="card">
+                <div class="semester-header">
+                    <div>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: var(--brand);">{semester.name}
+                        </h3>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Thời gian:
+                            {semester.startDate} - {semester.endDate}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 13px; color: var(--text-muted);">Điểm TB Học kỳ</div>
+                        <div style="font-size: 18px; font-weight: 600; color: var(--text);">{semester.semesterGPA}</div>
                     </div>
                 </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã môn</th>
+                            <th>Tên môn học</th>
+                            <th>Tín chỉ</th>
+                            <th>Điểm hệ 10</th>
+                            <th>Điểm chữ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#for grade in semester.grades}
+                        <tr>
+                            <td><span class="code-badge">{grade.subjectCode}</span></td>
+                            <td style="font-weight:500;">{grade.subjectName}</td>
+                            <td>{grade.credits}</td>
+                            <td>
+                                {#if grade.score}
+                                <span style="font-weight: 600;">{grade.score}</span>
+                                {#else}
+                                <span style="color: var(--text-muted);">Chưa có</span>
+                                {/if}
+                            </td>
+                            <td>
+                                <span class="badge {grade.badgeClass}">{grade.letterGrade}</span>
+                            </td>
+                        </tr>
+                        {/for}
+                    </tbody>
+                </table>
+            </div>
+            {/for}
+        </div>
+    </div>
 
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="card bg-success text-white p-3 shadow-sm">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5>Điểm TB Tích lũy (GPA)</h5>
-                                    <h2>3.2 / 4.0</h2>
-                                </div>
-                                <i class="fas fa-award fa-3x opacity-50"></i>
+    <!-- Modal Cập nhật thông tin -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/student/profile" method="post" id="profileForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold">Thông tin cá nhân</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            {#if user.avatar}
+                            <img src="{user.avatar}" id="avatarPreview" class="avatar-preview" alt="avatar"
+                                onclick="document.getElementById('avatarInput').click()" title="Nhấn để đổi ảnh">
+                            {#else}
+                            <div id="avatarPreview" class="avatar-preview"
+                                onclick="document.getElementById('avatarInput').click()" title="Nhấn để đổi ảnh">
+                                {user.firstName.charAt(0)}</div>
+                            {/if}
+                            <input type="file" id="avatarInput" accept="image/*" class="d-none">
+                            <input type="hidden" name="avatarBase64" id="avatarBase64">
+                            <button type="button" class="btn btn-sm btn-outline-primary mb-3"
+                                onclick="document.getElementById('avatarInput').click()">Thay đổi ảnh</button>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 13px;">Họ và tên đệm</label>
+                                <input type="text" name="lastName" class="form-control" value="{user.lastName}"
+                                    required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 13px;">Tên</label>
+                                <input type="text" name="firstName" class="form-control" value="{user.firstName}"
+                                    required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold" style="font-size: 13px;">Tên đăng nhập</label>
+                                <input type="text" name="username" class="form-control" value="{user.username}"
+                                    required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold" style="font-size: 13px;">Mật khẩu (để trống nếu
+                                    không đổi)</label>
+                                <input type="password" name="password" class="form-control" placeholder="••••••••">
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4">Bảng điểm học kỳ gần nhất</h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Mã Môn</th>
-                                        <th>Tên Môn Học</th>
-                                        <th>Tín chỉ</th>
-                                        <th>Điểm số</th>
-                                        <th>Xếp loại</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>INT101</td>
-                                        <td class="fw-bold">Lập trình cơ bản</td>
-                                        <td>3</td>
-                                        <td class="fw-bold text-success">8.5</td>
-                                        <td><span class="badge bg-success">Giỏi (B+)</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" style="border: 1px solid var(--border);"
+                            data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn-submit">Lưu thay đổi</button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Xử lý chuyển file ảnh sang Base64 để lưu tối ưu cho test UI
+        document.getElementById('avatarInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    const base64String = evt.target.result;
+                    document.getElementById('avatarBase64').value = base64String;
+
+                    const preview = document.getElementById('avatarPreview');
+                    if (preview.tagName === 'DIV') {
+                        const img = document.createElement('img');
+                        img.id = 'avatarPreview';
+                        img.className = 'avatar-preview';
+                        img.src = base64String;
+                        preview.parentNode.replaceChild(img, preview);
+                    } else {
+                        preview.src = base64String;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 </body>
 
 </html>

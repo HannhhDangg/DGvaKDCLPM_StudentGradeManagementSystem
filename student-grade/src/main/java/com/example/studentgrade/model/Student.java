@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "users") // Đổi tên bảng trong CSDL
@@ -18,6 +19,9 @@ public class Student {
     private String email;
     private String role; // Lữu trữ vai trò: ADMIN, TEACHER, STUDENT
     private String password; // Mật khẩu (Nên được băm/mã hoá khi lưu)
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String avatar; // Lưu ảnh dưới dạng Base64
 
     // Getters and Setters
     public Long getId() {
@@ -74,6 +78,14 @@ public class Student {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     // Phương thức tiện ích lấy Họ và Tên

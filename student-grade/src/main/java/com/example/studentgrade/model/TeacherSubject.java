@@ -7,14 +7,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "enrollments")
-public class Enrollment {
+@Table(name = "teacher_subjects")
+public class TeacherSubject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long studentId;
-    private Long classroomId;
+    private Long teacherId;
+    private Long subjectId;
 
     public Long getId() {
         return id;
@@ -24,19 +24,19 @@ public class Enrollment {
         this.id = id;
     }
 
-    public Long getStudentId() {
-        return studentId;
+    public Long getTeacherId() {
+        return teacherId;
     }
 
-    public void setStudentId(Long studentId) {
-        this.studentId = studentId;
+    public void setTeacherId(Long teacherId) {
+        this.teacherId = teacherId;
     }
 
-    public Long getClassroomId() {
-        return classroomId;
+    public Long getSubjectId() {
+        return subjectId;
     }
 
-    public void setClassroomId(Long classroomId) {
-        this.classroomId = classroomId;
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
     }
 }

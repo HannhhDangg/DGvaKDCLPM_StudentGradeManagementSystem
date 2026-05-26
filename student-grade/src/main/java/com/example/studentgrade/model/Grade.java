@@ -23,7 +23,10 @@ public class Grade {
     @JoinColumn(name = "subject_id")
     private Subject subject; // Điểm của môn học nào
 
-    private double score;
+    private Double attendanceScore; // Điểm chuyên cần
+    private Double midtermScore; // Điểm giữa kỳ
+    private Double finalExamScore; // Điểm cuối kỳ
+    private Double finalScore; // Điểm tổng kết
     private String gradeText; // VD: A, B, C hoặc Xếp loại
 
     // Getters and Setters
@@ -51,12 +54,36 @@ public class Grade {
         this.subject = subject;
     }
 
-    public double getScore() {
-        return score;
+    public Double getAttendanceScore() {
+        return attendanceScore;
     }
 
-    public void setScore(double score) {
-        this.score = score;
+    public void setAttendanceScore(Double attendanceScore) {
+        this.attendanceScore = attendanceScore;
+    }
+
+    public Double getMidtermScore() {
+        return midtermScore;
+    }
+
+    public void setMidtermScore(Double midtermScore) {
+        this.midtermScore = midtermScore;
+    }
+
+    public Double getFinalExamScore() {
+        return finalExamScore;
+    }
+
+    public void setFinalExamScore(Double finalExamScore) {
+        this.finalExamScore = finalExamScore;
+    }
+
+    public Double getFinalScore() {
+        return finalScore;
+    }
+
+    public void setFinalScore(Double finalScore) {
+        this.finalScore = finalScore;
     }
 
     public String getGradeText() {

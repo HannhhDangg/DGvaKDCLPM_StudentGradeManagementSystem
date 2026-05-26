@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giáo viên — EduManage</title>
+    <title>Bảng điểm chi tiết - EduManage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap"
         rel="stylesheet">
@@ -19,8 +19,7 @@
             --border: #e5e7eb;
             --bg: #f1f5f9;
             --card-bg: #ffffff;
-            --success: #059669;
-            --info: #0891b2;
+            --danger: #dc2626;
         }
 
         * {
@@ -28,26 +27,22 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-family: 'DM Sans', sans-serif;
             background: var(--bg);
             margin: 0;
             color: var(--text);
         }
 
-        /* SIDEBAR */
         .sidebar {
             position: fixed;
             top: 0;
             left: 0;
             width: 240px;
-            min-height: 100vh;
             height: 100vh;
             background: var(--sidebar-bg);
             display: flex;
             flex-direction: column;
             z-index: 100;
-            overflow-y: auto;
         }
 
         .sidebar-brand {
@@ -60,7 +55,6 @@
             font-size: 22px;
             color: white;
             font-weight: 400;
-            letter-spacing: -0.3px;
         }
 
         .sidebar-brand small {
@@ -68,26 +62,6 @@
             font-size: 11px;
             color: var(--sidebar-text);
             margin-top: 2px;
-            font-weight: 400;
-        }
-
-        .sidebar-icon {
-            width: 20px;
-            height: 20px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-        .sidebar-icon svg {
-            width: 16px;
-            height: 16px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 2;
-            stroke-linecap: round;
         }
 
         nav {
@@ -95,9 +69,19 @@
             flex: 1;
         }
 
+        .nav-section {
+            padding: 16px 20px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #475569;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
         .nav-link {
             display: flex;
             align-items: center;
+            gap: 10px;
             padding: 10px 20px;
             color: var(--sidebar-text);
             text-decoration: none;
@@ -105,7 +89,16 @@
             font-weight: 500;
             transition: all 0.15s;
             border-left: 3px solid transparent;
-            gap: 2px;
+        }
+
+        .nav-link svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            flex-shrink: 0;
         }
 
         .nav-link:hover {
@@ -117,15 +110,6 @@
             background: var(--sidebar-hover);
             color: white;
             border-left-color: var(--brand);
-        }
-
-        .nav-section {
-            padding: 16px 20px 6px;
-            font-size: 10px;
-            font-weight: 600;
-            color: #475569;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
         }
 
         .sidebar-footer {
@@ -141,14 +125,16 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
-            transition: color 0.15s;
         }
 
-        .logout-btn:hover {
-            color: #fca5a5;
+        .logout-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
         }
 
-        /* MAIN */
         .main {
             margin-left: 240px;
             min-height: 100vh;
@@ -170,7 +156,6 @@
         .topbar h1 {
             font-size: 18px;
             font-weight: 600;
-            color: var(--text);
             margin: 0;
         }
 
@@ -197,91 +182,43 @@
             padding: 28px 32px;
         }
 
-        /* STAT CARDS */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 22px 24px;
-            position: relative;
-            overflow: hidden;
+            padding: 24px;
+            text-align: center;
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 80px;
-            height: 80px;
-            border-radius: 0 14px 0 80px;
-            opacity: 0.08;
-        }
-
-        .stat-card.blue::before {
-            background: var(--brand);
-        }
-
-        .stat-card.teal::before {
-            background: var(--info);
-        }
-
-        .stat-label {
+        .stat-title {
             font-size: 13px;
             color: var(--text-muted);
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             margin-bottom: 8px;
         }
 
         .stat-value {
             font-size: 32px;
             font-weight: 600;
-            color: var(--text);
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-
-        .stat-icon {
-            position: absolute;
-            top: 18px;
-            right: 20px;
-            opacity: 0.15;
-        }
-
-        .stat-icon svg {
-            width: 36px;
-            height: 36px;
-            stroke: var(--text);
-            fill: none;
-            stroke-width: 1.5;
-        }
-
-        /* TABLE */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-            background: var(--card-bg);
-        }
-
-        .card-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text);
-            margin: 0;
+            color: var(--brand);
+            font-family: 'DM Serif Display', serif;
         }
 
         table {
@@ -320,74 +257,49 @@
             color: var(--text);
         }
 
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 10px;
-            border-radius: 20px;
+        .code-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #f0f4ff;
+            border: 1px solid #c7d7fd;
+            border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
+            color: var(--brand);
+            font-family: monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .badge.good {
-            background: #f0fdf4;
+            background: #dcfce7;
             color: #166534;
         }
 
         .badge.na {
             background: #f1f5f9;
-            color: #475569;
+            color: #64748b;
         }
 
-        .btn-icon {
-            width: 32px;
-            height: 32px;
-            border: 1.5px solid var(--border);
-            border-radius: 8px;
-            background: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
+        .badge.bad {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
-        .btn-icon svg {
-            width: 14px;
-            height: 14px;
-            stroke: var(--text-muted);
-            fill: none;
-            stroke-width: 2;
+        .badge.average {
+            background: #fef9c3;
+            color: #854d0e;
         }
 
-        .btn-icon:hover {
-            border-color: var(--brand);
-            background: #eff6ff;
-        }
-
-        .btn-icon:hover svg {
-            stroke: var(--brand);
-        }
-
-        .class-header {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
-            background: #f8fafc;
-            font-weight: 600;
-            font-size: 16px;
-            color: var(--brand);
-        }
-
-        .btn-edit {
-            background: #eff6ff;
-            color: var(--brand);
-            border: 1px solid #bfdbfe;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
+        /* Profile Modal Styles */
         .user-badge {
             cursor: pointer;
             padding: 4px 8px;
@@ -421,27 +333,6 @@
             opacity: 0.8;
         }
 
-        .modal-content {
-            border: none;
-            border-radius: 16px;
-        }
-
-        .modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .modal-body {
-            padding: 24px;
-        }
-
-        .modal-footer {
-            padding: 16px 24px;
-            border-top: 1px solid var(--border);
-            background: #f8fafc;
-            border-radius: 0 0 16px 16px;
-        }
-
         .form-control {
             width: 100%;
             height: 42px;
@@ -460,32 +351,36 @@
             <small>Hệ thống Quản lý Đào tạo</small>
         </div>
         <nav>
-            <div class="nav-section">Giáo viên</div>
-            <a href="/teacher" class="nav-link active">
-                <span class="sidebar-icon">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                    </svg>
-                </span>
-                Lớp của tôi
+            <div class="nav-section">Sinh viên</div>
+            <a href="/student" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                </svg>
+                Kết quả học tập
             </a>
-            <a href="/classes" class="nav-link">
-                <span class="sidebar-icon">
-                    <svg viewBox="0 0 24 24">
-                        <rect x="3" y="3" width="7" height="7" />
-                        <rect x="14" y="3" width="7" height="7" />
-                        <rect x="3" y="14" width="7" height="7" />
-                        <rect x="14" y="14" width="7" height="7" />
-                    </svg>
-                </span>
-                Quản lý Lớp học
+            <a href="/student/classes" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Lớp đang tham gia
+            </a>
+            <a href="/student/transcript" class="nav-link active">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+                Bảng điểm chi tiết
             </a>
         </nav>
         <div class="sidebar-footer">
             <a href="/login" class="logout-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round">
+                <svg viewBox="0 0 24 24" stroke-linecap="round">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                     <polyline points="16 17 21 12 16 7" />
                     <line x1="21" y1="12" x2="9" y2="12" />
@@ -497,7 +392,7 @@
 
     <div class="main">
         <div class="topbar">
-            <h1>Quản lý Lớp & Điểm Sinh viên</h1>
+            <h1>Bảng điểm chi tiết</h1>
             <div class="user-badge" title="{user.lastName} {user.firstName} - {user.email}" data-bs-toggle="modal"
                 data-bs-target="#profileModal">
                 <span style="font-size:14px;color:var(--text-muted);">Xin chào,</span>
@@ -512,72 +407,50 @@
 
         <div class="content">
             <div class="stats-grid">
-                <div class="stat-card teal">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                        </svg>
-                    </div>
-                    <div class="stat-label">Tổng số Lớp</div>
-                    <div class="stat-value">{totalClasses}</div>
+                <div class="stat-card">
+                    <div class="stat-title">Điểm TB tích lũy (GPA)</div>
+                    <div class="stat-value">{cumulativeGPA}</div>
                 </div>
-                <div class="stat-card blue">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                        </svg>
-                    </div>
-                    <div class="stat-label">Tổng Sinh viên</div>
-                    <div class="stat-value">{totalStudents}</div>
+                <div class="stat-card">
+                    <div class="stat-title">Tổng tín chỉ tích lũy</div>
+                    <div class="stat-value" style="color: var(--text);">{totalCredits}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Xếp loại học lực</div>
+                    <div class="stat-value" style="color: var(--text);">{classification}</div>
                 </div>
             </div>
 
-            {#for class in classes}
-            <div class="card" style="margin-bottom: 24px;">
-                <div class="class-header">Lớp: {class.className}</div>
+            <div class="card">
                 <table>
                     <thead>
                         <tr>
-                            <th>Mã SV</th>
-                            <th>Họ Tên</th>
-                            <th>Email</th>
-                            <th>Chuyên cần</th>
-                            <th>Giữa kỳ</th>
-                            <th>Cuối kỳ</th>
-                            <th>Tổng kết</th>
-                            <th>Xếp loại</th>
-                            <th style="text-align:right;">Hành động</th>
+                            <th>Mã môn</th>
+                            <th>Tên môn học</th>
+                            <th>Tín chỉ</th>
+                            <th>Điểm chuyên cần</th>
+                            <th>Điểm giữa kỳ</th>
+                            <th>Điểm cuối kỳ</th>
+                            <th>Điểm tổng kết</th>
+                            <th>Điểm chữ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {#for student in class.students}
+                        {#for item in transcript}
                         <tr>
-                            <td style="color:var(--text-muted);font-size:13px;">#{student.id}</td>
-                            <td style="font-weight:500;">{student.name}</td>
-                            <td style="color:var(--text-muted);">{student.email}</td>
-                            <td>{student.attendanceScore ?: '-'}</td>
-                            <td>{student.midtermScore ?: '-'}</td>
-                            <td>{student.finalExamScore ?: '-'}</td>
-                            <td style="font-weight:600;color:var(--brand);">{student.finalScore ?: '-'}</td>
-                            <td>
-                                <span class="badge {student.badgeClass}">{student.letterGrade}</span>
-                            </td>
-                            <td style="text-align:right;">
-                                <button class="btn-edit" data-bs-toggle="modal" data-bs-target="#gradeModal"
-                                    onclick="openGradeModal(`{student.id}`, `{student.subjectId}`, `{student.name}`, `{student.attendanceScore ?: ''}`, `{student.midtermScore ?: ''}`, `{student.finalExamScore ?: ''}`)">
-                                    Nhập điểm
-                                </button>
-                            </td>
+                            <td><span class="code-badge">{item.subjectCode}</span></td>
+                            <td style="font-weight:500;">{item.subjectName}</td>
+                            <td>{item.credits}</td>
+                            <td>{item.attendanceScore}</td>
+                            <td>{item.midtermScore}</td>
+                            <td>{item.finalExamScore}</td>
+                            <td style="font-weight: 600;">{item.finalScore}</td>
+                            <td><span class="badge {item.badgeClass}">{item.letterGrade}</span></td>
                         </tr>
                         {/for}
                     </tbody>
                 </table>
             </div>
-            {/for}
         </div>
     </div>
 
@@ -641,63 +514,28 @@
         </div>
     </div>
 
-    <!-- Modal Nhập Điểm -->
-    <div class="modal fade" id="gradeModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="/teacher/grade" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Nhập điểm Sinh viên</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="studentId" id="gradeStudentId">
-                        <input type="hidden" name="subjectId" id="gradeSubjectId">
-
-                        <div class="form-group mb-3">
-                            <label class="form-label fw-semibold">Sinh viên</label>
-                            <input type="text" id="gradeStudentName" class="form-control" readonly
-                                style="background: #f8fafc; color: var(--text-muted);">
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Chuyên cần</label>
-                                <input type="number" step="0.1" min="0" max="10" name="attendanceScore" id="gradeAtt"
-                                    class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Giữa kỳ</label>
-                                <input type="number" step="0.1" min="0" max="10" name="midtermScore" id="gradeMid"
-                                    class="form-control">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">Cuối kỳ</label>
-                                <input type="number" step="0.1" min="0" max="10" name="finalExamScore" id="gradeExam"
-                                    class="form-control">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary"
-                            style="background: var(--brand); border: none;">Lưu điểm</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function openGradeModal(studentId, subjectId, name, att, mid, exam) {
-            document.getElementById('gradeStudentId').value = studentId;
-            document.getElementById('gradeSubjectId').value = subjectId;
-            document.getElementById('gradeStudentName').value = name;
-            document.getElementById('gradeAtt').value = (att && att !== 'null') ? att : '';
-            document.getElementById('gradeMid').value = (mid && mid !== 'null') ? mid : '';
-            document.getElementById('gradeExam').value = (exam && exam !== 'null') ? exam : '';
-        }
+        document.getElementById('avatarInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    document.getElementById('avatarBase64').value = evt.target.result;
+                    const preview = document.getElementById('avatarPreview');
+                    if (preview.tagName === 'DIV') {
+                        const img = document.createElement('img');
+                        img.id = 'avatarPreview';
+                        img.className = 'avatar-preview';
+                        img.src = evt.target.result;
+                        preview.parentNode.replaceChild(img, preview);
+                    } else {
+                        preview.src = evt.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     </script>
 </body>
 

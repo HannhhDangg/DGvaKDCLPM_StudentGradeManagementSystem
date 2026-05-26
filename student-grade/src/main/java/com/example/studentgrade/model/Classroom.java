@@ -16,6 +16,10 @@ public class Classroom {
     private String name;
     private String description;
     private Long teacherId; // Liên kết tới ID của User có role TEACHER
+    private Long subjectId; // Môn học của lớp này
+    private String subjectName; // Tên môn học để hiển thị
+    private String startDate; // Ngày bắt đầu
+    private String endDate; // Ngày kết thúc
 
     // Getters and Setters
     public Long getId() {
@@ -48,5 +52,37 @@ public class Classroom {
 
     public void setTeacherId(Long teacherId) {
         this.teacherId = teacherId;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 }

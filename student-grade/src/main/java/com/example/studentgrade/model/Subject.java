@@ -16,9 +16,9 @@ public class Subject {
 
     private String code;
     private String name;
+    private int credits; // Số tín chỉ
     private String description;
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -41,6 +41,14 @@ public class Subject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    public void setCredits(int credits) {
+        this.credits = credits;
     }
 
     public String getDescription() {

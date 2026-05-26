@@ -646,14 +646,16 @@
                             <td>
                                 <div class="actions">
                                     <button class="btn-icon" title="Sửa thông tin" data-bs-toggle="modal"
-                                        data-bs-target="#updateModal{user.id}">
+                                        data-bs-target="#editUserModal"
+                                        onclick="openEditUserModal(`{user.id}`, `{user.lastName}`, `{user.firstName}`, `{user.username}`, `{user.email}`, `{user.role}`)">
                                         <svg viewBox="0 0 24 24">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                         </svg>
                                     </button>
                                     <button class="btn-icon" title="Đặt lại mật khẩu" data-bs-toggle="modal"
-                                        data-bs-target="#passwordModal{user.id}">
+                                        data-bs-target="#resetPasswordModal"
+                                        onclick="openResetPasswordModal(`{user.id}`, `{user.username}`)">
                                         <svg viewBox="0 0 24 24">
                                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                                             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -747,7 +749,101 @@
         </div>
     </div>
 
+    <!-- Modal Sửa người dùng -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form action="/users/edit" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sửa thông tin người dùng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="editUserId">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Họ và tên đệm</label>
+                                <input type="text" name="lastName" id="editUserLastName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tên</label>
+                                <input type="text" name="firstName" id="editUserFirstName" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Tên đăng nhập</label>
+                                <input type="text" name="username" id="editUserUsername" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" id="editUserEmail" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Vai trò</label>
+                                <select name="role" id="editUserRole" class="form-control" required>
+                                    <option value="STUDENT">Sinh viên</option>
+                                    <option value="TEACHER">Giáo viên</option>
+                                    <option value="ADMIN">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn-submit">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Đặt lại mật khẩu -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/users/reset-password" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Đặt lại mật khẩu</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="resetPasswordId">
+                        <p>Tài khoản: <strong id="resetPasswordUsernameLabel"></strong></p>
+                        <div class="form-group">
+                            <label class="form-label">Mật khẩu mới</label>
+                            <input type="password" name="newPassword" class="form-control" required
+                                placeholder="••••••••">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn-submit">Lưu mật khẩu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openEditUserModal(id, lastName, firstName, username, email, role) {
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editUserLastName').value = lastName;
+            document.getElementById('editUserFirstName').value = firstName;
+            document.getElementById('editUserUsername').value = username;
+            document.getElementById('editUserEmail').value = email;
+            document.getElementById('editUserRole').value = role;
+        }
+
+        function openResetPasswordModal(id, username) {
+            document.getElementById('resetPasswordId').value = id;
+            document.getElementById('resetPasswordUsernameLabel').innerText = username;
+        }
+    </script>
 </body>
 
 </html>
