@@ -3,6 +3,7 @@ D:\Student grade management system\student-grade\src\main\java\com\example\stude
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\model\DataInitializer.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\model\Enrollment.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\model\Grade.java
+D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\model\Semester.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\model\Student.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\model\Subject.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\model\TeacherSubject.java
@@ -10,6 +11,7 @@ D:\Student grade management system\student-grade\src\main\java\com\example\stude
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\repository\SubjectRepository.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\service\ClassroomResource.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\service\EnrollmentResource.java
+D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\service\SemesterResource.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\service\StudentService.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\service\SubjectResource.java
 D:\Student grade management system\student-grade\src\main\java\com\example\studentgrade\service\UserResource.java

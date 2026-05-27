@@ -255,7 +255,8 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 14px;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
 
         .alert-danger {
@@ -282,7 +283,9 @@
 
         table {
             width: 100%;
+            min-width: 1000px;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         thead th {
@@ -295,6 +298,7 @@
             border-bottom: 1px solid var(--border);
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            white-space: nowrap;
         }
 
         tbody tr {
@@ -314,6 +318,13 @@
             padding: 14px 16px;
             font-size: 14px;
             color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        td:last-child {
+            overflow: visible;
         }
 
         .badge {
@@ -347,6 +358,21 @@
             stroke: currentColor;
             fill: none;
             stroke-width: 2;
+        }
+
+        .badge.good {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .badge.average {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge.bad {
+            background: #fef2f2;
+            color: #991b1b;
         }
 
         .actions {
@@ -506,6 +532,33 @@
             grid-template-columns: 1fr 1fr;
             gap: 16px;
         }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 10px;
+            gap: 4px;
+        }
+
+        .filter-btn {
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--card-bg);
+            color: var(--brand);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
 
@@ -542,6 +595,15 @@
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                 </svg>
                 Môn học
+            </a>
+            <a href="/semesters" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                Học kỳ
             </a>
         </nav>
         <div class="sidebar-footer">
@@ -585,10 +647,21 @@
                             <circle cx="11" cy="11" r="8" />
                             <line x1="21" y1="21" x2="16.65" y2="16.65" />
                         </svg>
+                        <input type="hidden" name="role" value="{role == 'all' ? '' : role}">
                         <input type="text" name="search" class="search-input"
                             placeholder="Tìm kiếm tên, username, email..." value="{search}">
                     </div>
                 </form>
+                <div class="filter-group">
+                    <a href="/users?role=all{search != null && search != '' ? '&search=' + search : ''}"
+                        class="filter-btn {#if role == null || role == 'all'}active{/if}">Tất cả</a>
+                    <a href="/users?role=STUDENT{search != null && search != '' ? '&search=' + search : ''}"
+                        class="filter-btn {#if role == 'STUDENT'}active{/if}">Sinh viên</a>
+                    <a href="/users?role=TEACHER{search != null && search != '' ? '&search=' + search : ''}"
+                        class="filter-btn {#if role == 'TEACHER'}active{/if}">Giáo viên</a>
+                    <a href="/users?role=ADMIN{search != null && search != '' ? '&search=' + search : ''}"
+                        class="filter-btn {#if role == 'ADMIN'}active{/if}">Admin</a>
+                </div>
                 <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
                     <svg viewBox="0 0 24 24">
                         <line x1="12" y1="5" x2="12" y2="19" />
@@ -602,19 +675,28 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Họ và tên</th>
-                            <th>Tên đăng nhập</th>
-                            <th>Email</th>
-                            <th>Vai trò</th>
-                            <th style="text-align:right;">Hành động</th>
+                            <th style="width: 8%;">ID</th>
+                            <th style="width: 22%;">Họ và tên</th>
+                            <th style="width: 15%;">Tên đăng nhập</th>
+                            <th style="width: 25%;">Email</th>
+                            <th style="width: 15%;">Vai trò</th>
+                            <th style="width: 15%; text-align:right;">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         {#for user in users}
                         <tr>
                             <td style="color:var(--text-muted);font-size:13px;">#{user.id}</td>
-                            <td class="fw-medium">{user.lastName} {user.firstName}</td>
+                            <td class="fw-medium">
+                                {#if user.role == 'STUDENT'}
+                                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#transcriptModal"
+                                    onclick="loadTranscript(`{user.id}`, `{user.lastName} {user.firstName}`)"
+                                    style="text-decoration: none; color: var(--brand);"
+                                    title="Nhấn để xem bảng điểm">{user.lastName} {user.firstName}</a>
+                                {#else}
+                                {user.lastName} {user.firstName}
+                                {/if}
+                            </td>
                             <td style="color:var(--text-muted);">{user.username}</td>
                             <td style="color:var(--text-muted);">{user.email}</td>
                             <td>
@@ -645,6 +727,19 @@
                             </td>
                             <td>
                                 <div class="actions">
+                                    {#if user.role == 'STUDENT'}
+                                    <button class="btn-icon" title="Xem bảng điểm" data-bs-toggle="modal"
+                                        data-bs-target="#transcriptModal"
+                                        onclick="loadTranscript(`{user.id}`, `{user.lastName} {user.firstName}`)">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            <polyline points="10 9 9 9 8 9"></polyline>
+                                        </svg>
+                                    </button>
+                                    {/if}
                                     <button class="btn-icon" title="Sửa thông tin" data-bs-toggle="modal"
                                         data-bs-target="#editUserModal"
                                         onclick="openEditUserModal(`{user.id}`, `{user.lastName}`, `{user.firstName}`, `{user.username}`, `{user.email}`, `{user.role}`)">
@@ -680,6 +775,27 @@
                     </tbody>
                 </table>
             </div>
+
+            {#if totalPages > 1}
+            <div class="pagination-wrap"
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <div style="font-size: 13px; color: var(--text-muted);">
+                    Trang <strong style="color: var(--text);">{currentPage}</strong> / {totalPages}
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    {#if currentPage > 1}
+                    <a href="/users?page={currentPage - 1}{search != null && search != '' ? '&search=' + search : ''}{role != null && role != 'all' ? '&role=' + role : ''}"
+                        class="btn-secondary"
+                        style="text-decoration: none; display: inline-flex; align-items: center;">Trang trước</a>
+                    {/if}
+                    {#if currentPage < totalPages} <a
+                        href="/users?page={currentPage + 1}{search != null && search != '' ? '&search=' + search : ''}{role != null && role != 'all' ? '&role=' + role : ''}"
+                        class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center;">
+                        Trang sau</a>
+                        {/if}
+                </div>
+            </div>
+            {/if}
         </div>
     </div>
 
@@ -828,6 +944,69 @@
         </div>
     </div>
 
+    <!-- Modal Xem Bảng Điểm -->
+    <div class="modal fade" id="transcriptModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bảng điểm sinh viên: <span id="tsStudentName"
+                            style="color: var(--brand);"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="background: var(--bg);">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px;">
+                        <div class="card" style="padding: 16px; text-align: center; margin-bottom: 0;">
+                            <div
+                                style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+                                GPA Hệ 10</div>
+                            <div id="tsGpa" style="font-size: 24px; font-weight: 600; color: var(--brand);">0.0</div>
+                        </div>
+                        <div class="card" style="padding: 16px; text-align: center; margin-bottom: 0;">
+                            <div
+                                style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+                                GPA Hệ 4</div>
+                            <div id="tsGpa4" style="font-size: 24px; font-weight: 600; color: var(--info);">0.0</div>
+                        </div>
+                        <div class="card" style="padding: 16px; text-align: center; margin-bottom: 0;">
+                            <div
+                                style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+                                Tín chỉ</div>
+                            <div id="tsCredits" style="font-size: 24px; font-weight: 600; color: var(--text);">0</div>
+                        </div>
+                        <div class="card" style="padding: 16px; text-align: center; margin-bottom: 0;">
+                            <div
+                                style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+                                Xếp loại</div>
+                            <div id="tsClass" style="font-size: 24px; font-weight: 600; color: var(--text);">-</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 12%;">Mã môn</th>
+                                    <th style="width: 25%;">Tên môn</th>
+                                    <th style="width: 8%;">TC</th>
+                                    <th style="width: 10%;">Chuyên cần</th>
+                                    <th style="width: 10%;">Giữa kỳ</th>
+                                    <th style="width: 10%;">Cuối kỳ</th>
+                                    <th style="width: 8%;">Hệ 10</th>
+                                    <th style="width: 8%;">Hệ 4</th>
+                                    <th style="width: 9%;">Điểm chữ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transcriptBody">
+                                <tr>
+                                    <td colspan="9" style="text-align: center;">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function openEditUserModal(id, lastName, firstName, username, email, role) {
@@ -842,6 +1021,43 @@
         function openResetPasswordModal(id, username) {
             document.getElementById('resetPasswordId').value = id;
             document.getElementById('resetPasswordUsernameLabel').innerText = username;
+        }
+
+        function loadTranscript(id, name) {
+            document.getElementById('tsStudentName').innerText = name;
+            document.getElementById('transcriptBody').innerHTML = '<tr><td colspan="9" style="text-align: center;">Đang tải dữ liệu...</td></tr>';
+
+            fetch('/api/student/' + id + '/transcript')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('tsGpa').innerText = data.gpa;
+                    document.getElementById('tsGpa4').innerText = data.gpa4;
+                    document.getElementById('tsCredits').innerText = data.credits;
+                    document.getElementById('tsClass').innerText = data.classification;
+
+                    if (data.transcript && data.transcript.length > 0) {
+                        let html = '';
+                        data.transcript.forEach(t => {
+                            html += '<tr>' +
+                                '<td><span class="code-badge">' + t.subjectCode + '</span></td>' +
+                                '<td style="font-weight: 500;">' + t.subjectName + '</td>' +
+                                '<td>' + t.credits + '</td>' +
+                                '<td>' + (t.attendanceScore !== null ? t.attendanceScore : '-') + '</td>' +
+                                '<td>' + (t.midtermScore !== null ? t.midtermScore : '-') + '</td>' +
+                                '<td>' + (t.finalExamScore !== null ? t.finalExamScore : '-') + '</td>' +
+                                '<td style="font-weight: 600;">' + (t.finalScore !== null ? t.finalScore : '-') + '</td>' +
+                                '<td style="font-weight: 600; color: var(--info);">' + (t.score4 !== null ? t.score4 : '-') + '</td>' +
+                                '<td><span class="badge ' + t.badgeClass + '">' + t.letterGrade + '</span></td>' +
+                                '</tr>';
+                        });
+                        document.getElementById('transcriptBody').innerHTML = html;
+                    } else {
+                        document.getElementById('transcriptBody').innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted);">Sinh viên chưa có điểm học phần nào.</td></tr>';
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('transcriptBody').innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Lỗi tải dữ liệu.</td></tr>';
+                });
         }
     </script>
 </body>
