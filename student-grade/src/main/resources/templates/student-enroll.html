@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kết quả học tập - EduManage</title>
+    <title>Đăng ký học phần - EduManage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap"
         rel="stylesheet">
@@ -248,108 +248,24 @@
             font-weight: 600;
         }
 
-        .badge.good {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge.na {
-            background: #f1f5f9;
-            color: #64748b;
-        }
-
-        .badge.bad {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
         .badge.average {
             background: #fef9c3;
             color: #854d0e;
         }
 
-        .semester-header {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8fafc;
-        }
-
-        /* Profile Modal Styles */
-        .user-badge {
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 8px;
+        .btn-submit {
+            background: var(--brand);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 16px;
+            font-weight: 600;
+            font-size: 13px;
             transition: background 0.15s;
         }
 
-        .user-badge:hover {
-            background: #f1f5f9;
-        }
-
-        .avatar-preview {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: var(--brand);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 600;
-            margin: 0 auto 16px;
-            border: 2px solid var(--border);
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .avatar-preview:hover {
-            opacity: 0.8;
-        }
-
-        .modal-content {
-            border: none;
-            border-radius: 16px;
-        }
-
-        .modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .modal-body {
-            padding: 24px;
-        }
-
-        .modal-footer {
-            padding: 16px 24px;
-            border-top: 1px solid var(--border);
-            background: #f8fafc;
-            border-radius: 0 0 16px 16px;
-        }
-
-        .form-control {
-            width: 100%;
-            height: 42px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            padding: 0 14px;
-            font-size: 14px;
-        }
-
-        .btn-submit {
-            height: 38px;
-            background: var(--brand);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 0 18px;
-            font-size: 14px;
-            font-weight: 600;
+        .btn-submit:hover {
+            background: #1741b6;
         }
     </style>
 </head>
@@ -362,7 +278,7 @@
         </div>
         <nav>
             <div class="nav-section">Sinh viên</div>
-            <a href="/student" class="nav-link active">
+            <a href="/student" class="nav-link">
                 <svg viewBox="0 0 24 24">
                     <rect x="3" y="3" width="7" height="7" />
                     <rect x="14" y="3" width="7" height="7" />
@@ -380,7 +296,7 @@
                 </svg>
                 Lớp đang tham gia
             </a>
-            <a href="/student/enroll" class="nav-link">
+            <a href="/student/enroll" class="nav-link active">
                 <svg viewBox="0 0 24 24">
                     <path d="M12 20h9"></path>
                     <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
@@ -409,9 +325,8 @@
 
     <div class="main">
         <div class="topbar">
-            <h1>Kết quả học tập</h1>
-            <div class="user-badge" title="{user.lastName} {user.firstName} - {user.email}" data-bs-toggle="modal"
-                data-bs-target="#profileModal">
+            <h1>Đăng ký học phần</h1>
+            <div class="user-badge" title="{user.lastName} {user.firstName}">
                 <span style="font-size:14px;color:var(--text-muted);">Xin chào,</span>
                 <span style="font-size:14px;font-weight:600;">{user.firstName}</span>
                 {#if user.avatar}
@@ -423,146 +338,117 @@
         </div>
 
         <div class="content">
-            {#for semester in semesters}
+            {#if pendingClasses.size() > 0}
             <div class="card">
-                <div class="semester-header">
-                    <div>
-                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: var(--brand);">{semester.name}
-                        </h3>
-                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Thời gian:
-                            {semester.startDate} - {semester.endDate}</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 13px; color: var(--text-muted);">Điểm TB Học kỳ (Hệ 10 / Hệ 4)</div>
-                        <div style="font-size: 18px; font-weight: 600; color: var(--text);">{semester.semesterGPA} /
-                            <span style="color: var(--info);">{semester.semesterGPA4}</span></div>
-                    </div>
-                </div>
+                <div
+                    style="padding: 16px 24px; border-bottom: 1px solid var(--border); background: #fffbeb; color: #b45309; font-weight: 600;">
+                    Các lớp đang chờ duyệt</div>
                 <table>
                     <thead>
                         <tr>
-                            <th>Mã môn</th>
-                            <th>Tên môn học</th>
-                            <th>Tín chỉ</th>
-                            <th>Điểm hệ 10</th>
-                            <th>Điểm hệ 4</th>
-                            <th>Điểm chữ</th>
+                            <th>Mã Lớp</th>
+                            <th>Tên Lớp Học</th>
+                            <th>Môn học</th>
+                            <th>Giảng viên</th>
+                            <th>Lịch học</th>
+                            <th>Sĩ số</th>
+                            <th>Trạng thái</th>
+                            <th style="text-align:right;">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {#for grade in semester.grades}
+                        {#for class in pendingClasses}
                         <tr>
-                            <td><span class="code-badge">{grade.subjectCode}</span></td>
-                            <td style="font-weight:500;">{grade.subjectName}</td>
-                            <td>{grade.credits}</td>
-                            <td>
-                                {#if grade.score}
-                                <span style="font-weight: 600;">{grade.score}</span>
-                                {#else}
-                                <span style="color: var(--text-muted);">Chưa có</span>
-                                {/if}
-                            </td>
-                            <td>
-                                {#if grade.getScore4}
-                                <span style="font-weight: 600; color: var(--info);">{grade.getScore4}</span>
-                                {#else}
-                                <span style="color: var(--text-muted);">-</span>
-                                {/if}
-                            </td>
-                            <td>
-                                <span class="badge {grade.badgeClass}">{grade.letterGrade}</span>
+                            <td><span class="code-badge">{class.id}</span></td>
+                            <td style="font-weight:600;color:var(--brand);">{class.name}</td>
+                            <td>{class.subject}</td>
+                            <td>{class.teacher}</td>
+                            <td style="color:var(--text-muted);">{class.schedule}</td>
+                            <td style="font-weight:600;">{class.enrolledCount}/{class.maxCapacity}</td>
+                            <td><span class="badge average">Chờ duyệt</span></td>
+                            <td style="text-align:right;">
+                                <form action="/student/enroll/cancel" method="post" style="display:inline;"
+                                    onsubmit="return confirm('Bạn có chắc chắn muốn hủy yêu cầu đăng ký lớp này?');">
+                                    <input type="hidden" name="classroomId" value="{class.id}">
+                                    <button type="submit" class="btn btn-secondary"
+                                        style="font-size: 12px; font-weight: 600; padding: 4px 10px; border: none; background: #fee2e2; color: #991b1b;">Hủy
+                                        đăng ký</button>
+                                </form>
                             </td>
                         </tr>
                         {/for}
                     </tbody>
                 </table>
             </div>
-            {/for}
-        </div>
-    </div>
+            {/if}
 
-    <!-- Modal Cập nhật thông tin -->
-    <div class="modal fade" id="profileModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="/student/profile" method="post" id="profileForm">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold">Thông tin cá nhân</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center">
-                            {#if user.avatar}
-                            <img src="{user.avatar}" id="avatarPreview" class="avatar-preview" alt="avatar"
-                                onclick="document.getElementById('avatarInput').click()" title="Nhấn để đổi ảnh">
-                            {#else}
-                            <div id="avatarPreview" class="avatar-preview"
-                                onclick="document.getElementById('avatarInput').click()" title="Nhấn để đổi ảnh">
-                                {#if user.firstName}{user.firstName.charAt(0)}{#else}U{/if}</div>
-                            {/if}
-                            <input type="file" id="avatarInput" accept="image/*" class="d-none">
-                            <input type="hidden" name="avatarBase64" id="avatarBase64">
-                            <button type="button" class="btn btn-sm btn-outline-primary mb-3"
-                                onclick="document.getElementById('avatarInput').click()">Thay đổi ảnh</button>
-                        </div>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold" style="font-size: 13px;">Họ và tên đệm</label>
-                                <input type="text" name="lastName" class="form-control" value="{user.lastName}"
-                                    required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold" style="font-size: 13px;">Tên</label>
-                                <input type="text" name="firstName" class="form-control" value="{user.firstName}"
-                                    required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold" style="font-size: 13px;">Tên đăng nhập</label>
-                                <input type="text" name="username" class="form-control" value="{user.username}"
-                                    required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold" style="font-size: 13px;">Mật khẩu (để trống nếu
-                                    không đổi)</label>
-                                <input type="password" name="password" class="form-control" placeholder="••••••••">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" style="border: 1px solid var(--border);"
-                            data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn-submit">Lưu thay đổi</button>
-                    </div>
-                </form>
+            <div class="card">
+                <div style="padding: 16px 24px; border-bottom: 1px solid var(--border); font-weight: 600;">Danh sách lớp
+                    có thể đăng ký</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã Lớp</th>
+                            <th>Tên Lớp Học</th>
+                            <th>Môn học</th>
+                            <th>Giảng viên</th>
+                            <th>Lịch học</th>
+                            <th>Sĩ số</th>
+                            <th style="text-align:right;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#for class in availableClasses}
+                        <tr>
+                            <td><span class="code-badge">{class.id}</span></td>
+                            <td style="font-weight:600;color:var(--brand);">{class.name}</td>
+                            <td>{class.subject}</td>
+                            <td>{class.teacher}</td>
+                            <td style="color:var(--text-muted);">{class.schedule}</td>
+                            <td>
+                                {#if class.isFull}
+                                <span
+                                    style="color: var(--danger); font-weight: bold;">{class.enrolledCount}/{class.maxCapacity}
+                                    (Đã đầy)</span>
+                                {#else}
+                                <span
+                                    style="color: #166534; font-weight: 600;">{class.enrolledCount}/{class.maxCapacity}</span>
+                                {/if}
+                            </td>
+                            <td style="text-align:right;">
+                                {#if class.isFull}
+                                <button class="btn btn-secondary"
+                                    style="font-size: 13px; font-weight: 600; padding: 6px 16px; border: none;"
+                                    disabled>Đã đầy</button>
+                                {#else}
+                                <form action="/enrollments/add" method="post" style="display:inline;"
+                                    onsubmit="return confirm('Bạn xác nhận muốn đăng ký học phần này?');">
+                                    <input type="hidden" name="classroomId" value="{class.id}">
+                                    <button type="submit" class="btn-submit">Đăng ký</button>
+                                </form>
+                                {/if}
+                            </td>
+                        </tr>
+                        {/for}
+                        {#if availableClasses.size() == 0}
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Chưa có
+                                học phần để đăng ký hoặc chưa đến lịch đăng ký.</td>
+                        </tr>
+                        {/if}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Xử lý chuyển file ảnh sang Base64 để lưu tối ưu cho test UI
-        document.getElementById('avatarInput').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (evt) {
-                    const base64String = evt.target.result;
-                    document.getElementById('avatarBase64').value = base64String;
-
-                    const preview = document.getElementById('avatarPreview');
-                    if (preview.tagName === 'DIV') {
-                        const img = document.createElement('img');
-                        img.id = 'avatarPreview';
-                        img.className = 'avatar-preview';
-                        img.src = base64String;
-                        preview.parentNode.replaceChild(img, preview);
-                    } else {
-                        preview.src = base64String;
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        const urlParams = new URLSearchParams(window.location.search);
+        const err = urlParams.get('error');
+        if (err === 'deadline') alert('Lỗi: Đã hết hạn đăng ký! (Phải đăng ký trước 7 ngày)');
+        if (err === 'limit') alert('Lỗi: Lớp học đã đủ 10 sinh viên!');
+        if (err === 'notfound') alert('Lỗi: Không tìm thấy lớp học!');
+        if (err === 'invalid_user') alert('Lỗi: Tài khoản không hợp lệ hoặc phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!');
     </script>
 </body>
 

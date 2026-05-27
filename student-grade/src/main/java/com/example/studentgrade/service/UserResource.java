@@ -9,6 +9,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import jakarta.persistence.EntityManager;
 
 @Path("/users")
 @Produces(MediaType.TEXT_HTML)
@@ -20,22 +24,66 @@ public class UserResource {
     Template usersTemplate;
     @Inject
     StudentService userService;
+    @Inject
+    EntityManager em;
 
     @GET
-    public String getUsers(@QueryParam("search") String search) {
-        List<Student> users;
+    public String getUsers(@QueryParam("search") String search, @QueryParam("role") String role,
+            @QueryParam("page") @DefaultValue("1") int page) {
+        int pageSize = 10;
+
+        String qlString = "SELECT u FROM Student u";
+        String countQlString = "SELECT COUNT(u) FROM Student u";
+
+        List<String> conditions = new ArrayList<>();
+        Map<String, Object> params = new HashMap<>();
+
+        // Điều kiện 1: Tìm kiếm theo chữ
         if (search != null && !search.trim().isEmpty()) {
-            users = userService.searchUsers(search);
-        } else {
-            users = userService.getAllUsers();
+            conditions.add(
+                    "(lower(u.firstName) LIKE :search OR lower(u.lastName) LIKE :search OR lower(u.username) LIKE :search)");
+            params.put("search", "%" + search.toLowerCase() + "%");
         }
 
-        String safeSearch = search == null ? "" : search;
+        // Điều kiện 2: Lọc theo vai trò (Role)
+        if (role != null && !role.trim().isEmpty() && !role.equals("all")) {
+            conditions.add("u.role = :role");
+            params.put("role", role);
+        }
 
-        return usersTemplate
-                .data("users", users)
-                .data("search", safeSearch)
-                .data("error", "") // Tránh lỗi Null trong template
+        // Gộp các điều kiện
+        if (!conditions.isEmpty()) {
+            String whereClause = " WHERE " + String.join(" AND ", conditions);
+            qlString += whereClause;
+            countQlString += whereClause;
+        }
+
+        jakarta.persistence.TypedQuery<Long> countQuery = em.createQuery(countQlString, Long.class);
+        params.forEach(countQuery::setParameter);
+
+        Long totalRecords = countQuery.getSingleResult();
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+        if (page < 1)
+            page = 1;
+        if (page > totalPages && totalPages > 0)
+            page = totalPages;
+
+        qlString += " ORDER BY u.id DESC";
+        jakarta.persistence.TypedQuery<Student> query = em.createQuery(qlString, Student.class);
+        params.forEach(query::setParameter);
+
+        List<Student> users = query
+                .setFirstResult((page - 1) * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+
+        return usersTemplate.data("users", users)
+                .data("search", search == null ? "" : search)
+                .data("role", role == null ? "all" : role)
+                .data("currentPage", page)
+                .data("totalPages", totalPages)
+                .data("error", "") // Tránh lỗi null báo ngoài UI
                 .render();
     }
 

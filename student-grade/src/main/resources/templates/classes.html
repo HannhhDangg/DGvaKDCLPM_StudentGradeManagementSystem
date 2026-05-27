@@ -222,12 +222,15 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 14px;
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
 
         table {
             width: 100%;
+            min-width: 800px;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         thead th {
@@ -240,6 +243,7 @@
             border-bottom: 1px solid var(--border);
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            white-space: nowrap;
         }
 
         tbody tr {
@@ -259,6 +263,13 @@
             padding: 14px 24px;
             font-size: 14px;
             color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        td:last-child {
+            overflow: visible;
         }
 
         .actions {
@@ -437,6 +448,16 @@
                 </svg>
                 Quản lý Lớp học
             </a>
+            <a href="/teacher/enrollments" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Duyệt đăng ký
+            </a>
         </nav>
         <div class="sidebar-footer">
             <a href="/login" class="logout-btn">
@@ -462,7 +483,7 @@
                 {#if user.avatar}
                 <img src="{user.avatar}" class="avatar" style="object-fit: cover;" alt="avatar">
                 {#else}
-                <div class="avatar">{user.firstName.charAt(0)}</div>
+                <div class="avatar">{#if user.firstName}{user.firstName.charAt(0)}{#else}U{/if}</div>
                 {/if}
             </div>
         </div>
@@ -482,11 +503,11 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Tên Lớp Học</th>
-                            <th>Mô tả</th>
-                            <th>Giáo viên (ID)</th>
-                            <th style="text-align:right;">Hành động</th>
+                            <th style="width: 8%;">ID</th>
+                            <th style="width: 25%;">Tên Lớp Học</th>
+                            <th style="width: 35%;">Mô tả</th>
+                            <th style="width: 17%;">Giáo viên (ID)</th>
+                            <th style="width: 15%; text-align:right;">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -494,13 +515,14 @@
                         <tr>
                             <td style="color:var(--text-muted);font-size:13px;">#{classroom.id}</td>
                             <td style="font-weight:600;color:var(--brand);">{classroom.name}</td>
-                            <td style="color:var(--text-muted);">{classroom.description}</td>
+                            <td style="color:var(--text-muted);" title="{classroom.description}">
+                                {classroom.description}</td>
                             <td>{classroom.teacherId ?: 'Chưa phân công'}</td>
                             <td>
                                 <div class="actions">
                                     <button class="btn-icon" title="Sửa" data-bs-toggle="modal"
                                         data-bs-target="#editClassModal"
-                                        onclick="openEditClassModal(`{classroom.id}`, `{classroom.name}`, `{classroom.description ?: ''}`, `{classroom.startDate ?: ''}`, `{classroom.endDate ?: ''}`)">
+                                        onclick="openEditClassModal(`{classroom.id}`, `{classroom.name}`, `{classroom.description ?: ''}`, `{classroom.semesterId ?: ''}`)">
                                         <svg viewBox="0 0 24 24">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -525,6 +547,25 @@
                     </tbody>
                 </table>
             </div>
+
+            {#if totalPages > 1}
+            <div class="pagination-wrap"
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <div style="font-size: 13px; color: var(--text-muted);">
+                    Trang <strong style="color: var(--text);">{currentPage}</strong> / {totalPages}
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    {#if currentPage > 1}
+                    <a href="/classes?page={currentPage - 1}" class="btn-secondary"
+                        style="text-decoration: none; display: inline-flex; align-items: center;">Trang trước</a>
+                    {/if}
+                    {#if currentPage < totalPages} <a href="/classes?page={currentPage + 1}" class="btn-secondary"
+                        style="text-decoration: none; display: inline-flex; align-items: center;">Trang sau</a>
+                        {/if}
+                </div>
+            </div>
+            {/if}
+
         </div>
     </div>
 
@@ -557,15 +598,14 @@
                             <small class="text-muted" style="font-size: 11px; display: block; margin-top: 4px;">Tên lớp
                                 sẽ được tạo tự động: [Tên môn học] ([Mã nhóm])</small>
                         </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Ngày bắt đầu</label>
-                                <input type="date" name="startDate" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Ngày kết thúc</label>
-                                <input type="date" name="endDate" class="form-control" required>
-                            </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-semibold">Học kỳ sắp tới</label>
+                            <select name="semesterId" class="form-control" required>
+                                {#for semester in semesters}
+                                <option value="{semester.id}">{semester.name} ({semester.startDate} đến
+                                    {semester.endDate})</option>
+                                {/for}
+                            </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label fw-semibold">Mô tả chi tiết</label>
@@ -605,15 +645,14 @@
                             <label class="form-label fw-semibold">Tên lớp</label>
                             <input type="text" name="name" id="editClassName" class="form-control" required>
                         </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Ngày bắt đầu</label>
-                                <input type="date" name="startDate" id="editClassStart" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Ngày kết thúc</label>
-                                <input type="date" name="endDate" id="editClassEnd" class="form-control" required>
-                            </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-semibold">Học kỳ</label>
+                            <select name="semesterId" id="editClassSemester" class="form-control" required>
+                                {#for semester in semesters}
+                                <option value="{semester.id}">{semester.name} ({semester.startDate} đến
+                                    {semester.endDate})</option>
+                                {/for}
+                            </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label fw-semibold">Mô tả chi tiết</label>
@@ -654,7 +693,7 @@
                             {#else}
                             <div id="avatarPreview" class="avatar-preview"
                                 onclick="document.getElementById('avatarInput').click()" title="Nhấn để đổi ảnh">
-                                {user.firstName.charAt(0)}</div>
+                                {#if user.firstName}{user.firstName.charAt(0)}{#else}U{/if}</div>
                             {/if}
                             <input type="file" id="avatarInput" accept="image/*" class="d-none">
                             <input type="hidden" name="avatarBase64" id="avatarBase64">
@@ -714,32 +753,12 @@
             }
         }
 
-        function openEditClassModal(id, name, desc, start, end) {
+        function openEditClassModal(id, name, desc, semesterId) {
             document.getElementById('editClassId').value = id;
             document.getElementById('editClassName').value = name;
             document.getElementById('editClassDesc').value = desc;
-            document.getElementById('editClassStart').value = start;
-            document.getElementById('editClassEnd').value = end;
+            if (semesterId) document.getElementById('editClassSemester').value = semesterId;
         }
-
-        document.querySelector('form[action="/classes/add"]').addEventListener('submit', function (e) {
-            const startDate = document.querySelector('input[name="startDate"]').value;
-            const endDate = document.querySelector('input[name="endDate"]').value;
-            if (startDate && endDate) {
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-                const diffTime = end - start;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                if (diffTime <= 0) {
-                    e.preventDefault();
-                    alert('Lỗi: Ngày kết thúc phải sau ngày bắt đầu!');
-                } else if (diffDays < 60) {
-                    e.preventDefault();
-                    alert('Lỗi: Ngày bắt đầu và ngày kết thúc phải cách nhau ít nhất 60 ngày!');
-                }
-            }
-        });
     </script>
 </body>
 

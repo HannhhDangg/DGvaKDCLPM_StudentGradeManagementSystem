@@ -26,9 +26,24 @@ public class SubjectResource {
     Template subjectsTemplate;
 
     @GET
-    public String getSubjectsPage() {
-        List<Subject> subjects = em.createQuery("SELECT s FROM Subject s", Subject.class).getResultList();
-        return subjectsTemplate.data("subjects", subjects).render();
+    public String getSubjectsPage(@QueryParam("page") @DefaultValue("1") int page) {
+        int pageSize = 10;
+
+        Long totalRecords = em.createQuery("SELECT COUNT(s) FROM Subject s", Long.class).getSingleResult();
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+        if (page < 1)
+            page = 1;
+        if (page > totalPages && totalPages > 0)
+            page = totalPages;
+
+        List<Subject> subjects = em.createQuery("SELECT s FROM Subject s ORDER BY s.id DESC", Subject.class)
+                .setFirstResult((page - 1) * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+        return subjectsTemplate.data("subjects", subjects)
+                .data("currentPage", page)
+                .data("totalPages", totalPages).render();
     }
 
     @POST

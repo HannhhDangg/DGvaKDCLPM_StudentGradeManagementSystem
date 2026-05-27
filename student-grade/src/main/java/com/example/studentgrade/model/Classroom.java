@@ -18,6 +18,8 @@ public class Classroom {
     private Long teacherId; // Liên kết tới ID của User có role TEACHER
     private Long subjectId; // Môn học của lớp này
     private String subjectName; // Tên môn học để hiển thị
+    private Long semesterId; // ID Học kỳ
+    private String semesterName; // Tên học kỳ
     private String startDate; // Ngày bắt đầu
     private String endDate; // Ngày kết thúc
 
@@ -68,6 +70,22 @@ public class Classroom {
 
     public void setSubjectName(String subjectName) {
         this.subjectName = subjectName;
+    }
+
+    public Long getSemesterId() {
+        return semesterId;
+    }
+
+    public void setSemesterId(Long semesterId) {
+        this.semesterId = semesterId;
+    }
+
+    public String getSemesterName() {
+        return semesterName;
+    }
+
+    public void setSemesterName(String semesterName) {
+        this.semesterName = semesterName;
     }
 
     public String getStartDate() {

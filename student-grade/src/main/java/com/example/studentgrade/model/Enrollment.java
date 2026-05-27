@@ -15,6 +15,7 @@ public class Enrollment {
 
     private Long studentId;
     private Long classroomId;
+    private String status = "PENDING"; // PENDING, APPROVED, REJECTED
 
     public Long getId() {
         return id;
@@ -38,5 +39,13 @@ public class Enrollment {
 
     public void setClassroomId(Long classroomId) {
         this.classroomId = classroomId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
