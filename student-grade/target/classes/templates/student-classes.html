@@ -282,6 +282,21 @@
             padding: 0 14px;
             font-size: 14px;
         }
+
+        .btn-secondary {
+            height: 38px;
+            background: white;
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 0 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -419,6 +434,23 @@
             {#if ongoingClasses.size() == 0 && completedClasses.size() == 0}
             <div class="card" style="padding: 30px; text-align: center; color: var(--text-muted);">
                 Bạn chưa ghi danh vào lớp học nào.
+            </div>
+            {/if}
+
+            {#if totalPages > 1}
+            <div class="pagination-wrap"
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <div style="font-size: 13px; color: var(--text-muted);">
+                    Trang <strong style="color: var(--text);">{currentPage}</strong> / {totalPages}
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    {#if currentPage > 1}
+                    <a href="/student/classes?page={currentPage - 1}" class="btn-secondary">Trang trước</a>
+                    {/if}
+                    {#if currentPage < totalPages} <a href="/student/classes?page={currentPage + 1}"
+                        class="btn-secondary">Trang sau</a>
+                        {/if}
+                </div>
             </div>
             {/if}
         </div>

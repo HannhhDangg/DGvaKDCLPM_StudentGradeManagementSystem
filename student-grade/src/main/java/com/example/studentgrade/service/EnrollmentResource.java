@@ -27,8 +27,6 @@ public class EnrollmentResource {
             @CookieParam("logged_in_username") String cookieUsername,
             @FormParam("classroomId") String classroomIdStr) {
 
-        // Lấy thông tin sinh viên trực tiếp từ Cookie thay vì từ Form UI (An toàn tuyệt
-        // đối)
         String username = cookieUsername != null ? cookieUsername : "student_1";
         Student student = null;
         try {

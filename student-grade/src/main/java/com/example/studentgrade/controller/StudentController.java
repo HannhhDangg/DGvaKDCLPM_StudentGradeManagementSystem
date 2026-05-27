@@ -363,7 +363,9 @@ public class StudentController {
             }
 
             String semName = c.getSemesterName() != null ? c.getSemesterName() : "Không xác định";
-            classes.add(new TeacherClassDTO(c.getName(), semName, studentGrades));
+            String schedule = (c.getStartDate() != null ? c.getStartDate() : "Chưa rõ") + " - "
+                    + (c.getEndDate() != null ? c.getEndDate() : "Chưa rõ");
+            classes.add(new TeacherClassDTO(c.getName(), semName, schedule, studentGrades));
         }
 
         // Tính tổng số lớp (tất cả) của giáo viên này
@@ -550,13 +552,34 @@ public class StudentController {
     @GET
     @Path("/student/classes")
     @Produces(MediaType.TEXT_HTML)
-    public String getStudentClasses(@CookieParam("logged_in_username") String cookieUsername) {
+    public String getStudentClasses(
+            @CookieParam("logged_in_username") String cookieUsername,
+            @QueryParam("page") @DefaultValue("1") int page) {
         Student student = getLoggedStudent(cookieUsername);
-        List<Classroom> classrooms = em.createQuery(
-                "SELECT c FROM Classroom c WHERE c.id IN (SELECT e.classroomId FROM Enrollment e WHERE e.studentId = :sid AND e.status = 'APPROVED') ORDER BY c.startDate DESC",
-                Classroom.class)
+
+        int pageSize = 10;
+        Long totalRecords = em.createQuery(
+                "SELECT COUNT(c) FROM Classroom c WHERE c.id IN (SELECT e.classroomId FROM Enrollment e WHERE e.studentId = :sid AND e.status = 'APPROVED')",
+                Long.class)
                 .setParameter("sid", student.getId())
-                .getResultList();
+                .getSingleResult();
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+        if (page < 1)
+            page = 1;
+        if (page > totalPages && totalPages > 0)
+            page = totalPages;
+
+        List<Classroom> classrooms = new ArrayList<>();
+        if (totalRecords > 0) {
+            classrooms = em.createQuery(
+                    "SELECT c FROM Classroom c WHERE c.id IN (SELECT e.classroomId FROM Enrollment e WHERE e.studentId = :sid AND e.status = 'APPROVED') ORDER BY c.startDate DESC",
+                    Classroom.class)
+                    .setParameter("sid", student.getId())
+                    .setFirstResult((page - 1) * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        }
 
         List<StudentClassDTO> ongoingClasses = new ArrayList<>();
         List<StudentClassDTO> completedClasses = new ArrayList<>();
@@ -587,6 +610,8 @@ public class StudentController {
         return studentClasses.data("ongoingClasses", ongoingClasses)
                 .data("completedClasses", completedClasses)
                 .data("user", student)
+                .data("currentPage", page)
+                .data("totalPages", totalPages)
                 .render();
     }
 
@@ -654,7 +679,8 @@ public class StudentController {
     @Path("/student/enroll/cancel")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Transactional
-    public Response cancelEnrollment(@CookieParam("logged_in_username") String cookieUsername,
+    public Response cancelEnrollment(
+            @CookieParam("logged_in_username") String cookieUsername,
             @FormParam("classroomId") Long classroomId) {
         Student student = getLoggedStudent(cookieUsername);
         if (student != null && classroomId != null) {
@@ -1023,11 +1049,13 @@ public class StudentController {
     public static class TeacherClassDTO {
         public String className;
         public String semesterName;
+        public String schedule;
         public List<StudentGradeDTO> students;
 
-        public TeacherClassDTO(String className, String semesterName, List<StudentGradeDTO> students) {
+        public TeacherClassDTO(String className, String semesterName, String schedule, List<StudentGradeDTO> students) {
             this.className = className;
             this.semesterName = semesterName;
+            this.schedule = schedule;
             this.students = students;
         }
     }

@@ -628,7 +628,12 @@
 
             {#for class in classes}
             <div class="card" style="margin-bottom: 24px;">
-                <div class="class-header">Lớp: {class.className}</div>
+                <div class="class-header">
+                    Lớp: {class.className}
+                    <span
+                        style="font-size: 14px; color: var(--text-muted); font-weight: normal; margin-left: 10px;">Thời
+                        gian: {class.schedule}</span>
+                </div>
                 <table>
                     <thead>
                         <tr>

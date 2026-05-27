@@ -506,7 +506,6 @@
                             <th style="width: 8%;">ID</th>
                             <th style="width: 25%;">Tên Lớp Học</th>
                             <th style="width: 35%;">Mô tả</th>
-                            <th style="width: 17%;">Giáo viên (ID)</th>
                             <th style="width: 15%; text-align:right;">Hành động</th>
                         </tr>
                     </thead>
@@ -517,7 +516,6 @@
                             <td style="font-weight:600;color:var(--brand);">{classroom.name}</td>
                             <td style="color:var(--text-muted);" title="{classroom.description}">
                                 {classroom.description}</td>
-                            <td>{classroom.teacherId ?: 'Chưa phân công'}</td>
                             <td>
                                 <div class="actions">
                                     <button class="btn-icon" title="Sửa" data-bs-toggle="modal"

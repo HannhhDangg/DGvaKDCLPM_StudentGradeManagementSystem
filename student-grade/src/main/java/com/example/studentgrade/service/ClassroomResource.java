@@ -32,19 +32,6 @@ public class ClassroomResource {
     @GET
     public String getClassesPage(@CookieParam("logged_in_username") String cookieUsername,
             @QueryParam("page") @DefaultValue("1") int page) {
-        int pageSize = 10;
-        Long totalRecords = em.createQuery("SELECT COUNT(c) FROM Classroom c", Long.class).getSingleResult();
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-
-        if (page < 1)
-            page = 1;
-        if (page > totalPages && totalPages > 0)
-            page = totalPages;
-
-        List<Classroom> classes = em.createQuery("SELECT c FROM Classroom c ORDER BY c.startDate DESC", Classroom.class)
-                .setFirstResult((page - 1) * pageSize)
-                .setMaxResults(pageSize)
-                .getResultList();
 
         String username = cookieUsername != null ? cookieUsername : "teacher_toan";
         Student teacher;
@@ -60,6 +47,25 @@ public class ClassroomResource {
         }
 
         Long loggedTeacherId = teacher.getId();
+
+        int pageSize = 10;
+        Long totalRecords = em.createQuery("SELECT COUNT(c) FROM Classroom c WHERE c.teacherId = :tid", Long.class)
+                .setParameter("tid", loggedTeacherId)
+                .getSingleResult();
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+        if (page < 1)
+            page = 1;
+        if (page > totalPages && totalPages > 0)
+            page = totalPages;
+
+        List<Classroom> classes = em
+                .createQuery("SELECT c FROM Classroom c WHERE c.teacherId = :tid ORDER BY c.startDate DESC",
+                        Classroom.class)
+                .setParameter("tid", loggedTeacherId)
+                .setFirstResult((page - 1) * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
 
         // Truy vấn bảng trung gian TeacherSubject để lấy danh sách môn học được phép
         // dạy
@@ -154,9 +160,19 @@ public class ClassroomResource {
     @POST
     @Path("/delete/{id}")
     @Transactional
-    public Response deleteClassroom(@PathParam("id") Long id) {
+    public Response deleteClassroom(@CookieParam("logged_in_username") String cookieUsername,
+            @PathParam("id") Long id) {
+        String username = cookieUsername != null ? cookieUsername : "teacher_toan";
+        Student teacher = null;
+        try {
+            teacher = em.createQuery("SELECT s FROM Student s WHERE s.username = :username", Student.class)
+                    .setParameter("username", username)
+                    .setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+        }
+
         Classroom classroom = em.find(Classroom.class, id);
-        if (classroom != null) {
+        if (classroom != null && teacher != null && teacher.getId().equals(classroom.getTeacherId())) {
             em.remove(classroom);
         }
         return Response.seeOther(URI.create("/classes")).build();
@@ -167,12 +183,23 @@ public class ClassroomResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Transactional
     public Response editClassroom(
+            @CookieParam("logged_in_username") String cookieUsername,
             @FormParam("id") Long id,
             @FormParam("name") String name,
             @FormParam("semesterId") Long semesterId,
             @FormParam("description") String description) {
+
+        String username = cookieUsername != null ? cookieUsername : "teacher_toan";
+        Student teacher = null;
+        try {
+            teacher = em.createQuery("SELECT s FROM Student s WHERE s.username = :username", Student.class)
+                    .setParameter("username", username)
+                    .setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+        }
+
         Classroom classroom = em.find(Classroom.class, id);
-        if (classroom != null) {
+        if (classroom != null && teacher != null && teacher.getId().equals(classroom.getTeacherId())) {
             classroom.setName(name);
             classroom.setDescription(description);
 
