@@ -20,6 +20,7 @@
             --bg: #f1f5f9;
             --card-bg: #ffffff;
             --danger: #dc2626;
+            --info: #0891b2;
         }
 
         * {
@@ -205,6 +206,11 @@
             text-align: center;
         }
 
+        .stat-card.blue { border-left: 4px solid var(--brand); }
+        .stat-card.teal { border-left: 4px solid var(--info); }
+        .stat-card.purple { border-left: 4px solid #8b5cf6; }
+        .stat-card.orange { border-left: 4px solid #f59e0b; }
+
         .stat-title {
             font-size: 13px;
             color: var(--text-muted);
@@ -384,6 +390,12 @@
                 </svg>
                 Bảng điểm chi tiết
             </a>
+            <a href="/student/tuition" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                Học phí
+            </a>
         </nav>
         <div class="sidebar-footer">
             <a href="/login" class="logout-btn">
@@ -414,19 +426,19 @@
 
         <div class="content">
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card blue">
                     <div class="stat-title">Điểm TB tích lũy (Hệ 10)</div>
                     <div class="stat-value">{cumulativeGPA}</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card teal">
                     <div class="stat-title">Điểm TB tích lũy (Hệ 4)</div>
                     <div class="stat-value" style="color: var(--info);">{cumulativeGPA4}</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card purple">
                     <div class="stat-title">Tổng tín chỉ tích lũy</div>
                     <div class="stat-value" style="color: var(--text);">{totalCredits}</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card orange">
                     <div class="stat-title">Xếp loại học lực</div>
                     <div class="stat-value" style="color: var(--text);">{classification}</div>
                 </div>

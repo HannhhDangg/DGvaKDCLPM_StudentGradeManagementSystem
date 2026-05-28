@@ -4,26 +4,24 @@ import com.example.studentgrade.model.Classroom;
 import com.example.studentgrade.model.Student;
 import com.example.studentgrade.model.Semester;
 import com.example.studentgrade.model.Subject;
-import com.example.studentgrade.controller.StudentController;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
-import io.quarkus.qute.TemplateInstance;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 @Path("/classes")
 @Produces(MediaType.TEXT_HTML)
 public class ClassroomResource {
 
     @Inject
-    EntityManager em;
+    ClassroomService classroomService;
 
     @Inject
     @Location("classes")
@@ -31,27 +29,17 @@ public class ClassroomResource {
 
     @GET
     public String getClassesPage(@CookieParam("logged_in_username") String cookieUsername,
-            @QueryParam("page") @DefaultValue("1") int page) {
+            @QueryParam("page") @DefaultValue("1") int page,
+            @QueryParam("subjectId") Long subjectId,
+            @QueryParam("semesterId") Long semesterId) {
 
         String username = cookieUsername != null ? cookieUsername : "teacher_toan";
-        Student teacher;
-        try {
-            teacher = em.createQuery("SELECT s FROM Student s WHERE s.username = :username", Student.class)
-                    .setParameter("username", username)
-                    .setMaxResults(1).getSingleResult();
-        } catch (Exception e) {
-            teacher = new Student();
-            teacher.setId(0L); // Tránh lỗi null nếu DB chưa kịp tạo
-            teacher.setFirstName("User");
-            teacher.setLastName("Teacher");
-        }
+        Student teacher = classroomService.getTeacherByUsername(username);
 
         Long loggedTeacherId = teacher.getId();
 
         int pageSize = 10;
-        Long totalRecords = em.createQuery("SELECT COUNT(c) FROM Classroom c WHERE c.teacherId = :tid", Long.class)
-                .setParameter("tid", loggedTeacherId)
-                .getSingleResult();
+        Long totalRecords = classroomService.countClassesByTeacher(loggedTeacherId, subjectId, semesterId);
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
         if (page < 1)
@@ -59,38 +47,48 @@ public class ClassroomResource {
         if (page > totalPages && totalPages > 0)
             page = totalPages;
 
-        List<Classroom> classes = em
-                .createQuery("SELECT c FROM Classroom c WHERE c.teacherId = :tid ORDER BY c.startDate DESC",
-                        Classroom.class)
-                .setParameter("tid", loggedTeacherId)
-                .setFirstResult((page - 1) * pageSize)
-                .setMaxResults(pageSize)
-                .getResultList();
+        List<Classroom> classesOnPage = classroomService.getClassesByTeacher(loggedTeacherId, subjectId, semesterId,
+                page, pageSize);
+        List<Subject> subjects = classroomService.getSubjectsByTeacher(loggedTeacherId);
+        List<Semester> semesters = classroomService.getAllSemesters();
 
-        // Truy vấn bảng trung gian TeacherSubject để lấy danh sách môn học được phép
-        // dạy
-        List<Subject> subjects = em.createQuery(
-                "SELECT s FROM Subject s JOIN TeacherSubject ts ON s.id = ts.subjectId WHERE ts.teacherId = :tid",
-                Subject.class)
-                .setParameter("tid", loggedTeacherId)
-                .getResultList();
+        // Phân loại lớp học thành các nhóm: sắp diễn ra, đang diễn ra và đã kết thúc
+        // để giao diện có thể hiển thị rõ ràng hơn cho giáo viên.
+        List<Classroom> upcomingClasses = new ArrayList<>();
+        List<Classroom> ongoingClasses = new ArrayList<>();
+        List<Classroom> pastClasses = new ArrayList<>();
+        String currentDate = LocalDate.now().toString();
 
-        List<Semester> semesters = em.createQuery("SELECT s FROM Semester s ORDER BY s.startDate DESC", Semester.class)
-                .getResultList();
+        for (Classroom c : classesOnPage) {
+            String startDate = c.getStartDate();
+            String endDate = c.getEndDate();
 
-        return classesTemplate.data("classes", classes)
+            if (endDate != null && !endDate.isEmpty() && endDate.compareTo(currentDate) < 0) {
+                pastClasses.add(c);
+            } else if (startDate != null && !startDate.isEmpty() && startDate.compareTo(currentDate) > 0) {
+                upcomingClasses.add(c);
+            } else {
+                ongoingClasses.add(c);
+            }
+        }
+
+        return classesTemplate.data("classes", classesOnPage) // Giữ lại "classes" để tương thích ngược với template cũ
+                .data("upcomingClasses", upcomingClasses)
+                .data("ongoingClasses", ongoingClasses)
+                .data("pastClasses", pastClasses)
                 .data("subjects", subjects)
                 .data("semesters", semesters)
                 .data("user", teacher) // Truyền thông tin user thực tế ra giao diện
                 .data("currentPage", page)
                 .data("totalPages", totalPages)
+                .data("selectedSubjectId", subjectId)
+                .data("selectedSemesterId", semesterId)
                 .render();
     }
 
     @POST
     @Path("/add")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Transactional
     public Response addClassroom(
             @CookieParam("logged_in_username") String cookieUsername,
             @FormParam("subjectId") Long subjectId,
@@ -100,88 +98,23 @@ public class ClassroomResource {
             @FormParam("description") String description) {
 
         String username = cookieUsername != null ? cookieUsername : "teacher_toan";
-        Student creator = null;
-        try {
-            creator = em.createQuery("SELECT s FROM Student s WHERE s.username = :username", Student.class)
-                    .setParameter("username", username)
-                    .setMaxResults(1).getSingleResult();
-        } catch (Exception e) {
-        }
-
-        Classroom classroom = new Classroom();
-        // Tự động ghép tên môn học và mã nhóm để tạo tên Lớp
-        classroom.setName(subjectName + " (" + classCode + ")");
-        classroom.setSubjectId(subjectId);
-        classroom.setSubjectName(subjectName);
-        classroom.setDescription(description);
-
-        if (semesterId != null) {
-            Semester sem = em.find(Semester.class, semesterId);
-            if (sem != null) {
-                classroom.setSemesterId(sem.getId());
-                classroom.setSemesterName(sem.getName());
-                classroom.setStartDate(sem.getStartDate());
-                classroom.setEndDate(sem.getEndDate());
-            }
-        } else {
-            // Tự động gán cho Học kỳ hiện hành hoặc sắp tới
-            String currentDate = java.time.LocalDate.now().toString();
-            List<Semester> sems = em
-                    .createQuery("SELECT s FROM Semester s WHERE s.endDate >= :currentDate ORDER BY s.startDate ASC",
-                            Semester.class)
-                    .setParameter("currentDate", currentDate)
-                    .getResultList();
-            if (!sems.isEmpty()) {
-                classroom.setSemesterId(sems.get(0).getId());
-                classroom.setSemesterName(sems.get(0).getName());
-                classroom.setStartDate(sems.get(0).getStartDate());
-                classroom.setEndDate(sems.get(0).getEndDate());
-            } else {
-                List<Semester> allSems = em
-                        .createQuery("SELECT s FROM Semester s ORDER BY s.startDate DESC", Semester.class)
-                        .getResultList();
-                if (!allSems.isEmpty()) {
-                    classroom.setSemesterId(allSems.get(0).getId());
-                    classroom.setSemesterName(allSems.get(0).getName());
-                    classroom.setStartDate(allSems.get(0).getStartDate());
-                    classroom.setEndDate(allSems.get(0).getEndDate());
-                }
-            }
-        }
-
-        if (creator != null) {
-            classroom.setTeacherId(creator.getId());
-        }
-        em.persist(classroom);
+        classroomService.addClassroom(username, subjectId, subjectName, classCode, semesterId, description);
 
         return Response.seeOther(URI.create("/classes")).build();
     }
 
     @POST
     @Path("/delete/{id}")
-    @Transactional
     public Response deleteClassroom(@CookieParam("logged_in_username") String cookieUsername,
             @PathParam("id") Long id) {
         String username = cookieUsername != null ? cookieUsername : "teacher_toan";
-        Student teacher = null;
-        try {
-            teacher = em.createQuery("SELECT s FROM Student s WHERE s.username = :username", Student.class)
-                    .setParameter("username", username)
-                    .setMaxResults(1).getSingleResult();
-        } catch (Exception e) {
-        }
-
-        Classroom classroom = em.find(Classroom.class, id);
-        if (classroom != null && teacher != null && teacher.getId().equals(classroom.getTeacherId())) {
-            em.remove(classroom);
-        }
+        classroomService.deleteClassroom(username, id);
         return Response.seeOther(URI.create("/classes")).build();
     }
 
     @POST
     @Path("/edit")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Transactional
     public Response editClassroom(
             @CookieParam("logged_in_username") String cookieUsername,
             @FormParam("id") Long id,
@@ -190,54 +123,7 @@ public class ClassroomResource {
             @FormParam("description") String description) {
 
         String username = cookieUsername != null ? cookieUsername : "teacher_toan";
-        Student teacher = null;
-        try {
-            teacher = em.createQuery("SELECT s FROM Student s WHERE s.username = :username", Student.class)
-                    .setParameter("username", username)
-                    .setMaxResults(1).getSingleResult();
-        } catch (Exception e) {
-        }
-
-        Classroom classroom = em.find(Classroom.class, id);
-        if (classroom != null && teacher != null && teacher.getId().equals(classroom.getTeacherId())) {
-            classroom.setName(name);
-            classroom.setDescription(description);
-
-            if (semesterId != null) {
-                Semester sem = em.find(Semester.class, semesterId);
-                if (sem != null) {
-                    classroom.setSemesterId(sem.getId());
-                    classroom.setSemesterName(sem.getName());
-                    classroom.setStartDate(sem.getStartDate());
-                    classroom.setEndDate(sem.getEndDate());
-                }
-            } else if (classroom.getSemesterId() == null) {
-                String currentDate = java.time.LocalDate.now().toString();
-                List<Semester> sems = em
-                        .createQuery(
-                                "SELECT s FROM Semester s WHERE s.endDate >= :currentDate ORDER BY s.startDate ASC",
-                                Semester.class)
-                        .setParameter("currentDate", currentDate)
-                        .getResultList();
-                if (!sems.isEmpty()) {
-                    classroom.setSemesterId(sems.get(0).getId());
-                    classroom.setSemesterName(sems.get(0).getName());
-                    classroom.setStartDate(sems.get(0).getStartDate());
-                    classroom.setEndDate(sems.get(0).getEndDate());
-                } else {
-                    List<Semester> allSems = em
-                            .createQuery("SELECT s FROM Semester s ORDER BY s.startDate DESC", Semester.class)
-                            .getResultList();
-                    if (!allSems.isEmpty()) {
-                        classroom.setSemesterId(allSems.get(0).getId());
-                        classroom.setSemesterName(allSems.get(0).getName());
-                        classroom.setStartDate(allSems.get(0).getStartDate());
-                        classroom.setEndDate(allSems.get(0).getEndDate());
-                    }
-                }
-            }
-            em.merge(classroom);
-        }
+        classroomService.editClassroom(username, id, name, semesterId, description);
         return Response.seeOther(URI.create("/classes")).build();
     }
 }

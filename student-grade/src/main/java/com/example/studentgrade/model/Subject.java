@@ -18,6 +18,7 @@ public class Subject {
     private String name;
     private int credits; // Số tín chỉ
     private String description;
+    private String category; // Phân loại môn học (TECHNICAL, GENERAL, BASIC)
 
     public Long getId() {
         return id;
@@ -57,5 +58,13 @@ public class Subject {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

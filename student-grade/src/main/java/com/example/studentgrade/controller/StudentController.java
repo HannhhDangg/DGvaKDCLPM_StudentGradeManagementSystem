@@ -5,6 +5,9 @@ import com.example.studentgrade.model.Classroom;
 import com.example.studentgrade.model.Enrollment;
 import com.example.studentgrade.model.Grade;
 import com.example.studentgrade.model.Subject;
+import com.example.studentgrade.model.TuitionFee;
+import com.example.studentgrade.model.TuitionFee;
+import com.example.studentgrade.model.PaymentTransaction;
 import com.example.studentgrade.repository.SubjectRepository;
 import com.example.studentgrade.repository.StudentRepository;
 import com.example.studentgrade.service.StudentService;
@@ -57,6 +60,9 @@ public class StudentController {
     @Inject
     @Location("teacher-enrollments")
     Template teacherEnrollments;
+    @Inject
+    @Location("student-tuition")
+    Template studentTuition;
 
     @Inject
     StudentService studentService;
@@ -168,7 +174,15 @@ public class StudentController {
     @GET
     @Path("/dashboard")
     @Produces(MediaType.TEXT_HTML)
-    public String getDashboard() {
+    public String getDashboard(@QueryParam("tuitionSemesterId") String tuitionSemesterIdStr) {
+        Long tuitionSemesterId = null;
+        if (tuitionSemesterIdStr != null && !tuitionSemesterIdStr.trim().isEmpty()) {
+            try {
+                tuitionSemesterId = Long.parseLong(tuitionSemesterIdStr);
+            } catch (NumberFormatException e) {
+            }
+        }
+
         Long totalUsers = (Long) em.createQuery("SELECT COUNT(s) FROM Student s").getSingleResult();
         Double average = (Double) em.createQuery("SELECT AVG(g.finalScore) FROM Grade g WHERE g.finalScore IS NOT NULL")
                 .getSingleResult();
@@ -280,6 +294,33 @@ public class StudentController {
                 .setParameter("currentDate", java.time.LocalDate.now().toString())
                 .getSingleResult();
 
+        // Thống kê học phí theo kỳ cho biểu đồ
+        double totalCollectedForSemRaw = 0.0;
+        double totalUncollectedForSemRaw = 0.0;
+
+        if (tuitionSemesterId != null) {
+            Double collectedDouble = em.createQuery("SELECT SUM(t.paidAmount) FROM TuitionFee t WHERE t.semesterId = :semId", Double.class)
+                .setParameter("semId", tuitionSemesterId)
+                .getSingleResult();
+            totalCollectedForSemRaw = collectedDouble != null ? collectedDouble : 0.0;
+
+            Double uncollectedDouble = em.createQuery("SELECT SUM(t.totalAmount - t.paidAmount) FROM TuitionFee t WHERE t.status = 'UNPAID' AND t.semesterId = :semId", Double.class)
+                .setParameter("semId", tuitionSemesterId)
+                .getSingleResult();
+            totalUncollectedForSemRaw = uncollectedDouble != null ? uncollectedDouble : 0.0;
+        } else {
+            // Tính cho tất cả các kỳ
+            Double collectedDouble = em.createQuery("SELECT SUM(t.paidAmount) FROM TuitionFee t", Double.class).getSingleResult();
+            totalCollectedForSemRaw = collectedDouble != null ? collectedDouble : 0.0;
+
+            Double uncollectedDouble = em.createQuery("SELECT SUM(t.totalAmount - t.paidAmount) FROM TuitionFee t WHERE t.status = 'UNPAID'", Double.class).getSingleResult();
+            totalUncollectedForSemRaw = uncollectedDouble != null ? uncollectedDouble : 0.0;
+        }
+
+        java.text.NumberFormat currencyFormat = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN"));
+        String totalCollectedForSemStr = currencyFormat.format(totalCollectedForSemRaw);
+        String totalUncollectedForSemStr = currencyFormat.format(totalUncollectedForSemRaw);
+
         return dashboard
                 .data("total", totalUsers)
                 .data("average", String.valueOf(average))
@@ -289,6 +330,12 @@ public class StudentController {
                 .data("semesterStats", semesterStats)
                 .data("completedSemesters", completedSemesters)
                 .data("ongoingSemesters", totalSemesters - completedSemesters)
+                .data("allSemestersForTuition", semesters)
+                .data("selectedTuitionSemesterId", tuitionSemesterId)
+                .data("totalCollectedForSemRaw", totalCollectedForSemRaw)
+                .data("totalUncollectedForSemRaw", totalUncollectedForSemRaw)
+                .data("totalCollectedForSemStr", totalCollectedForSemStr)
+                .data("totalUncollectedForSemStr", totalUncollectedForSemStr)
                 .render();
     }
 
@@ -522,14 +569,32 @@ public class StudentController {
                     .getResultList();
 
             List<GradeDTO> semGrades = new ArrayList<>();
-            for (Grade g : grades) {
-                if (subjectIdsInSem.contains(g.getSubject().getId())) {
-                    semGrades.add(new GradeDTO(g.getSubject().getCode(), g.getSubject().getName(),
-                            g.getSubject().getCredits(), g.getFinalScore()));
-                    processedGrades.add(g);
+            java.util.Set<Long> processedSubIds = new java.util.HashSet<>();
+            for (Long subId : subjectIdsInSem) {
+                if (processedSubIds.contains(subId)) continue;
+                processedSubIds.add(subId);
+                
+                Subject sub = em.find(Subject.class, subId);
+                if (sub == null) continue;
+                
+                Double finalScore = null;
+                Grade foundGrade = null;
+                for (Grade g : grades) {
+                    if (g.getSubject().getId().equals(subId)) {
+                        finalScore = g.getFinalScore();
+                        foundGrade = g;
+                        break;
+                    }
                 }
+                if (foundGrade != null) {
+                    processedGrades.add(foundGrade);
+                }
+                semGrades.add(new GradeDTO(sub.getCode(), sub.getName(), sub.getCredits(), finalScore));
             }
-            semesters.add(new SemesterDTO(sem.getName(), sem.getStartDate(), sem.getEndDate(), semGrades));
+            
+            if (!semGrades.isEmpty()) {
+                semesters.add(new SemesterDTO(sem.getName(), sem.getStartDate(), sem.getEndDate(), semGrades));
+            }
         }
 
         // Gom các điểm không thuộc lớp học nào (dữ liệu mồ côi nếu có)
@@ -622,7 +687,7 @@ public class StudentController {
         Student student = getLoggedStudent(cookieUsername);
         Long sid = student.getId() != null ? student.getId() : -1L;
 
-        String maxThresholdDate = java.time.LocalDate.now().plusDays(30).toString(); // Mở đăng ký trước 30 ngày
+        String maxThresholdDate = java.time.LocalDate.now().plusDays(35).toString(); // Mở đăng ký trước 35 ngày
         String minThresholdDate = java.time.LocalDate.now().plusDays(7).toString();
 
         List<Classroom> availableClassrooms = em.createQuery(
@@ -691,6 +756,93 @@ public class StudentController {
                     .executeUpdate();
         }
         return Response.seeOther(URI.create("/student/enroll")).build();
+    }
+
+    @GET
+    @Path("/student/tuition")
+    @Produces(MediaType.TEXT_HTML)
+    public String getStudentTuition(@CookieParam("logged_in_username") String cookieUsername) {
+        Student student = getLoggedStudent(cookieUsername);
+        List<TuitionFee> fees = em
+                .createQuery("SELECT t FROM TuitionFee t WHERE t.studentId = :sid ORDER BY t.semesterId DESC",
+                        TuitionFee.class)
+                .setParameter("sid", student.getId())
+                .getResultList();
+
+        List<TuitionFeeDTO> tuitionList = new ArrayList<>();
+        double totalDebt = 0.0;
+        double totalPaid = 0.0; // Biến tính tổng tiền đã nộp
+
+        for (TuitionFee fee : fees) {
+            com.example.studentgrade.model.Semester sem = em.find(com.example.studentgrade.model.Semester.class,
+                    fee.getSemesterId());
+            String semName = sem != null ? sem.getName() : "Không xác định";
+            double remaining = fee.getTotalAmount() - fee.getPaidAmount();
+            if (remaining > 0)
+                totalDebt += remaining;
+            if (fee.getPaidAmount() != null)
+                totalPaid += fee.getPaidAmount(); // Tính dồn tiền đã nộp
+
+            List<PaymentTransaction> transactions = em
+                    .createQuery("SELECT p FROM PaymentTransaction p WHERE p.tuitionFeeId = :tid ORDER BY p.id DESC",
+                            PaymentTransaction.class)
+                    .setParameter("tid", fee.getId())
+                    .getResultList();
+
+            List<PaymentTransactionDTO> transactionDTOs = new ArrayList<>();
+            for (PaymentTransaction tx : transactions) {
+                transactionDTOs.add(new PaymentTransactionDTO(tx));
+            }
+
+            tuitionList.add(new TuitionFeeDTO(fee, semName, remaining, transactionDTOs));
+        }
+
+        double totalRequired = totalDebt + totalPaid;
+
+        return studentTuition.data("tuitionList", tuitionList)
+                .data("totalDebtStr",
+                        java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN")).format(totalDebt))
+                .data("totalPaidStr",
+                        java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN")).format(totalPaid))
+                .data("totalRequiredStr",
+                        java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN")).format(totalRequired))
+                .data("totalDebtRaw", totalDebt)
+                .data("totalPaidRaw", totalPaid)
+                .data("user", student)
+                .render();
+    }
+
+    @POST
+    @Path("/student/tuition/pay")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Transactional
+    public Response studentPayTuition(
+            @CookieParam("logged_in_username") String cookieUsername,
+            @FormParam("tuitionFeeId") Long tuitionFeeId,
+            @FormParam("amount") Double amount) {
+        Student student = getLoggedStudent(cookieUsername);
+        TuitionFee fee = em.find(TuitionFee.class, tuitionFeeId);
+        if (fee != null && fee.getStudentId().equals(student.getId()) && amount != null && amount > 0) {
+            double currentPaid = fee.getPaidAmount() != null ? fee.getPaidAmount() : 0.0;
+            double newPaid = currentPaid + amount;
+
+            if (newPaid >= fee.getTotalAmount()) {
+                fee.setPaidAmount(fee.getTotalAmount());
+                fee.setStatus("PAID");
+            } else {
+                fee.setPaidAmount(newPaid);
+                fee.setStatus("UNPAID");
+            }
+            em.merge(fee);
+
+            PaymentTransaction tx = new PaymentTransaction();
+            tx.setTuitionFeeId(fee.getId());
+            tx.setAmount(amount);
+            tx.setPaymentDate(java.time.LocalDate.now().toString());
+            tx.setMethod("Thanh toán trực tuyến (Mô phỏng)");
+            em.persist(tx);
+        }
+        return Response.seeOther(URI.create("/student/tuition")).build();
     }
 
     @GET
@@ -844,6 +996,61 @@ public class StudentController {
 
         NewCookie newCookie = new NewCookie.Builder("logged_in_username").value(username).path("/").build();
         return Response.seeOther(URI.create(redirectUrl)).cookie(newCookie).build();
+    }
+
+    @POST
+    @Path("/users/edit")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Transactional
+    public Response editUser(
+            @FormParam("id") Long id,
+            @FormParam("lastName") String lastName,
+            @FormParam("firstName") String firstName,
+            @FormParam("username") String username,
+            @FormParam("email") String email,
+            @FormParam("role") String role) {
+        Student user = em.find(Student.class, id);
+        if (user != null) {
+            user.setLastName(lastName);
+            user.setFirstName(firstName);
+            user.setUsername(username);
+            user.setEmail(email);
+            user.setRole(role);
+            em.merge(user);
+        }
+        return Response.seeOther(URI.create("/users")).build();
+    }
+
+    @POST
+    @Path("/users/reset-password")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Transactional
+    public Response resetUserPassword(@FormParam("id") Long id, @FormParam("newPassword") String newPassword) {
+        Student user = em.find(Student.class, id);
+        if (user != null && newPassword != null && !newPassword.trim().isEmpty()) {
+            user.setPassword(newPassword);
+            em.merge(user);
+        }
+        return Response.seeOther(URI.create("/users")).build();
+    }
+
+    @POST
+    @Path("/subjects/edit")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Transactional
+    public Response editSubject(
+            @FormParam("id") Long id,
+            @FormParam("code") String code,
+            @FormParam("name") String name,
+            @FormParam("description") String description) {
+        Subject subject = em.find(Subject.class, id);
+        if (subject != null) {
+            subject.setCode(code);
+            subject.setName(name);
+            subject.setDescription(description);
+            em.merge(subject);
+        }
+        return Response.seeOther(URI.create("/subjects")).build();
     }
 
     public static class GradeDTO {
@@ -1134,6 +1341,55 @@ public class StudentController {
             this.enrollmentId = enrollmentId;
             this.studentName = studentName;
             this.className = className;
+        }
+    }
+
+    public static class TuitionFeeDTO {
+        public TuitionFee fee;
+        public String semesterName;
+        public Double remainingAmount;
+        public List<PaymentTransactionDTO> transactions;
+
+        public TuitionFeeDTO(TuitionFee fee, String semesterName, Double remainingAmount,
+                List<PaymentTransactionDTO> transactions) {
+            this.fee = fee;
+            this.semesterName = semesterName;
+            this.remainingAmount = remainingAmount;
+            this.transactions = transactions;
+        }
+
+        public String getTotalAmountStr() {
+            return java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN"))
+                    .format(fee.getTotalAmount());
+        }
+
+        public String getPaidAmountStr() {
+            return java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN"))
+                    .format(fee.getPaidAmount());
+        }
+
+        public String getRemainingAmountStr() {
+            return java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN")).format(remainingAmount);
+        }
+    }
+
+    public static class PaymentTransactionDTO {
+        private final PaymentTransaction tx;
+
+        public PaymentTransactionDTO(PaymentTransaction tx) {
+            this.tx = tx;
+        }
+
+        public String getPaymentDate() {
+            return tx.getPaymentDate();
+        }
+
+        public String getMethod() {
+            return tx.getMethod();
+        }
+
+        public String getAmountStr() {
+            return java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN")).format(tx.getAmount());
         }
     }
 }

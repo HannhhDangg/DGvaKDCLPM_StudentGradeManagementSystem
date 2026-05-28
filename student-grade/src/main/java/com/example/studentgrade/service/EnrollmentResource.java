@@ -112,7 +112,8 @@ public class EnrollmentResource {
             @FormParam("status") String status) {
         Enrollment e = em.find(Enrollment.class, enrollmentId);
         if (e != null) {
-            if ("APPROVED".equals(status)) {
+            String oldStatus = e.getStatus();
+            if ("APPROVED".equals(status) && !"APPROVED".equals(oldStatus)) {
                 Long count = em.createQuery(
                         "SELECT COUNT(en) FROM Enrollment en WHERE en.classroomId = :cid AND en.status = 'APPROVED'",
                         Long.class)
@@ -123,7 +124,70 @@ public class EnrollmentResource {
             }
             e.setStatus(status);
             em.merge(e);
+
+            // Tự động tính toán & cập nhật Học phí cho Sinh viên
+            if ("APPROVED".equals(status) && !"APPROVED".equals(oldStatus)) {
+                updateTuitionFee(e.getStudentId(), e.getClassroomId(), 1); // Sinh viên được duyệt -> Tăng công nợ
+            } else if ("APPROVED".equals(oldStatus) && !"APPROVED".equals(status)) {
+                updateTuitionFee(e.getStudentId(), e.getClassroomId(), -1); // Bị huỷ duyệt -> Trừ bớt công nợ
+            }
         }
         return Response.seeOther(URI.create("/teacher/enrollments")).build();
+    }
+
+    private void updateTuitionFee(Long studentId, Long classroomId, int sign) {
+        Classroom c = em.find(Classroom.class, classroomId);
+        if (c == null) return;
+        com.example.studentgrade.model.Subject sub = em.find(com.example.studentgrade.model.Subject.class, c.getSubjectId());
+        if (sub == null) return;
+        
+        int credits = sub.getCredits();
+        double amount = 0.0;
+        String category = sub.getCategory();
+        if ("TECHNICAL".equals(category)) {
+            amount = credits * 750000.0;
+        } else if ("BASIC".equals(category)) {
+            amount = credits * 650000.0;
+        } else if ("GENERAL".equals(category)) {
+            amount = credits * 600000.0;
+        } else {
+            amount = credits * 750000.0;
+        }
+        
+        java.util.List<com.example.studentgrade.model.TuitionFee> fees = em.createQuery(
+            "SELECT t FROM TuitionFee t WHERE t.studentId = :sid AND t.semesterId = :semId",
+            com.example.studentgrade.model.TuitionFee.class)
+            .setParameter("sid", studentId)
+            .setParameter("semId", c.getSemesterId())
+            .getResultList();
+            
+        com.example.studentgrade.model.TuitionFee fee;
+        if (fees.isEmpty()) {
+            if (sign < 0) return;
+            fee = new com.example.studentgrade.model.TuitionFee();
+            fee.setStudentId(studentId);
+            fee.setSemesterId(c.getSemesterId());
+            fee.setTotalCredits(credits);
+            fee.setTotalAmount(amount);
+            fee.setPaidAmount(0.0);
+            fee.setStatus("UNPAID");
+            em.persist(fee);
+        } else {
+            fee = fees.get(0);
+            fee.setTotalCredits(fee.getTotalCredits() + (credits * sign));
+            fee.setTotalAmount(fee.getTotalAmount() + (amount * sign));
+            
+            if (fee.getTotalAmount() <= 0) {
+                em.remove(fee);
+                return;
+            }
+            
+            if (fee.getPaidAmount() >= fee.getTotalAmount()) {
+                fee.setStatus("PAID");
+            } else {
+                fee.setStatus("UNPAID");
+            }
+            em.merge(fee);
+        }
     }
 }

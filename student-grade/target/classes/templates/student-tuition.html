@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học phí của tôi — EduManage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --brand: #1a56db;
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --sidebar-text: #94a3b8;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --danger: #dc2626;
+            --info: #0891b2;
+            --success: #10b981;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+        }
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
+            background: var(--sidebar-bg); display: flex; flex-direction: column; z-index: 100;
+        }
+        .sidebar-brand {
+            padding: 28px 24px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .sidebar-brand span {
+            font-family: 'DM Serif Display', serif; font-size: 22px; color: white; font-weight: 400;
+        }
+        .sidebar-brand small {
+            display: block; font-size: 11px; color: var(--sidebar-text); margin-top: 2px;
+        }
+        nav { padding: 12px 0; flex: 1; }
+        .nav-section {
+            padding: 16px 20px 6px; font-size: 10px; font-weight: 600; color: #475569;
+            letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .nav-link {
+            display: flex; align-items: center; gap: 10px; padding: 10px 20px;
+            color: var(--sidebar-text); text-decoration: none; font-size: 14px;
+            font-weight: 500; transition: all 0.15s; border-left: 3px solid transparent;
+        }
+        .nav-link svg {
+            width: 16px; height: 16px; stroke: currentColor; fill: none;
+            stroke-width: 2; stroke-linecap: round; flex-shrink: 0;
+        }
+        .nav-link:hover { background: var(--sidebar-hover); color: white; }
+        .nav-link.active { background: var(--sidebar-hover); color: white; border-left-color: var(--brand); }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255, 255, 255, 0.07); }
+        .logout-btn {
+            display: flex; align-items: center; gap: 8px; color: #f87171;
+            text-decoration: none; font-size: 14px; font-weight: 500;
+        }
+        .logout-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+        .main { margin-left: 240px; min-height: 100vh; }
+        .topbar {
+            background: var(--card-bg); border-bottom: 1px solid var(--border);
+            padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
+        }
+        .topbar h1 { font-size: 18px; font-weight: 600; margin: 0; }
+        .user-badge { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background 0.15s;}
+        .user-badge:hover { background: #f1f5f9; }
+        .avatar {
+            width: 34px; height: 34px; border-radius: 50%; background: var(--brand);
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 600;
+        }
+        .avatar-preview {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: var(--brand);
+            color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 600;
+            margin: 0 auto 16px; border: 2px solid var(--border); cursor: pointer; transition: opacity 0.2s;
+        }
+        .avatar-preview:hover { opacity: 0.8; }
+        .content { padding: 28px 32px; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .debt-alert {
+            background: #fef2f2;
+            border: 1px solid #f87171;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+
+        .bg-paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .bg-partial {
+            background: #fef9c3;
+            color: #92400e;
+        }
+
+        .bg-unpaid {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .tx-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border-top: 1px dashed #e2e8f0;
+            margin-top: 15px;
+            padding-top: 15px;
+        }
+
+        .tx-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #475569;
+            padding: 8px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+        }
+        
+        .stat-card.blue { border-left: 4px solid var(--brand); grid-column: span 2; }
+        .stat-card.green { border-left: 4px solid var(--success); }
+        .stat-card.red { border-left: 4px solid var(--danger); }
+
+        .stat-title {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            width: 100%; height: 42px; border: 1.5px solid var(--border);
+            border-radius: 10px; padding: 0 14px; font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span>EduManage</span>
+            <small>Hệ thống Quản lý Đào tạo</small>
+        </div>
+        <nav>
+            <div class="nav-section">Sinh viên</div>
+            <a href="/student" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                </svg>
+                Kết quả học tập
+            </a>
+            <a href="/student/classes" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Lớp đang tham gia
+            </a>
+            <a href="/student/enroll" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                Đăng ký học phần
+            </a>
+            <a href="/student/transcript" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+                Bảng điểm chi tiết
+            </a>
+            <a href="/student/tuition" class="nav-link active">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                Học phí
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/login" class="logout-btn">
+                <svg viewBox="0 0 24 24" stroke-linecap="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Đăng xuất
+            </a>
+        </div>
+    </aside>
+
+    <div class="main">
+        <div class="topbar">
+            <h1>Học phí của tôi</h1>
+            <div class="user-badge" title="{user.lastName} {user.firstName} - {user.email}" data-bs-toggle="modal"
+                data-bs-target="#profileModal">
+                <span style="font-size:14px;color:var(--text-muted);">Xin chào,</span>
+                <span style="font-size:14px;font-weight:600;">{user.firstName}</span>
+                {#if user.avatar}
+                <img src="{user.avatar}" class="avatar" style="object-fit: cover;" alt="avatar">
+                {#else}
+                <div class="avatar">{#if user.firstName}{user.firstName.charAt(0)}{#else}U{/if}</div>
+                {/if}
+            </div>
+        </div>
+
+        <div class="content">
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-title">Tổng học phí phải đóng</div>
+                    <div style="font-size: 28px; font-weight: bold; color: var(--brand);">{totalRequiredStr}</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-title">Tổng học phí đã nộp</div>
+                    <div style="font-size: 28px; font-weight: bold; color: var(--success);">{totalPaidStr}</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-title">Tổng học phí chưa nộp</div>
+                    <div style="font-size: 28px; font-weight: bold; color: var(--danger);">{totalDebtStr}</div>
+                </div>
+            </div>
+            <div class="card d-flex flex-column align-items-center justify-content-center mb-0" style="padding: 20px;">
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px; width: 100%; text-align: center;">Tỷ lệ hoàn thành</div>
+                <div style="position: relative; height: 160px; width: 100%; display: flex; justify-content: center;">
+                    <canvas id="studentTuitionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {#for item in tuitionList}
+        <div class="card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 style="margin: 0; font-weight: 600; color: #1e293b;">{item.semesterName}</h5>
+                <div>
+                    {#if item.fee.status == 'PAID'}
+                    <span class="badge bg-paid">Đã thanh toán đủ</span>
+                    {#else}
+                    <span class="badge bg-unpaid">Chưa thanh toán</span>
+                    <button class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#payModal{item.fee.id}" style="background: var(--brand); border: none; border-radius: 6px;">Thanh toán</button>
+                    {/if}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div style="color: var(--text-muted); font-size: 13px;">Tổng tín chỉ</div>
+                    <div style="font-weight: 600;">{item.fee.totalCredits} TC</div>
+                </div>
+                <div class="col-md-3">
+                    <div style="color: var(--text-muted); font-size: 13px;">Học phí gốc</div>
+                    <div style="font-weight: 600;">{item.getTotalAmountStr()}</div>
+                </div>
+                <div class="col-md-3">
+                    <div style="color: var(--text-muted); font-size: 13px;">Đã nộp</div>
+                    <div style="font-weight: 600; color: var(--success);">{item.getPaidAmountStr()}</div>
+                </div>
+                <div class="col-md-3">
+                    <div style="color: var(--text-muted); font-size: 13px;">Học phí chưa nộp</div>
+                    <div style="font-weight: 600; color: var(--danger);">{item.getRemainingAmountStr()}</div>
+                </div>
+            </div>
+
+            {#if item.transactions.size() > 0}
+            <ul class="tx-list">
+                <li style="font-weight: 600; font-size: 13px; color: #1e293b; margin-bottom: 5px;">Lịch sử giao dịch:
+                </li>
+                {#for tx in item.transactions}
+                <li class="tx-item">
+                    <span>Ngày GD: {tx.paymentDate} - Qua: {tx.method}</span>
+                    <strong style="color: var(--success);">+{tx.amountStr}</strong>
+                </li>
+                {/for}
+            </ul>
+            {/if}
+
+            <!-- Modal Thanh Toán Sinh Viên -->
+            {#if item.fee.status != 'PAID'}
+            <div class="modal fade" id="payModal{item.fee.id}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="/student/tuition/pay" method="post">
+                            <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 20px;">
+                                <h5 class="modal-title" style="font-weight: 600;">Thanh toán trực tuyến - {item.semesterName}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" style="padding: 20px;">
+                                <input type="hidden" name="tuitionFeeId" value="{item.fee.id}">
+                                <div class="mb-3">
+                                    <label style="font-size: 14px; color: var(--text-muted); font-weight: 500;">Số tiền cần thanh toán (VNĐ):</label>
+                                    <div style="font-size: 18px; font-weight: bold; color: var(--danger);">{item.getRemainingAmountStr()}</div>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="hidden" name="amount" value="{item.remainingAmount}">
+                                    <label style="font-size: 14px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; display: block;">Xác nhận thanh toán toàn bộ học phí cho học kỳ này.</label>
+                                    <small style="color: var(--text-muted); margin-top: 8px; display: block;">(Giao dịch mô phỏng qua VNPay/MoMo)</small>
+                                </div>
+                            </div>
+                            <div class="modal-footer" style="border-top: 1px solid var(--border); padding: 20px; background: #f8fafc; border-radius: 0 0 16px 16px;">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border: 1px solid var(--border); border-radius: 8px;">Hủy</button>
+                                <button type="submit" class="btn btn-primary" style="border-radius: 8px; font-weight: 500;">Xác nhận chuyển khoản</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {/if}
+        </div>
+        {/for}
+        </div>
+    </div>
+
+    <!-- Modal Cập nhật thông tin (Dùng chung cho profile) -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border: none; border-radius: 16px;">
+                <form action="/student/profile" method="post">
+                    <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid var(--border);">
+                        <h5 class="modal-title fw-bold">Thông tin cá nhân</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="padding: 24px;">
+                        <div class="text-center">
+                            {#if user.avatar}
+                            <img src="{user.avatar}" id="avatarPreview" class="avatar-preview" alt="avatar"
+                                onclick="document.getElementById('avatarInput').click()" title="Nhấn để đổi ảnh">
+                            {#else}
+                            <div id="avatarPreview" class="avatar-preview"
+                                onclick="document.getElementById('avatarInput').click()" title="Nhấn để đổi ảnh">
+                                {#if user.firstName}{user.firstName.charAt(0)}{#else}U{/if}</div>
+                            {/if}
+                            <input type="file" id="avatarInput" accept="image/*" class="d-none">
+                            <input type="hidden" name="avatarBase64" id="avatarBase64">
+                            <button type="button" class="btn btn-sm btn-outline-primary mb-3"
+                                onclick="document.getElementById('avatarInput').click()">Thay đổi ảnh</button>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 13px;">Họ và tên đệm</label>
+                                <input type="text" name="lastName" class="form-control" value="{user.lastName}"
+                                    required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" style="font-size: 13px;">Tên</label>
+                                <input type="text" name="firstName" class="form-control" value="{user.firstName}"
+                                    required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold" style="font-size: 13px;">Tên đăng nhập</label>
+                                <input type="text" name="username" class="form-control" value="{user.username}"
+                                    required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold" style="font-size: 13px;">Mật khẩu</label>
+                                <input type="password" name="password" class="form-control"
+                                    placeholder="Để trống nếu không đổi">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer"
+                        style="padding: 16px 24px; border-top: 1px solid var(--border); background: #f8fafc; border-radius: 0 0 16px 16px;">
+                        <button type="button" class="btn btn-light" style="border: 1px solid var(--border);"
+                            data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"
+                            style="background: var(--brand); border: none; height: 38px; border-radius: 10px; font-size: 14px; font-weight: 600; padding: 0 18px;">Lưu
+                            thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('avatarInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    document.getElementById('avatarBase64').value = evt.target.result;
+                    const preview = document.getElementById('avatarPreview');
+                    if (preview.tagName === 'DIV') {
+                        const img = document.createElement('img');
+                        img.id = 'avatarPreview';
+                        img.className = 'avatar-preview';
+                        img.src = evt.target.result;
+                        preview.parentNode.replaceChild(img, preview);
+                    } else {
+                        preview.src = evt.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        const ctxTuition = document.getElementById('studentTuitionChart').getContext('2d');
+        const paid = {totalPaidRaw};
+        const debt = {totalDebtRaw};
+        
+        if (paid === 0 && debt === 0) {
+            // Hiển thị một vòng tròn xám nếu chưa có dữ liệu học phí
+            new Chart(ctxTuition, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Chưa có dữ liệu'],
+                    datasets: [{ data: [1], backgroundColor: ['#e2e8f0'], borderWidth: 0 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                }
+            });
+        } else {
+            new Chart(ctxTuition, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Đã nộp', 'Chưa nộp'],
+                    datasets: [{ 
+                        data: [paid, debt], 
+                        backgroundColor: ['#10b981', '#dc2626'], 
+                        borderWidth: 0, 
+                        hoverOffset: 4 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { 
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 12 } } },
+                        tooltip: { callbacks: { label: function(context) {
+                            return ' ' + context.label + ': ' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.raw);
+                        }}}
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

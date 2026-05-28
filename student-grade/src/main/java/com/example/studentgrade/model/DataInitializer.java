@@ -7,6 +7,8 @@ import com.example.studentgrade.model.Semester;
 import com.example.studentgrade.model.Classroom;
 import com.example.studentgrade.model.Enrollment;
 import com.example.studentgrade.model.Grade;
+import com.example.studentgrade.model.TuitionFee;
+import com.example.studentgrade.model.PaymentTransaction;
 import com.example.studentgrade.repository.StudentRepository;
 import com.example.studentgrade.repository.SubjectRepository;
 import io.quarkus.runtime.StartupEvent;
@@ -318,6 +320,9 @@ public class DataInitializer {
                                                 createClassAndGrades(currentSem, sub, assignedTeacher, students);
                                         }
                                 }
+
+                                // Khởi tạo Học phí cho 3 học kỳ vừa tạo
+                                generateTuitionFees(sems, students);
                         }
                 }
 
@@ -346,6 +351,16 @@ public class DataInitializer {
                 sub.setName(name);
                 sub.setCredits(credits);
                 sub.setDescription(description);
+
+                // Phân loại nhóm môn học để tính học phí và phân khoa giáo viên
+                if (code.startsWith("MAT") || code.startsWith("PHY")) {
+                        sub.setCategory("BASIC"); // Cơ bản (650.000 VND / tín)
+                } else if (code.startsWith("POL") || code.startsWith("FBE") || code.startsWith("FTS")
+                                || code.startsWith("FFS") || code.startsWith("FEL")) {
+                        sub.setCategory("GENERAL"); // Đại cương/Lý luận (600.000 VND / tín)
+                } else {
+                        sub.setCategory("TECHNICAL"); // Khối kỹ thuật/CNTT (750.000 VND / tín)
+                }
                 subjectRepository.persist(sub);
                 return sub;
         }
@@ -425,6 +440,63 @@ public class DataInitializer {
                                 g.setFinalScore(finalScore);
 
                                 em.persist(g);
+                        }
+                }
+        }
+
+        private void generateTuitionFees(List<Semester> sems, List<Student> students) {
+                for (Semester sem : sems) {
+                        for (Student student : students) {
+                                List<Enrollment> enrollments = em.createQuery(
+                                                "SELECT e FROM Enrollment e JOIN Classroom c ON e.classroomId = c.id WHERE e.studentId = :sid AND c.semesterId = :semId AND e.status = 'APPROVED'",
+                                                Enrollment.class)
+                                                .setParameter("sid", student.getId())
+                                                .setParameter("semId", sem.getId())
+                                                .getResultList();
+
+                                if (enrollments.isEmpty())
+                                        continue;
+
+                                int totalCredits = 0;
+                                double totalAmount = 0.0;
+
+                                for (Enrollment e : enrollments) {
+                                        Classroom c = em.find(Classroom.class, e.getClassroomId());
+                                        Subject sub = em.find(Subject.class, c.getSubjectId());
+                                        int credits = sub.getCredits();
+                                        totalCredits += credits;
+
+                                        String category = sub.getCategory();
+                                        if ("TECHNICAL".equals(category)) {
+                                                totalAmount += credits * 750000.0;
+                                        } else if ("BASIC".equals(category)) {
+                                                totalAmount += credits * 650000.0;
+                                        } else if ("GENERAL".equals(category)) {
+                                                totalAmount += credits * 600000.0;
+                                        } else {
+                                                totalAmount += credits * 750000.0;
+                                        }
+                                }
+
+                                TuitionFee fee = new TuitionFee();
+                                fee.setStudentId(student.getId());
+                                fee.setSemesterId(sem.getId());
+                                fee.setTotalCredits(totalCredits);
+                                fee.setTotalAmount(totalAmount);
+
+                                fee.setPaidAmount(totalAmount);
+                                fee.setStatus("PAID");
+                                em.persist(fee);
+
+                                if (fee.getPaidAmount() > 0) {
+                                        PaymentTransaction pt = new PaymentTransaction();
+                                        pt.setTuitionFeeId(fee.getId());
+                                        pt.setAmount(fee.getPaidAmount());
+                                        pt.setPaymentDate(java.time.LocalDate.now()
+                                                        .minusDays((long) (Math.random() * 30)).toString());
+                                        pt.setMethod("Chuyển khoản");
+                                        em.persist(pt);
+                                }
                         }
                 }
         }

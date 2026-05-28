@@ -394,6 +394,12 @@
                 </svg>
                 Bảng điểm chi tiết
             </a>
+            <a href="/student/tuition" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                Học phí
+            </a>
         </nav>
         <div class="sidebar-footer">
             <a href="/login" class="logout-btn">
@@ -478,6 +484,12 @@
                 </table>
             </div>
             {/for}
+
+            {#if semesters.size() == 0}
+            <div class="card" style="padding: 30px; text-align: center; color: var(--text-muted);">
+                Chưa có dữ liệu kết quả học tập. Hãy đăng ký học phần để bắt đầu.
+            </div>
+            {/if}
         </div>
     </div>
 

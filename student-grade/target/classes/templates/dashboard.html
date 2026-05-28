@@ -204,28 +204,11 @@
             overflow: hidden;
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 80px;
-            height: 80px;
-            border-radius: 0 14px 0 80px;
-            opacity: 0.08;
-        }
-
-        .stat-card.blue::before {
-            background: var(--brand);
-        }
-
-        .stat-card.green::before {
-            background: var(--success);
-        }
-
-        .stat-card.teal::before {
-            background: var(--info);
-        }
+        .stat-card.blue { border-left: 4px solid var(--brand); }
+        .stat-card.green { border-left: 4px solid var(--success); }
+        .stat-card.teal { border-left: 4px solid var(--info); }
+        .stat-card.orange { border-left: 4px solid #f59e0b; }
+        .stat-card.purple { border-left: 4px solid #8b5cf6; }
 
         .stat-label {
             font-size: 13px;
@@ -368,6 +351,12 @@
                 </svg>
                 Học kỳ
             </a>
+            <a href="/tuition" class="nav-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                Học phí
+            </a>
         </nav>
         <div class="sidebar-footer">
             <a href="/login" class="logout-btn">
@@ -423,7 +412,7 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
                 <div class="chart-card">
                     <div class="chart-card-header">
                         <div class="chart-card-title">Phân bổ điểm số</div>
@@ -461,22 +450,42 @@
                 </div>
                 <div class="chart-card">
                     <div class="chart-card-header">
-                        <div class="chart-card-title">Tình trạng Học kỳ</div>
-                    </div>
-                    <div class="chart-wrap">
-                        <canvas id="semesterChart" style="max-height:280px;"></canvas>
-                        <div class="chart-legend">
-                            <div class="legend-item">
-                                <div class="legend-dot" style="background:#10b981;"></div>
-                                <span class="legend-label">Đã hoàn thành</span>
-                                <span class="legend-count">{completedSemesters}</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-dot" style="background:#3b82f6;"></div>
-                                <span class="legend-label">Đang/Sắp diễn ra</span>
-                                <span class="legend-count">{ongoingSemesters}</span>
-                            </div>
+                        <div>
+                            <div class="chart-card-title">Tỷ lệ thu Học phí</div>
+                            <span style="font-size:12px;color:var(--text-muted);">
+                                {#if selectedTuitionSemesterId == null}Toàn trường{#else}Theo học kỳ{/if}
+                            </span>
                         </div>
+                        <form action="/dashboard" method="get" style="max-width: 200px;">
+                            <select name="tuitionSemesterId" class="form-control form-control-sm" onchange="this.form.submit()" title="Chọn học kỳ để xem thống kê học phí">
+                                <option value="" {#if selectedTuitionSemesterId == null}selected{/if}>Tất cả học kỳ</option>
+                                {#for sem in allSemestersForTuition}
+                                <option value="{sem.id}" {#if sem.id == selectedTuitionSemesterId}selected{/if}>{sem.name}</option>
+                                {/for}
+                            </select>
+                        </form>
+                    </div>
+                    <div class="chart-wrap" style="height: 220px;">
+                        <canvas id="tuitionChart"></canvas>
+                    </div>
+                    <div class="tuition-stats-footer" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+                        <div style="font-size: 13px; display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: var(--text-muted);">Đã thu:</span>
+                            <strong style="color: #10b981;">{totalCollectedForSemStr}</strong>
+                        </div>
+                        <div style="font-size: 13px; display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-muted);">Chưa thu:</span>
+                            <strong style="color: #dc2626;">{totalUncollectedForSemStr}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div class="chart-card-title">Biến động Điểm trung bình</div>
+                        <span style="font-size:12px;color:var(--text-muted);">6 học kỳ gần nhất</span>
+                    </div>
+                    <div class="chart-wrap" style="height: 250px;">
+                        <canvas id="semesterChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -498,20 +507,75 @@
             }
         });
 
-        const ctxSem = document.getElementById('semesterChart').getContext('2d');
-        const semData = {
-            completed: Number('{completedSemesters}'),
-            ongoing: Number('{ongoingSemesters}')
-        };
-        new Chart(ctxSem, {
+        const ctxTuition = document.getElementById('tuitionChart').getContext('2d');
+        new Chart(ctxTuition, {
             type: 'doughnut',
             data: {
-                labels: ['Đã hoàn thành', 'Đang/Sắp diễn ra'],
-                datasets: [{ data: [semData.completed, semData.ongoing], backgroundColor: ['#10b981', '#3b82f6'], borderWidth: 0, hoverOffset: 6 }]
+                labels: ['Đã thu', 'Chưa thu'],
+                datasets: [{ 
+                    data: [{totalCollectedForSemRaw}, {totalUncollectedForSemRaw}], 
+                    backgroundColor: ['#10b981', '#dc2626'], 
+                    borderWidth: 0, 
+                    hoverOffset: 6 
+                }]
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 cutout: '68%',
-                plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (context) { return ' ' + context.label + ': ' + context.parsed + ' học kỳ'; } } } }
+                plugins: { 
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: { callbacks: { label: function(context) {
+                        return ' ' + context.label + ': ' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.raw);
+                    }}}
+                }
+            }
+        });
+
+        const ctxSem = document.getElementById('semesterChart').getContext('2d');
+        const semLabels = [];
+        const semAverages = [];
+    </script>
+        
+    {#for stat in semesterStats}
+    <script>
+        semLabels.unshift('{stat.name}');
+        semAverages.unshift({stat.average});
+    </script>
+    {/for}
+        
+    <script>
+        if (semLabels.length > 6) {
+            semLabels.splice(0, semLabels.length - 6);
+            semAverages.splice(0, semAverages.length - 6);
+        }
+
+        new Chart(ctxSem, {
+            type: 'line',
+            data: {
+                labels: semLabels.map(l => l.length > 15 ? l.substring(0, 15) + '...' : l),
+                datasets: [{ 
+                    label: 'Điểm TB (Hệ 10)', 
+                    data: semAverages, 
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)', 
+                    borderColor: '#3b82f6', 
+                    borderWidth: 2, 
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#3b82f6',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { min: 0, max: 10, ticks: { stepSize: 2 } },
+                    x: { grid: { display: false } }
+                }
             }
         });
     </script>

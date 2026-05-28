@@ -214,24 +214,9 @@
             overflow: hidden;
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 80px;
-            height: 80px;
-            border-radius: 0 14px 0 80px;
-            opacity: 0.08;
-        }
-
-        .stat-card.blue::before {
-            background: var(--brand);
-        }
-
-        .stat-card.teal::before {
-            background: var(--info);
-        }
+        .stat-card.blue { border-left: 4px solid var(--brand); }
+        .stat-card.teal { border-left: 4px solid var(--info); }
+        .stat-card.green { border-left: 4px solid var(--success); }
 
         .stat-label {
             font-size: 13px;
