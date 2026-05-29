@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Classroom.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">StudentServiceTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.model</a> &gt; <span class="el_source">Classroom.java</span></div><h1>Classroom.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.model;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Classroom.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnrollmentWhiteBoxTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.model</a> &gt; <span class="el_source">Classroom.java</span></div><h1>Classroom.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,38 +16,92 @@ import jakarta.persistence.Table;
     private String name;
     private String description;
     private Long teacherId; // Liên kết tới ID của User có role TEACHER
+    private Long subjectId; // Môn học của lớp này
+    private String subjectName; // Tên môn học để hiển thị
+    private Long semesterId; // ID Học kỳ
+    private String semesterName; // Tên học kỳ
+    private String startDate; // Ngày bắt đầu
+    private String endDate; // Ngày kết thúc
 
     // Getters and Setters
     public Long getId() {
-<span class="nc" id="L22">        return id;</span>
+<span class="fc" id="L28">        return id;</span>
     }
 
     public void setId(Long id) {
-<span class="nc" id="L26">        this.id = id;</span>
-<span class="nc" id="L27">    }</span>
+<span class="nc" id="L32">        this.id = id;</span>
+<span class="nc" id="L33">    }</span>
 
     public String getName() {
-<span class="nc" id="L30">        return name;</span>
+<span class="nc" id="L36">        return name;</span>
     }
 
     public void setName(String name) {
-<span class="nc" id="L34">        this.name = name;</span>
-<span class="nc" id="L35">    }</span>
+<span class="fc" id="L40">        this.name = name;</span>
+<span class="fc" id="L41">    }</span>
 
     public String getDescription() {
-<span class="nc" id="L38">        return description;</span>
+<span class="nc" id="L44">        return description;</span>
     }
 
     public void setDescription(String description) {
-<span class="nc" id="L42">        this.description = description;</span>
-<span class="nc" id="L43">    }</span>
+<span class="fc" id="L48">        this.description = description;</span>
+<span class="fc" id="L49">    }</span>
 
     public Long getTeacherId() {
-<span class="nc" id="L46">        return teacherId;</span>
+<span class="nc" id="L52">        return teacherId;</span>
     }
 
     public void setTeacherId(Long teacherId) {
-<span class="nc" id="L50">        this.teacherId = teacherId;</span>
-<span class="nc" id="L51">    }</span>
+<span class="fc" id="L56">        this.teacherId = teacherId;</span>
+<span class="fc" id="L57">    }</span>
+
+    public Long getSubjectId() {
+<span class="fc" id="L60">        return subjectId;</span>
+    }
+
+    public void setSubjectId(Long subjectId) {
+<span class="fc" id="L64">        this.subjectId = subjectId;</span>
+<span class="fc" id="L65">    }</span>
+
+    public String getSubjectName() {
+<span class="nc" id="L68">        return subjectName;</span>
+    }
+
+    public void setSubjectName(String subjectName) {
+<span class="fc" id="L72">        this.subjectName = subjectName;</span>
+<span class="fc" id="L73">    }</span>
+
+    public Long getSemesterId() {
+<span class="nc" id="L76">        return semesterId;</span>
+    }
+
+    public void setSemesterId(Long semesterId) {
+<span class="fc" id="L80">        this.semesterId = semesterId;</span>
+<span class="fc" id="L81">    }</span>
+
+    public String getSemesterName() {
+<span class="nc" id="L84">        return semesterName;</span>
+    }
+
+    public void setSemesterName(String semesterName) {
+<span class="fc" id="L88">        this.semesterName = semesterName;</span>
+<span class="fc" id="L89">    }</span>
+
+    public String getStartDate() {
+<span class="nc" id="L92">        return startDate;</span>
+    }
+
+    public void setStartDate(String startDate) {
+<span class="fc" id="L96">        this.startDate = startDate;</span>
+<span class="fc" id="L97">    }</span>
+
+    public String getEndDate() {
+<span class="nc" id="L100">        return endDate;</span>
+    }
+
+    public void setEndDate(String endDate) {
+<span class="fc" id="L104">        this.endDate = endDate;</span>
+<span class="fc" id="L105">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SubjectResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">StudentServiceTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.service</a> &gt; <span class="el_source">SubjectResource.java</span></div><h1>SubjectResource.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.service;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SubjectResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnrollmentWhiteBoxTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.service</a> &gt; <span class="el_source">SubjectResource.java</span></div><h1>SubjectResource.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.service;
 
 import com.example.studentgrade.model.Subject;
 import io.quarkus.qute.Location;
@@ -26,9 +26,24 @@ import java.util.List;
     Template subjectsTemplate;
 
     @GET
-    public TemplateInstance getSubjectsPage() {
-<span class="nc" id="L30">        List&lt;Subject&gt; subjects = em.createQuery(&quot;SELECT s FROM Subject s&quot;, Subject.class).getResultList();</span>
-<span class="nc" id="L31">        return subjectsTemplate.data(&quot;subjects&quot;, subjects);</span>
+    public String getSubjectsPage(@QueryParam(&quot;page&quot;) @DefaultValue(&quot;1&quot;) int page) {
+<span class="nc" id="L30">        int pageSize = 10;</span>
+
+<span class="nc" id="L32">        Long totalRecords = em.createQuery(&quot;SELECT COUNT(s) FROM Subject s&quot;, Long.class).getSingleResult();</span>
+<span class="nc" id="L33">        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);</span>
+
+<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (page &lt; 1)</span>
+<span class="nc" id="L36">            page = 1;</span>
+<span class="nc bnc" id="L37" title="All 4 branches missed.">        if (page &gt; totalPages &amp;&amp; totalPages &gt; 0)</span>
+<span class="nc" id="L38">            page = totalPages;</span>
+
+<span class="nc" id="L40">        List&lt;Subject&gt; subjects = em.createQuery(&quot;SELECT s FROM Subject s ORDER BY s.id DESC&quot;, Subject.class)</span>
+<span class="nc" id="L41">                .setFirstResult((page - 1) * pageSize)</span>
+<span class="nc" id="L42">                .setMaxResults(pageSize)</span>
+<span class="nc" id="L43">                .getResultList();</span>
+<span class="nc" id="L44">        return subjectsTemplate.data(&quot;subjects&quot;, subjects)</span>
+<span class="nc" id="L45">                .data(&quot;currentPage&quot;, page)</span>
+<span class="nc" id="L46">                .data(&quot;totalPages&quot;, totalPages).render();</span>
     }
 
     @POST
@@ -38,24 +53,24 @@ import java.util.List;
     public Response addSubject(@FormParam(&quot;code&quot;) String code,
             @FormParam(&quot;name&quot;) String name,
             @FormParam(&quot;description&quot;) String description) {
-<span class="nc" id="L41">        Subject subject = new Subject();</span>
-<span class="nc" id="L42">        subject.setCode(code);</span>
-<span class="nc" id="L43">        subject.setName(name);</span>
-<span class="nc" id="L44">        subject.setDescription(description);</span>
-<span class="nc" id="L45">        em.persist(subject);</span>
+<span class="nc" id="L56">        Subject subject = new Subject();</span>
+<span class="nc" id="L57">        subject.setCode(code);</span>
+<span class="nc" id="L58">        subject.setName(name);</span>
+<span class="nc" id="L59">        subject.setDescription(description);</span>
+<span class="nc" id="L60">        em.persist(subject);</span>
 
-<span class="nc" id="L47">        return Response.seeOther(URI.create(&quot;/subjects&quot;)).build();</span>
+<span class="nc" id="L62">        return Response.seeOther(URI.create(&quot;/subjects&quot;)).build();</span>
     }
 
     @POST
     @Path(&quot;/delete/{id}&quot;)
     @Transactional
     public Response deleteSubject(@PathParam(&quot;id&quot;) Long id) {
-<span class="nc" id="L54">        Subject subject = em.find(Subject.class, id);</span>
-<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (subject != null) {</span>
-<span class="nc" id="L56">            em.remove(subject);</span>
+<span class="nc" id="L69">        Subject subject = em.find(Subject.class, id);</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (subject != null) {</span>
+<span class="nc" id="L71">            em.remove(subject);</span>
         }
-<span class="nc" id="L58">        return Response.seeOther(URI.create(&quot;/subjects&quot;)).build();</span>
+<span class="nc" id="L73">        return Response.seeOther(URI.create(&quot;/subjects&quot;)).build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

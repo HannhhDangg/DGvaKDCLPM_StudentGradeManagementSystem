@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TuitionFee.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnrollmentWhiteBoxTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.model</a> &gt; <span class="el_source">TuitionFee.java</span></div><h1>TuitionFee.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = &quot;tuition_fees&quot;)
+<span class="fc" id="L11">public class TuitionFee {</span>
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Long studentId;
+    private Long semesterId;
+
+    private int totalCredits; // Tổng số tín chỉ trong kỳ
+    private Double totalAmount; // Tổng tiền học phí phải đóng
+<span class="fc" id="L21">    private Double paidAmount = 0.0; // Số tiền đã nộp</span>
+
+<span class="fc" id="L23">    private String status = &quot;UNPAID&quot;; // Trạng thái: UNPAID (Chưa nộp), PARTIAL (Nộp một phần), PAID (Đã hoàn thành)</span>
+
+    public Long getId() {
+<span class="fc" id="L26">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L30">        this.id = id;</span>
+<span class="nc" id="L31">    }</span>
+
+    public Long getStudentId() {
+<span class="nc" id="L34">        return studentId;</span>
+    }
+
+    public void setStudentId(Long studentId) {
+<span class="fc" id="L38">        this.studentId = studentId;</span>
+<span class="fc" id="L39">    }</span>
+
+    public Long getSemesterId() {
+<span class="nc" id="L42">        return semesterId;</span>
+    }
+
+    public void setSemesterId(Long semesterId) {
+<span class="fc" id="L46">        this.semesterId = semesterId;</span>
+<span class="fc" id="L47">    }</span>
+
+    public int getTotalCredits() {
+<span class="nc" id="L50">        return totalCredits;</span>
+    }
+
+    public void setTotalCredits(int totalCredits) {
+<span class="fc" id="L54">        this.totalCredits = totalCredits;</span>
+<span class="fc" id="L55">    }</span>
+
+    public Double getTotalAmount() {
+<span class="nc" id="L58">        return totalAmount;</span>
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+<span class="fc" id="L62">        this.totalAmount = totalAmount;</span>
+<span class="fc" id="L63">    }</span>
+
+    public Double getPaidAmount() {
+<span class="fc" id="L66">        return paidAmount;</span>
+    }
+
+    public void setPaidAmount(Double paidAmount) {
+<span class="fc" id="L70">        this.paidAmount = paidAmount;</span>
+<span class="fc" id="L71">    }</span>
+
+    public String getStatus() {
+<span class="nc" id="L74">        return status;</span>
+    }
+
+    public void setStatus(String status) {
+<span class="fc" id="L78">        this.status = status;</span>
+<span class="fc" id="L79">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

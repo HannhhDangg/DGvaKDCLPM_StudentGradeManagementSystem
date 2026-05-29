@@ -1,3 +1,5 @@
 com\example\studentgrade\ui\SeleniumUITest.class
+com\example\studentgrade\ui\GradeBlackBoxTest.class
+com\example\studentgrade\service\EnrollmentWhiteBoxTest.class
 com\example\studentgrade\service\StudentServiceTest.class
 META-INF\panache-archive.marker

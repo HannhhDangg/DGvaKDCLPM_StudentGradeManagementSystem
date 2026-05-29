@@ -1,59 +1,130 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClassroomResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">StudentServiceTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.service</a> &gt; <span class="el_source">ClassroomResource.java</span></div><h1>ClassroomResource.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.service;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClassroomResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnrollmentWhiteBoxTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.service</a> &gt; <span class="el_source">ClassroomResource.java</span></div><h1>ClassroomResource.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.service;
 
 import com.example.studentgrade.model.Classroom;
+import com.example.studentgrade.model.Student;
+import com.example.studentgrade.model.Semester;
+import com.example.studentgrade.model.Subject;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
-import io.quarkus.qute.TemplateInstance;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 @Path(&quot;/classes&quot;)
 @Produces(MediaType.TEXT_HTML)
-<span class="nc" id="L19">public class ClassroomResource {</span>
+<span class="nc" id="L21">public class ClassroomResource {</span>
 
     @Inject
-    EntityManager em;
+    ClassroomService classroomService;
 
     @Inject
     @Location(&quot;classes&quot;)
     Template classesTemplate;
 
     @GET
-    public TemplateInstance getClassesPage() {
-<span class="nc" id="L30">        List&lt;Classroom&gt; classes = em.createQuery(&quot;SELECT c FROM Classroom c&quot;, Classroom.class).getResultList();</span>
-<span class="nc" id="L31">        return classesTemplate.data(&quot;classes&quot;, classes);</span>
+    public String getClassesPage(@CookieParam(&quot;logged_in_username&quot;) String cookieUsername,
+            @QueryParam(&quot;page&quot;) @DefaultValue(&quot;1&quot;) int page,
+            @QueryParam(&quot;subjectId&quot;) Long subjectId,
+            @QueryParam(&quot;semesterId&quot;) Long semesterId) {
+
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
+<span class="nc" id="L37">        Student teacher = classroomService.getTeacherByUsername(username);</span>
+
+<span class="nc" id="L39">        Long loggedTeacherId = teacher.getId();</span>
+
+<span class="nc" id="L41">        int pageSize = 10;</span>
+<span class="nc" id="L42">        Long totalRecords = classroomService.countClassesByTeacher(loggedTeacherId, subjectId, semesterId);</span>
+<span class="nc" id="L43">        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);</span>
+
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (page &lt; 1)</span>
+<span class="nc" id="L46">            page = 1;</span>
+<span class="nc bnc" id="L47" title="All 4 branches missed.">        if (page &gt; totalPages &amp;&amp; totalPages &gt; 0)</span>
+<span class="nc" id="L48">            page = totalPages;</span>
+
+<span class="nc" id="L50">        List&lt;Classroom&gt; classesOnPage = classroomService.getClassesByTeacher(loggedTeacherId, subjectId, semesterId,</span>
+                page, pageSize);
+<span class="nc" id="L52">        List&lt;Subject&gt; subjects = classroomService.getSubjectsByTeacher(loggedTeacherId);</span>
+<span class="nc" id="L53">        List&lt;Semester&gt; semesters = classroomService.getAllSemesters();</span>
+
+        // Phân loại lớp học thành các nhóm: sắp diễn ra, đang diễn ra và đã kết thúc
+        // để giao diện có thể hiển thị rõ ràng hơn cho giáo viên.
+<span class="nc" id="L57">        List&lt;Classroom&gt; upcomingClasses = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L58">        List&lt;Classroom&gt; ongoingClasses = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L59">        List&lt;Classroom&gt; pastClasses = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L60">        String currentDate = LocalDate.now().toString();</span>
+
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        for (Classroom c : classesOnPage) {</span>
+<span class="nc" id="L63">            String startDate = c.getStartDate();</span>
+<span class="nc" id="L64">            String endDate = c.getEndDate();</span>
+
+<span class="nc bnc" id="L66" title="All 6 branches missed.">            if (endDate != null &amp;&amp; !endDate.isEmpty() &amp;&amp; endDate.compareTo(currentDate) &lt; 0) {</span>
+<span class="nc" id="L67">                pastClasses.add(c);</span>
+<span class="nc bnc" id="L68" title="All 6 branches missed.">            } else if (startDate != null &amp;&amp; !startDate.isEmpty() &amp;&amp; startDate.compareTo(currentDate) &gt; 0) {</span>
+<span class="nc" id="L69">                upcomingClasses.add(c);</span>
+            } else {
+<span class="nc" id="L71">                ongoingClasses.add(c);</span>
+            }
+<span class="nc" id="L73">        }</span>
+
+<span class="nc" id="L75">        return classesTemplate.data(&quot;classes&quot;, classesOnPage) // Giữ lại &quot;classes&quot; để tương thích ngược với template cũ</span>
+<span class="nc" id="L76">                .data(&quot;upcomingClasses&quot;, upcomingClasses)</span>
+<span class="nc" id="L77">                .data(&quot;ongoingClasses&quot;, ongoingClasses)</span>
+<span class="nc" id="L78">                .data(&quot;pastClasses&quot;, pastClasses)</span>
+<span class="nc" id="L79">                .data(&quot;subjects&quot;, subjects)</span>
+<span class="nc" id="L80">                .data(&quot;semesters&quot;, semesters)</span>
+<span class="nc" id="L81">                .data(&quot;user&quot;, teacher) // Truyền thông tin user thực tế ra giao diện</span>
+<span class="nc" id="L82">                .data(&quot;currentPage&quot;, page)</span>
+<span class="nc" id="L83">                .data(&quot;totalPages&quot;, totalPages)</span>
+<span class="nc" id="L84">                .data(&quot;selectedSubjectId&quot;, subjectId)</span>
+<span class="nc" id="L85">                .data(&quot;selectedSemesterId&quot;, semesterId)</span>
+<span class="nc" id="L86">                .render();</span>
     }
 
     @POST
     @Path(&quot;/add&quot;)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Transactional
-    public Response addClassroom(@FormParam(&quot;name&quot;) String name,
+    public Response addClassroom(
+            @CookieParam(&quot;logged_in_username&quot;) String cookieUsername,
+            @FormParam(&quot;subjectId&quot;) Long subjectId,
+            @FormParam(&quot;subjectName&quot;) String subjectName,
+            @FormParam(&quot;classCode&quot;) String classCode,
+            @FormParam(&quot;semesterId&quot;) Long semesterId,
             @FormParam(&quot;description&quot;) String description) {
-<span class="nc" id="L40">        Classroom classroom = new Classroom();</span>
-<span class="nc" id="L41">        classroom.setName(name);</span>
-<span class="nc" id="L42">        classroom.setDescription(description);</span>
-<span class="nc" id="L43">        em.persist(classroom);</span>
 
-<span class="nc" id="L45">        return Response.seeOther(URI.create(&quot;/classes&quot;)).build();</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
+<span class="nc" id="L101">        classroomService.addClassroom(username, subjectId, subjectName, classCode, semesterId, description);</span>
+
+<span class="nc" id="L103">        return Response.seeOther(URI.create(&quot;/classes&quot;)).build();</span>
     }
 
     @POST
     @Path(&quot;/delete/{id}&quot;)
-    @Transactional
-    public Response deleteClassroom(@PathParam(&quot;id&quot;) Long id) {
-<span class="nc" id="L52">        Classroom classroom = em.find(Classroom.class, id);</span>
-<span class="nc bnc" id="L53" title="All 2 branches missed.">        if (classroom != null) {</span>
-<span class="nc" id="L54">            em.remove(classroom);</span>
-        }
-<span class="nc" id="L56">        return Response.seeOther(URI.create(&quot;/classes&quot;)).build();</span>
+    public Response deleteClassroom(@CookieParam(&quot;logged_in_username&quot;) String cookieUsername,
+            @PathParam(&quot;id&quot;) Long id) {
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
+<span class="nc" id="L111">        classroomService.deleteClassroom(username, id);</span>
+<span class="nc" id="L112">        return Response.seeOther(URI.create(&quot;/classes&quot;)).build();</span>
+    }
+
+    @POST
+    @Path(&quot;/edit&quot;)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response editClassroom(
+            @CookieParam(&quot;logged_in_username&quot;) String cookieUsername,
+            @FormParam(&quot;id&quot;) Long id,
+            @FormParam(&quot;name&quot;) String name,
+            @FormParam(&quot;semesterId&quot;) Long semesterId,
+            @FormParam(&quot;description&quot;) String description) {
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
+<span class="nc" id="L126">        classroomService.editClassroom(username, id, name, semesterId, description);</span>
+<span class="nc" id="L127">        return Response.seeOther(URI.create(&quot;/classes&quot;)).build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

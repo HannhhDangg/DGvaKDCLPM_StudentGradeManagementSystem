@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SemesterResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnrollmentWhiteBoxTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.service</a> &gt; <span class="el_source">SemesterResource.java</span></div><h1>SemesterResource.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.service;
+
+import com.example.studentgrade.model.Classroom;
+import com.example.studentgrade.model.Semester;
+import io.quarkus.qute.Location;
+import io.quarkus.qute.Template;
+import io.smallrye.common.annotation.Blocking;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import java.net.URI;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+
+@Path(&quot;/semesters&quot;)
+@Produces(MediaType.TEXT_HTML)
+@Blocking
+<span class="nc" id="L24">public class SemesterResource {</span>
+
+    @Inject
+    EntityManager em;
+
+    @Inject
+    @Location(&quot;semesters&quot;)
+    Template semestersTemplate;
+
+    @GET
+    public String getSemestersPage(@QueryParam(&quot;search&quot;) String search, @QueryParam(&quot;status&quot;) String status,
+            @QueryParam(&quot;error&quot;) String error,
+            @QueryParam(&quot;success&quot;) String success,
+            @QueryParam(&quot;page&quot;) @DefaultValue(&quot;1&quot;) int page) {
+
+<span class="nc" id="L39">        int pageSize = 10;</span>
+
+<span class="nc" id="L41">        String qlString = &quot;SELECT s FROM Semester s&quot;;</span>
+<span class="nc" id="L42">        Map&lt;String, Object&gt; params = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L43">        List&lt;String&gt; whereClauses = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L44">        String currentDate = java.time.LocalDate.now().toString();</span>
+
+<span class="nc bnc" id="L46" title="All 4 branches missed.">        if (search != null &amp;&amp; !search.trim().isEmpty()) {</span>
+<span class="nc" id="L47">            whereClauses.add(&quot;lower(s.name) LIKE :search&quot;);</span>
+<span class="nc" id="L48">            params.put(&quot;search&quot;, &quot;%&quot; + search.toLowerCase() + &quot;%&quot;);</span>
+        }
+
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (&quot;ongoing&quot;.equals(status)) {</span>
+<span class="nc" id="L52">            whereClauses.add(&quot;s.endDate &gt;= :currentDate&quot;);</span>
+<span class="nc" id="L53">            params.put(&quot;currentDate&quot;, currentDate);</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        } else if (&quot;completed&quot;.equals(status)) {</span>
+<span class="nc" id="L55">            whereClauses.add(&quot;s.endDate &lt; :currentDate&quot;);</span>
+<span class="nc" id="L56">            params.put(&quot;currentDate&quot;, currentDate);</span>
+        }
+
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        if (!whereClauses.isEmpty()) {</span>
+<span class="nc" id="L60">            qlString += &quot; WHERE &quot; + String.join(&quot; AND &quot;, whereClauses);</span>
+        }
+
+        // Đếm tổng số lượng bản ghi để phân trang
+        String countQlString = &quot;SELECT COUNT(s) FROM Semester s&quot;
+<span class="nc bnc" id="L65" title="All 2 branches missed.">                + (whereClauses.isEmpty() ? &quot;&quot; : &quot; WHERE &quot; + String.join(&quot; AND &quot;, whereClauses));</span>
+<span class="nc" id="L66">        jakarta.persistence.TypedQuery&lt;Long&gt; countQuery = em.createQuery(countQlString, Long.class);</span>
+<span class="nc" id="L67">        params.forEach(countQuery::setParameter);</span>
+<span class="nc" id="L68">        Long totalRecords = countQuery.getSingleResult();</span>
+<span class="nc" id="L69">        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);</span>
+
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        if (page &lt; 1)</span>
+<span class="nc" id="L72">            page = 1;</span>
+<span class="nc bnc" id="L73" title="All 4 branches missed.">        if (page &gt; totalPages &amp;&amp; totalPages &gt; 0)</span>
+<span class="nc" id="L74">            page = totalPages;</span>
+
+<span class="nc" id="L76">        qlString += &quot; ORDER BY s.startDate DESC&quot;;</span>
+
+<span class="nc" id="L78">        jakarta.persistence.TypedQuery&lt;Semester&gt; query = em.createQuery(qlString, Semester.class);</span>
+<span class="nc" id="L79">        params.forEach(query::setParameter);</span>
+<span class="nc" id="L80">        query.setFirstResult((page - 1) * pageSize);</span>
+<span class="nc" id="L81">        query.setMaxResults(pageSize);</span>
+<span class="nc" id="L82">        List&lt;Semester&gt; semesters = query.getResultList();</span>
+
+<span class="nc" id="L84">        Map&lt;Long, Long&gt; classCounts = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L85">        Map&lt;Long, Long&gt; completedCounts = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L86">        Map&lt;Long, Integer&gt; progressMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L87">        Map&lt;Long, List&lt;Classroom&gt;&gt; classesBySemester = new HashMap&lt;&gt;();</span>
+
+<span class="nc bnc" id="L89" title="All 2 branches missed.">        for (Semester s : semesters) {</span>
+<span class="nc" id="L90">            Long count = em.createQuery(&quot;SELECT COUNT(c) FROM Classroom c WHERE c.semesterId = :sid&quot;, Long.class)</span>
+<span class="nc" id="L91">                    .setParameter(&quot;sid&quot;, s.getId())</span>
+<span class="nc" id="L92">                    .getSingleResult();</span>
+<span class="nc" id="L93">            classCounts.put(s.getId(), count);</span>
+
+<span class="nc" id="L95">            Long completed = em</span>
+<span class="nc" id="L96">                    .createQuery(</span>
+                            &quot;SELECT COUNT(c) FROM Classroom c WHERE c.semesterId = :sid AND c.endDate &lt; :currentDate&quot;,
+                            Long.class)
+<span class="nc" id="L99">                    .setParameter(&quot;sid&quot;, s.getId())</span>
+<span class="nc" id="L100">                    .setParameter(&quot;currentDate&quot;, currentDate)</span>
+<span class="nc" id="L101">                    .getSingleResult();</span>
+<span class="nc" id="L102">            completedCounts.put(s.getId(), completed);</span>
+
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            int progress = count &gt; 0 ? (int) ((completed * 100) / count) : 0;</span>
+<span class="nc" id="L105">            progressMap.put(s.getId(), progress);</span>
+
+<span class="nc" id="L107">            List&lt;Classroom&gt; semClasses = em</span>
+<span class="nc" id="L108">                    .createQuery(&quot;SELECT c FROM Classroom c WHERE c.semesterId = :sid&quot;, Classroom.class)</span>
+<span class="nc" id="L109">                    .setParameter(&quot;sid&quot;, s.getId())</span>
+<span class="nc" id="L110">                    .getResultList();</span>
+<span class="nc" id="L111">            classesBySemester.put(s.getId(), semClasses);</span>
+<span class="nc" id="L112">        }</span>
+
+<span class="nc" id="L114">        return semestersTemplate.data(&quot;semesters&quot;, semesters)</span>
+<span class="nc" id="L115">                .data(&quot;classCounts&quot;, classCounts)</span>
+<span class="nc" id="L116">                .data(&quot;completedCounts&quot;, completedCounts)</span>
+<span class="nc" id="L117">                .data(&quot;progressMap&quot;, progressMap)</span>
+<span class="nc" id="L118">                .data(&quot;classesBySemester&quot;, classesBySemester)</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">                .data(&quot;search&quot;, search == null ? &quot;&quot; : search)</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">                .data(&quot;status&quot;, status == null ? &quot;all&quot; : status)</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">                .data(&quot;error&quot;, error != null ? error : &quot;&quot;)</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                .data(&quot;success&quot;, success != null ? success : &quot;&quot;)</span>
+<span class="nc" id="L123">                .data(&quot;currentPage&quot;, page)</span>
+<span class="nc" id="L124">                .data(&quot;totalPages&quot;, totalPages).render();</span>
+    }
+
+    @POST
+    @Path(&quot;/add&quot;)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Transactional
+    public Response addSemester(@FormParam(&quot;name&quot;) String name, @FormParam(&quot;startDate&quot;) String startDate,
+            @FormParam(&quot;endDate&quot;) String endDate) {
+<span class="nc" id="L133">        Semester semester = new Semester();</span>
+<span class="nc" id="L134">        semester.setName(name);</span>
+<span class="nc" id="L135">        semester.setStartDate(startDate);</span>
+<span class="nc" id="L136">        semester.setEndDate(endDate);</span>
+<span class="nc" id="L137">        em.persist(semester);</span>
+<span class="nc" id="L138">        return Response.seeOther(URI.create(&quot;/semesters&quot;)).build();</span>
+    }
+
+    @POST
+    @Path(&quot;/edit&quot;)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Transactional
+    public Response editSemester(@FormParam(&quot;id&quot;) Long id, @FormParam(&quot;name&quot;) String name,
+            @FormParam(&quot;startDate&quot;) String startDate, @FormParam(&quot;endDate&quot;) String endDate) {
+<span class="nc" id="L147">        Semester semester = em.find(Semester.class, id);</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        if (semester != null) {</span>
+<span class="nc" id="L149">            semester.setName(name);</span>
+<span class="nc" id="L150">            semester.setStartDate(startDate);</span>
+<span class="nc" id="L151">            semester.setEndDate(endDate);</span>
+<span class="nc" id="L152">            em.merge(semester);</span>
+        }
+<span class="nc" id="L154">        return Response.seeOther(URI.create(&quot;/semesters&quot;)).build();</span>
+    }
+
+    @POST
+    @Path(&quot;/delete/{id}&quot;)
+    @Transactional
+    public Response deleteSemester(@PathParam(&quot;id&quot;) Long id) {
+<span class="nc" id="L161">        Semester semester = em.find(Semester.class, id);</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        if (semester != null) {</span>
+            // Kiểm tra xem có lớp học nào đang dùng học kỳ này không
+<span class="nc" id="L164">            Long classCount = em.createQuery(&quot;SELECT COUNT(c) FROM Classroom c WHERE c.semesterId = :sid&quot;, Long.class)</span>
+<span class="nc" id="L165">                    .setParameter(&quot;sid&quot;, id)</span>
+<span class="nc" id="L166">                    .getSingleResult();</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">            if (classCount &gt; 0) {</span>
+<span class="nc" id="L168">                return Response.seeOther(URI.create(&quot;/semesters?error=has_classes&quot;)).build();</span>
+            }
+<span class="nc" id="L170">            em.remove(semester);</span>
+        }
+<span class="nc" id="L172">        return Response.seeOther(URI.create(&quot;/semesters&quot;)).build();</span>
+    }
+
+    @POST
+    @Path(&quot;/transfer&quot;)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Transactional
+    public Response transferClasses(@FormParam(&quot;fromSemesterId&quot;) Long fromSemesterId,
+            @FormParam(&quot;toSemesterId&quot;) Long toSemesterId) {
+<span class="nc bnc" id="L181" title="All 6 branches missed.">        if (fromSemesterId == null || toSemesterId == null || fromSemesterId.equals(toSemesterId)) {</span>
+<span class="nc" id="L182">            return Response.seeOther(URI.create(&quot;/semesters?error=invalid_transfer&quot;)).build();</span>
+        }
+
+<span class="nc" id="L185">        Semester toSemester = em.find(Semester.class, toSemesterId);</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">        if (toSemester == null) {</span>
+<span class="nc" id="L187">            return Response.seeOther(URI.create(&quot;/semesters?error=not_found&quot;)).build();</span>
+        }
+
+<span class="nc" id="L190">        List&lt;com.example.studentgrade.model.Classroom&gt; classrooms = em</span>
+<span class="nc" id="L191">                .createQuery(&quot;SELECT c FROM Classroom c WHERE c.semesterId = :fromId&quot;,</span>
+                        com.example.studentgrade.model.Classroom.class)
+<span class="nc" id="L193">                .setParameter(&quot;fromId&quot;, fromSemesterId)</span>
+<span class="nc" id="L194">                .getResultList();</span>
+
+<span class="nc bnc" id="L196" title="All 2 branches missed.">        for (com.example.studentgrade.model.Classroom c : classrooms) {</span>
+<span class="nc" id="L197">            c.setSemesterId(toSemester.getId());</span>
+<span class="nc" id="L198">            c.setSemesterName(toSemester.getName());</span>
+<span class="nc" id="L199">            c.setStartDate(toSemester.getStartDate());</span>
+<span class="nc" id="L200">            c.setEndDate(toSemester.getEndDate());</span>
+<span class="nc" id="L201">            em.merge(c);</span>
+<span class="nc" id="L202">        }</span>
+
+<span class="nc" id="L204">        return Response.seeOther(URI.create(&quot;/semesters?success=transferred&quot;)).build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

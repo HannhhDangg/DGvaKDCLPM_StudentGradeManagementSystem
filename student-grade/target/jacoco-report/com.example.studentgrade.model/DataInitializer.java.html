@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataInitializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EnrollmentWhiteBoxTest (QuarkusTest)</a> &gt; <a href="index.source.html" class="el_package">com.example.studentgrade.model</a> &gt; <span class="el_source">DataInitializer.java</span></div><h1>DataInitializer.java</h1><pre class="source lang-java linenums">package com.example.studentgrade.model;
+
+import com.example.studentgrade.model.Student;
+import com.example.studentgrade.model.Subject;
+import com.example.studentgrade.model.TeacherSubject;
+import com.example.studentgrade.model.Semester;
+import com.example.studentgrade.model.Classroom;
+import com.example.studentgrade.model.Enrollment;
+import com.example.studentgrade.model.Grade;
+import com.example.studentgrade.model.TuitionFee;
+import com.example.studentgrade.model.PaymentTransaction;
+import com.example.studentgrade.repository.StudentRepository;
+import com.example.studentgrade.repository.SubjectRepository;
+import io.quarkus.runtime.StartupEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
+
+@ApplicationScoped
+<span class="fc" id="L24">public class DataInitializer {</span>
+
+        @Inject
+        StudentRepository userRepository;
+
+        @Inject
+        SubjectRepository subjectRepository;
+
+        @Inject
+        EntityManager em;
+
+        @Transactional
+        public void onStart(@Observes StartupEvent ev) {
+                // Khởi tạo Học kỳ nếu chưa có
+<span class="fc" id="L38">                boolean isNewDb = false;</span>
+<span class="fc" id="L39">                Long semCount = em.createQuery(&quot;SELECT COUNT(s) FROM Semester s&quot;, Long.class).getSingleResult();</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">                if (semCount == 0) {</span>
+<span class="fc" id="L41">                        isNewDb = true;</span>
+<span class="fc" id="L42">                        createSemester(&quot;Học kỳ 1&quot;, &quot;2025-06-27&quot;, &quot;2025-08-30&quot;);</span>
+<span class="fc" id="L43">                        createSemester(&quot;Học kỳ 2&quot;, &quot;2025-10-30&quot;, &quot;2026-01-05&quot;);</span>
+<span class="fc" id="L44">                        createSemester(&quot;Học kỳ 3&quot;, &quot;2026-03-10&quot;, &quot;2026-05-20&quot;);</span>
+<span class="fc" id="L45">                        createSemester(&quot;Học kỳ 4&quot;, &quot;2026-06-27&quot;, &quot;2026-08-30&quot;);</span>
+<span class="fc" id="L46">                        createSemester(&quot;Học kỳ 5&quot;, &quot;2026-10-30&quot;, &quot;2027-01-05&quot;);</span>
+<span class="fc" id="L47">                        createSemester(&quot;Học kỳ 6&quot;, &quot;2027-03-10&quot;, &quot;2027-05-20&quot;);</span>
+<span class="fc" id="L48">                        System.out.println(&quot;=============== ĐÃ KHỞI TẠO DỮ LIỆU HỌC KỲ ===============&quot;);</span>
+                }
+
+                // Chỉ tạo dữ liệu nếu bảng users đang trống
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">                if (userRepository.count() &gt; 0) {</span>
+<span class="nc" id="L53">                        return;</span>
+                }
+
+                // 1. TẠO ADMIN
+<span class="fc" id="L57">                createUser(&quot;Admin&quot;, &quot;Hệ thống&quot;, &quot;admin&quot;, &quot;admin@edumanage.com&quot;, &quot;ADMIN&quot;, &quot;123456&quot;);</span>
+
+                // 2. TẠO TÀI KHOẢN GIẢNG VIÊN
+<span class="fc" id="L60">                Student gvToan = createUser(&quot;GV Toán&quot;, &quot;Cơ bản&quot;, &quot;teacher_toan&quot;, &quot;toan@edumanage.com&quot;, &quot;TEACHER&quot;,</span>
+                                &quot;123456&quot;);
+<span class="fc" id="L62">                Student gvLyLuan = createUser(&quot;GV Lý luận&quot;, &quot;Chính trị&quot;, &quot;teacher_lyluan&quot;, &quot;lyluan@edumanage.com&quot;,</span>
+                                &quot;TEACHER&quot;,
+                                &quot;123456&quot;);
+<span class="fc" id="L65">                Student gvCNTT = createUser(&quot;GV Công nghệ&quot;, &quot;Thông tin&quot;, &quot;teacher_cntt&quot;, &quot;cntt@edumanage.com&quot;,</span>
+                                &quot;TEACHER&quot;,
+                                &quot;123456&quot;);
+
+                // 3. TẠO 20 TÀI KHOẢN SINH VIÊN TỰ ĐỘNG
+<span class="fc" id="L70">                List&lt;Student&gt; students = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">                for (int i = 1; i &lt;= 20; i++) {</span>
+<span class="fc" id="L72">                        students.add(createUser(&quot;Sinh viên&quot;, String.format(&quot;%02d&quot;, i), &quot;student_&quot; + i,</span>
+                                        &quot;sv&quot; + i + &quot;@edumanage.com&quot;,
+                                        &quot;STUDENT&quot;, &quot;123456&quot;));
+                }
+
+                // 4. TẠO DỮ LIỆU MÔN HỌC &amp; GÁN CHO GIẢNG VIÊN (Mỗi người 5 môn)
+
+                // Nhóm 1: teacher_toan (Toán &amp; Cơ bản)
+<span class="fc" id="L80">                Subject mat101 = createSubject(&quot;MAT101&quot;, &quot;Giải tích&quot;, 3,</span>
+                                &quot;Môn học cung cấp nền tảng toán học về giới hạn, đạo hàm, và tích phân. Sinh viên cần làm bài tập hàng tuần và tham gia đầy đủ các buổi thực hành.&quot;);
+<span class="fc" id="L82">                assignTeacherToSubject(gvToan.getId(), mat101.getId());</span>
+
+<span class="fc" id="L84">                Subject mat102 = createSubject(&quot;MAT102&quot;, &quot;Lý thuyết xác suất thống kê&quot;, 3,</span>
+                                &quot;Nghiên cứu các khái niệm cơ bản về xác suất, đại lượng ngẫu nhiên và các phương pháp thống kê toán học ứng dụng.&quot;);
+<span class="fc" id="L86">                assignTeacherToSubject(gvToan.getId(), mat102.getId());</span>
+
+<span class="fc" id="L88">                Subject mat103 = createSubject(&quot;MAT103&quot;, &quot;Đại số tuyến tính&quot;, 3,</span>
+                                &quot;Cung cấp kiến thức về ma trận, định thức, hệ phương trình tuyến tính, không gian vector và ánh xạ tuyến tính.&quot;);
+<span class="fc" id="L90">                assignTeacherToSubject(gvToan.getId(), mat103.getId());</span>
+
+<span class="fc" id="L92">                Subject mat104 = createSubject(&quot;MAT104&quot;, &quot;Toán rời rạc&quot;, 3,</span>
+                                &quot;Môn học thiết yếu cho sinh viên CNTT, bao gồm logic, lý thuyết tập hợp, lý thuyết đồ thị và đại số Boole.&quot;);
+<span class="fc" id="L94">                assignTeacherToSubject(gvToan.getId(), mat104.getId());</span>
+
+<span class="fc" id="L96">                Subject phy101 = createSubject(&quot;PHY101&quot;, &quot;Vật lý 1&quot;, 3,</span>
+                                &quot;Nghiên cứu các định luật cơ bản của cơ học cổ điển, dao động, sóng và nhiệt học.&quot;);
+<span class="fc" id="L98">                assignTeacherToSubject(gvToan.getId(), phy101.getId());</span>
+
+                // Nhóm 2: teacher_lyluan (Lý luận chính trị)
+<span class="fc" id="L101">                Subject pol101 = createSubject(&quot;POL101&quot;, &quot;Kinh tế chính trị Mác - Lênin&quot;, 2,</span>
+                                &quot;Nghiên cứu các quy luật kinh tế của phương thức sản xuất tư bản chủ nghĩa và những vấn đề kinh tế trong thời kỳ quá độ lên CNXH ở Việt Nam.&quot;);
+<span class="fc" id="L103">                assignTeacherToSubject(gvLyLuan.getId(), pol101.getId());</span>
+
+<span class="fc" id="L105">                Subject pol102 = createSubject(&quot;POL102&quot;, &quot;Pháp luật đại cương&quot;, 2,</span>
+                                &quot;Cung cấp hệ thống kiến thức cơ bản về Nhà nước và Pháp luật, quyền và nghĩa vụ cơ bản của công dân.&quot;);
+<span class="fc" id="L107">                assignTeacherToSubject(gvLyLuan.getId(), pol102.getId());</span>
+
+<span class="fc" id="L109">                Subject pol103 = createSubject(&quot;POL103&quot;, &quot;Lịch sử Đảng cộng sản Việt Nam&quot;, 2,</span>
+                                &quot;Nghiên cứu quá trình ra đời, lãnh đạo đấu tranh giải phóng dân tộc và xây dựng đất nước của Đảng Cộng sản Việt Nam.&quot;);
+<span class="fc" id="L111">                assignTeacherToSubject(gvLyLuan.getId(), pol103.getId());</span>
+
+<span class="fc" id="L113">                Subject pol104 = createSubject(&quot;POL104&quot;, &quot;Chủ nghĩa xã hội khoa học&quot;, 2,</span>
+                                &quot;Nghiên cứu những vấn đề lý luận chính trị - xã hội cơ bản của Chủ nghĩa Mác - Lênin về giai cấp công nhân và cách mạng XHCN.&quot;);
+<span class="fc" id="L115">                assignTeacherToSubject(gvLyLuan.getId(), pol104.getId());</span>
+
+<span class="fc" id="L117">                Subject pol105 = createSubject(&quot;POL105&quot;, &quot;Triết học Mác - Lê nin&quot;, 3,</span>
+                                &quot;Cung cấp thế giới quan và phương pháp luận triết học duy vật biện chứng, giúp sinh viên nhận thức đúng đắn về tự nhiên, xã hội và tư duy.&quot;);
+<span class="fc" id="L119">                assignTeacherToSubject(gvLyLuan.getId(), pol105.getId());</span>
+
+                // Nhóm 3: teacher_cntt (Công nghệ thông tin)
+<span class="fc" id="L122">                Subject cse201 = createSubject(&quot;CSE201&quot;, &quot;Khoa học dữ liệu và trí tuệ nhân tạo&quot;, 2,</span>
+                                &quot;Giới thiệu các thuật toán AI cơ bản, Machine Learning, Deep Learning và quy trình khai phá dữ liệu trong thực tế.&quot;);
+<span class="fc" id="L124">                assignTeacherToSubject(gvCNTT.getId(), cse201.getId());</span>
+
+<span class="fc" id="L126">                Subject cse202 = createSubject(&quot;CSE202&quot;, &quot;Lập trình cho thiết bị di động&quot;, 2,</span>
+                                &quot;Thực hành phát triển ứng dụng di động đa nền tảng sử dụng các công cụ và framework hiện đại (React Native/Flutter/Android).&quot;);
+<span class="fc" id="L128">                assignTeacherToSubject(gvCNTT.getId(), cse202.getId());</span>
+
+<span class="fc" id="L130">                Subject cse203 = createSubject(&quot;CSE203&quot;, &quot;Cơ sở dữ liệu&quot;, 3,</span>
+                                &quot;Nghiên cứu mô hình dữ liệu quan hệ, ngôn ngữ truy vấn SQL, thiết kế CSDL chuẩn hóa. Yêu cầu cài đặt MySQL/PostgreSQL trên máy cá nhân.&quot;);
+<span class="fc" id="L132">                assignTeacherToSubject(gvCNTT.getId(), cse203.getId());</span>
+
+<span class="fc" id="L134">                Subject cse204 = createSubject(&quot;CSE204&quot;, &quot;Mạng máy tính&quot;, 2,</span>
+                                &quot;Tìm hiểu kiến trúc mạng máy tính, cấu trúc và chức năng của mô hình OSI/TCP-IP cùng các giao thức mạng phổ biến.&quot;);
+<span class="fc" id="L136">                assignTeacherToSubject(gvCNTT.getId(), cse204.getId());</span>
+
+<span class="fc" id="L138">                Subject cse205 = createSubject(&quot;CSE205&quot;, &quot;Lập trình hướng đối tượng&quot;, 3,</span>
+                                &quot;Nắm vững 4 tính chất cốt lõi của OOP (Đóng gói, Kế thừa, Đa hình, Trừu tượng) thông qua ngôn ngữ lập trình Java hoặc C++.&quot;);
+<span class="fc" id="L140">                assignTeacherToSubject(gvCNTT.getId(), cse205.getId());</span>
+
+                // Nhóm 4: Danh sách các môn học bổ sung từ chương trình đào tạo
+<span class="fc" id="L143">                Object[][] additionalSubjects = {</span>
+<span class="fc" id="L144">                                { &quot;EEE703044&quot;, &quot;Kỹ thuật số&quot;, 3,</span>
+                                                &quot;Nghiên cứu các hệ thống số, cổng logic, mạch tổ hợp và mạch tuần tự cơ bản.&quot; },
+<span class="fc" id="L146">                                { &quot;CSE703010&quot;, &quot;Đánh giá và kiểm định chất lượng phần mềm&quot;, 3,</span>
+                                                &quot;Các phương pháp kiểm thử, đảm bảo chất lượng và quy trình đánh giá phần mềm.&quot; },
+<span class="fc" id="L148">                                { &quot;CSE702036&quot;, &quot;Mạng máy tính&quot;, 2,</span>
+                                                &quot;Cấu trúc, giao thức và nguyên lý hoạt động của mạng máy tính, mô hình OSI và TCP/IP.&quot; },
+<span class="fc" id="L150">                                { &quot;CSE703029&quot;, &quot;Lập trình hướng đối tượng&quot;, 3,</span>
+                                                &quot;Nguyên lý lập trình hướng đối tượng với Java/C++, đóng gói, kế thừa và đa hình.&quot; },
+<span class="fc" id="L152">                                { &quot;CSE703023&quot;, &quot;Kiến trúc máy tính&quot;, 3,</span>
+                                                &quot;Nghiên cứu cấu trúc và nguyên lý hoạt động của hệ thống máy tính, CPU, bộ nhớ.&quot; },
+<span class="fc" id="L154">                                { &quot;CSE702025&quot;, &quot;Kỹ thuật phần mềm&quot;, 2,</span>
+                                                &quot;Quy trình phát triển phần mềm, vòng đời phần mềm, mô hình Agile/Scrum.&quot; },
+<span class="fc" id="L156">                                { &quot;CSE702040&quot;, &quot;Nhập môn Công nghệ thông tin&quot;, 2,</span>
+                                                &quot;Tổng quan về ngành CNTT, máy tính, mạng và các hướng chuyên ngành.&quot; },
+<span class="fc" id="L158">                                { &quot;CSE703004&quot;, &quot;An toàn và bảo mật thông tin&quot;, 3,</span>
+                                                &quot;Các khái niệm cơ bản về mật mã học, an toàn mạng và bảo vệ dữ liệu.&quot; },
+<span class="fc" id="L160">                                { &quot;CSE703048&quot;, &quot;Phân tích và thiết kế phần mềm&quot;, 3,</span>
+                                                &quot;Sử dụng UML để phân tích yêu cầu và thiết kế kiến trúc phần mềm.&quot; },
+<span class="fc" id="L162">                                { &quot;CSE702011&quot;, &quot;Điện toán đám mây&quot;, 2,</span>
+                                                &quot;Tìm hiểu về các mô hình dịch vụ IaaS, PaaS, SaaS và ảo hóa.&quot; },
+<span class="fc" id="L164">                                { &quot;CSE703038&quot;, &quot;Ngôn ngữ lập trình C&quot;, 3,</span>
+                                                &quot;Cung cấp kiến thức cơ bản về lập trình C, con trỏ, mảng và cấp phát bộ nhớ.&quot; },
+<span class="fc" id="L166">                                { &quot;CSE703064&quot;, &quot;Xây dựng ứng dụng web&quot;, 3,</span>
+                                                &quot;Phát triển web cơ bản với HTML, CSS, JavaScript và Backend cơ bản.&quot; },
+<span class="fc" id="L168">                                { &quot;CSE702017&quot;, &quot;Hệ điều hành&quot;, 2,</span>
+                                                &quot;Nguyên lý hoạt động của HĐH, quản lý tiến trình, bộ nhớ và hệ thống file.&quot; },
+<span class="fc" id="L170">                                { &quot;CSE703006&quot;, &quot;Cấu trúc dữ liệu và thuật toán&quot;, 3,</span>
+                                                &quot;Nghiên cứu danh sách liên kết, cây, đồ thị và các thuật toán sắp xếp, tìm kiếm.&quot; },
+<span class="fc" id="L172">                                { &quot;CSE702117&quot;, &quot;Kỹ năng viết và thuyết trình bằng Tiếng Anh&quot;, 2,</span>
+                                                &quot;Nâng cao kỹ năng giao tiếp học thuật và chuyên ngành bằng Tiếng Anh.&quot; },
+<span class="fc" id="L174">                                { &quot;FBE702001&quot;, &quot;Quản trị học&quot;, 2,</span>
+                                                &quot;Cung cấp nền tảng về tổ chức, quản lý, lãnh đạo và ra quyết định trong doanh nghiệp.&quot; },
+<span class="fc" id="L176">                                { &quot;FTS702001&quot;, &quot;Kỹ năng khởi nghiệp và lãnh đạo&quot;, 2,</span>
+                                                &quot;Kỹ năng lập kế hoạch kinh doanh, tinh thần khởi nghiệp và kỹ năng lãnh đạo nhóm.&quot; },
+<span class="fc" id="L178">                                { &quot;FTS702003&quot;, &quot;Kỹ năng đàm phán, thương lượng&quot;, 2,</span>
+                                                &quot;Phát triển kỹ năng giao tiếp, chiến lược và kỹ thuật đàm phán hiệu quả.&quot; },
+<span class="fc" id="L180">                                { &quot;FTS702004&quot;, &quot;Kỹ năng tư duy sáng tạo và phản biện&quot;, 2,</span>
+                                                &quot;Phương pháp rèn luyện tư duy logic, phân tích vấn đề đa chiều.&quot; },
+<span class="fc" id="L182">                                { &quot;FTS702002&quot;, &quot;Kỹ năng quản lý dự án&quot;, 2,</span>
+                                                &quot;Kiến thức cơ bản về lập kế hoạch, phân bổ nguồn lực và quản lý rủi ro dự án.&quot; },
+<span class="fc" id="L184">                                { &quot;CSE702051&quot;, &quot;Thiết kế web nâng cao&quot;, 2,</span>
+                                                &quot;Xây dựng ứng dụng web hiện đại, sử dụng framework và tối ưu hóa UI/UX.&quot; },
+<span class="fc" id="L186">                                { &quot;CSE702005&quot;, &quot;Bảo mật ứng dụng và hệ thống&quot;, 2,</span>
+                                                &quot;Kỹ thuật tấn công và phòng thủ mạng, bảo mật ứng dụng web và hệ điều hành.&quot; },
+<span class="fc" id="L188">                                { &quot;CSE703018&quot;, &quot;Hệ nhúng&quot;, 3,</span>
+                                                &quot;Thiết kế và lập trình cho các hệ thống nhúng vi điều khiển.&quot; },
+<span class="fc" id="L190">                                { &quot;CSE702063&quot;, &quot;Ứng dụng phân tán&quot;, 2,</span>
+                                                &quot;Cơ sở lý thuyết và công nghệ xây dựng các hệ thống tính toán phân tán.&quot; },
+<span class="fc" id="L192">                                { &quot;CSE702022&quot;, &quot;Khai phá dữ liệu&quot;, 2,</span>
+                                                &quot;Kỹ thuật Data Mining, trích xuất tri thức và mô hình hóa dữ liệu.&quot; },
+<span class="fc" id="L194">                                { &quot;CSE702049&quot;, &quot;Quản trị dự án công nghệ thông tin&quot;, 2,</span>
+                                                &quot;Phương pháp quản lý các dự án phần mềm chuyên sâu.&quot; },
+<span class="fc" id="L196">                                { &quot;CSE703110&quot;, &quot;Kiến trúc phần mềm&quot;, 3,</span>
+                                                &quot;Các mẫu kiến trúc (Design Patterns) và mô hình triển khai phần mềm quy mô lớn.&quot; },
+<span class="fc" id="L198">                                { &quot;CSE702060&quot;, &quot;Trực quan hoá dữ liệu&quot;, 2,</span>
+                                                &quot;Kỹ thuật và công cụ vẽ biểu đồ, Data Visualization để báo cáo phân tích.&quot; },
+<span class="fc" id="L200">                                { &quot;CSE702103&quot;, &quot;Linux và phần mềm mã nguồn mở&quot;, 2,</span>
+                                                &quot;Quản trị hệ điều hành Linux và sử dụng các công cụ mã nguồn mở.&quot; },
+<span class="fc" id="L202">                                { &quot;CSE703102&quot;, &quot;Thương mại điện tử&quot;, 3,</span>
+                                                &quot;Mô hình kinh doanh trực tuyến, thanh toán điện tử và hệ thống thương mại điện tử.&quot; },
+<span class="fc" id="L204">                                { &quot;CSE703098&quot;, &quot;Lập trình phân tán&quot;, 3,</span>
+                                                &quot;Lập trình đa luồng, sockets, RMI và các dịch vụ Web Services.&quot; },
+<span class="fc" id="L206">                                { &quot;CSE703009&quot;, &quot;Công nghệ .Net&quot;, 3,</span>
+                                                &quot;Phát triển phần mềm trên nền tảng .NET Framework/Core bằng C#.&quot; },
+<span class="fc" id="L208">                                { &quot;CSE702046&quot;, &quot;Phân tích nghiệp vụ kinh doanh&quot;, 2,</span>
+                                                &quot;Kỹ năng phân tích nghiệp vụ, quy trình và đặc tả yêu cầu phần mềm.&quot; },
+<span class="fc" id="L210">                                { &quot;CSE702031&quot;, &quot;Lập trình phân tích dữ liệu với python&quot;, 2,</span>
+                                                &quot;Sử dụng Python (Pandas, NumPy) để phân tích và xử lý dữ liệu.&quot; },
+<span class="fc" id="L212">                                { &quot;CSE702133&quot;, &quot;Ứng dụng WebGIS&quot;, 2,</span>
+                                                &quot;Xây dựng các hệ thống thông tin địa lý trên nền tảng web.&quot; },
+<span class="fc" id="L214">                                { &quot;CSE703007&quot;, &quot;Chương trình dịch&quot;, 3,</span>
+                                                &quot;Nguyên lý hoạt động của trình biên dịch, phân tích từ vựng và cú pháp.&quot; },
+<span class="fc" id="L216">                                { &quot;CSE702043&quot;, &quot;Phân tích dữ liệu&quot;, 2,</span>
+                                                &quot;Phương pháp thống kê và công cụ trực quan hóa hỗ trợ phân tích dữ liệu.&quot; },
+<span class="fc" id="L218">                                { &quot;CSE703130&quot;, &quot;Công nghệ Java&quot;, 3,</span>
+                                                &quot;Lập trình ứng dụng doanh nghiệp quy mô lớn với Java EE/Spring Boot.&quot; },
+<span class="fc" id="L220">                                { &quot;CSE703099&quot;, &quot;Các hệ nhúng&quot;, 3,</span>
+                                                &quot;Thực hành lập trình nhúng chuyên sâu trên các nền tảng vi điều khiển.&quot; },
+<span class="fc" id="L222">                                { &quot;CSE703132&quot;, &quot;Lập trình C nâng cao&quot;, 3,</span>
+                                                &quot;Kỹ thuật lập trình C cấp cao, tối ưu hóa bộ nhớ và cấu trúc dữ liệu.&quot; },
+<span class="fc" id="L224">                                { &quot;CSE702028&quot;, &quot;Lập trình cho trí tuệ nhân tạo&quot;, 2,</span>
+                                                &quot;Sử dụng các thư viện AI để giải quyết bài toán thị giác máy tính và NLP.&quot; },
+<span class="fc" id="L226">                                { &quot;CSE703112&quot;, &quot;Bảo mật hệ thống&quot;, 3,</span>
+                                                &quot;Bảo vệ hệ thống mạng và máy chủ khỏi các rủi ro an ninh mạng.&quot; },
+<span class="fc" id="L228">                                { &quot;CSE702033&quot;, &quot;Lập trình trò chơi&quot;, 2,</span>
+                                                &quot;Thiết kế và phát triển game sử dụng Unity/Unreal Engine.&quot; },
+<span class="fc" id="L230">                                { &quot;CSE703032&quot;, &quot;Lập trình song song&quot;, 3,</span>
+                                                &quot;Kỹ thuật lập trình song song và đa luồng, CUDA, OpenMP.&quot; },
+<span class="fc" id="L232">                                { &quot;CSE703015&quot;, &quot;Đồ hoạ máy tính và thực tế ảo&quot;, 3,</span>
+                                                &quot;Nguyên lý đồ họa 3D, OpenGL và công nghệ thực tế ảo VR/AR.&quot; },
+<span class="fc" id="L234">                                { &quot;CSE703093&quot;, &quot;An toàn phần mềm&quot;, 3,</span>
+                                                &quot;Lập trình an toàn (Secure Coding) để ngăn ngừa lỗ hổng bảo mật.&quot; },
+<span class="fc" id="L236">                                { &quot;CSE703037&quot;, &quot;Mạng nơron và học sâu&quot;, 3,</span>
+                                                &quot;Nghiên cứu Deep Learning, mạng nơ-ron tích chập (CNN), mạng hồi quy (RNN).&quot; },
+<span class="fc" id="L238">                                { &quot;EEE703068&quot;, &quot;Thị giác máy tính&quot;, 3,</span>
+                                                &quot;Xử lý ảnh, trích xuất đặc trưng và nhận diện đối tượng bằng thị giác máy.&quot; },
+<span class="fc" id="L240">                                { &quot;CSE703097&quot;, &quot;Công nghệ chuỗi khối&quot;, 3,</span>
+                                                &quot;Nguyên lý hoạt động của Blockchain, Smart Contracts và tiền điện tử.&quot; },
+<span class="fc" id="L242">                                { &quot;CSE703054&quot;, &quot;Tích hợp và phân tích dữ liệu lớn&quot;, 3,</span>
+                                                &quot;Công nghệ Big Data, Hadoop, Spark và xử lý dữ liệu phân tán.&quot; },
+<span class="fc" id="L244">                                { &quot;CSE703065&quot;, &quot;Xử lý ngôn ngữ tự nhiên&quot;, 3,</span>
+                                                &quot;Kỹ thuật NLP, phân tích cú pháp, phân tích cảm xúc và dịch tự động.&quot; },
+<span class="fc" id="L246">                                { &quot;CSE703134&quot;, &quot;Xử lý dữ liệu GIS thông minh&quot;, 3,</span>
+                                                &quot;Phân tích dữ liệu không空间 đa chiều và hệ thống thông tin địa lý.&quot; },
+<span class="fc" id="L248">                                { &quot;CSE704067&quot;, &quot;Thực tập tốt nghiệp&quot;, 4,</span>
+                                                &quot;Kỳ thực tập và làm việc thực tế tại các doanh nghiệp CNTT để lấy kinh nghiệm.&quot; },
+<span class="fc" id="L250">                                { &quot;CSE702131&quot;, &quot;Đồ án cơ sở Công nghệ Thông tin&quot;, 2,</span>
+                                                &quot;Sinh viên thực hiện đồ án nhỏ để vận dụng kiến thức cơ sở ngành.&quot; },
+<span class="fc" id="L252">                                { &quot;CSE702053&quot;, &quot;Thực tập công nghiệp&quot;, 2,</span>
+                                                &quot;Kỳ thực tập chuyên sâu tập trung vào quy trình công nghiệp phần mềm.&quot; },
+<span class="fc" id="L254">                                { &quot;CSE703014&quot;, &quot;Đồ án liên ngành&quot;, 3,</span>
+                                                &quot;Thực hiện dự án kết hợp nhiều chuyên ngành, giải quyết bài toán quy mô lớn.&quot; },
+<span class="fc" id="L256">                                { &quot;CSE710068&quot;, &quot;Đồ án tốt nghiệp&quot;, 10,</span>
+                                                &quot;Nghiên cứu khoa học và hoàn thành sản phẩm khóa luận tốt nghiệp kỹ sư.&quot; },
+<span class="fc" id="L258">                                { &quot;FFS708066&quot;, &quot;Giáo dục quốc phòng - an ninh&quot;, 8,</span>
+                                                &quot;Cung cấp kiến thức quốc phòng, an ninh và rèn luyện thể lực, kỷ luật quân sự.&quot; },
+<span class="fc" id="L260">                                { &quot;FFS701072&quot;, &quot;Chạy 1&quot;, 1,</span>
+                                                &quot;Giáo dục thể chất cơ bản: rèn luyện sức bền thông qua môn chạy bộ ngoài trời.&quot; },
+<span class="fc" id="L262">                                { &quot;FFS701073&quot;, &quot;Aerobic&quot;, 1,</span>
+                                                &quot;Giáo dục thể chất: tập luyện thể dục nhịp điệu giúp nâng cao sức khỏe và độ dẻo dai.&quot; },
+<span class="fc" id="L264">                                { &quot;FFS701068&quot;, &quot;Bóng chuyền&quot;, 1,</span>
+                                                &quot;Giáo dục thể chất: tìm hiểu luật chơi, rèn luyện kỹ thuật và chiến thuật bóng chuyền.&quot; },
+<span class="fc" id="L266">                                { &quot;FFS701070&quot;, &quot;Cầu lông&quot;, 1,</span>
+                                                &quot;Giáo dục thể chất: luật chơi, kỹ thuật phát bóng, đập cầu và di chuyển trên sân.&quot; },
+<span class="fc" id="L268">                                { &quot;FFS701069&quot;, &quot;Bóng đá&quot;, 1,</span>
+                                                &quot;Giáo dục thể chất: kỹ thuật dẫn bóng, chuyền bóng và phối hợp đồng đội môn thể thao vua.&quot; },
+<span class="fc" id="L270">                                { &quot;FFS701067&quot;, &quot;Bóng rổ&quot;, 1,</span>
+                                                &quot;Giáo dục thể chất: kỹ thuật ném rổ, phòng thủ, qua người và chiến thuật bóng rổ.&quot; },
+<span class="fc" id="L272">                                { &quot;FEL704000&quot;, &quot;Tiếng Anh bổ trợ&quot;, 2,</span>
+                                                &quot;Tăng cường vốn từ vựng học thuật và ngữ pháp tiếng Anh tổng quát cho sinh viên.&quot; }
+                };
+
+<span class="fc bfc" id="L276" title="All 2 branches covered.">                for (Object[] row : additionalSubjects) {</span>
+<span class="fc" id="L277">                        String code = (String) row[0];</span>
+<span class="fc" id="L278">                        String name = (String) row[1];</span>
+<span class="fc" id="L279">                        int credits = (int) row[2];</span>
+<span class="fc" id="L280">                        String desc = (String) row[3];</span>
+
+<span class="fc" id="L282">                        Subject sub = createSubject(code, name, credits, desc);</span>
+
+                        // Phân công môn học cho giảng viên tương ứng dựa trên mã môn
+<span class="fc bfc" id="L285" title="All 6 branches covered.">                        if (code.startsWith(&quot;FFS&quot;) || code.startsWith(&quot;FBE&quot;) || code.startsWith(&quot;FTS&quot;)</span>
+<span class="fc bfc" id="L286" title="All 2 branches covered.">                                        || code.startsWith(&quot;FEL&quot;)) {</span>
+<span class="fc" id="L287">                                assignTeacherToSubject(gvLyLuan.getId(), sub.getId());</span>
+                        } else {
+<span class="fc" id="L289">                                assignTeacherToSubject(gvCNTT.getId(), sub.getId());</span>
+                        }
+                }
+
+<span class="pc bpc" id="L293" title="1 of 2 branches missed.">                if (isNewDb) {</span>
+<span class="fc" id="L294">                        List&lt;Semester&gt; sems = em</span>
+<span class="fc" id="L295">                                        .createQuery(&quot;SELECT s FROM Semester s ORDER BY s.id ASC&quot;, Semester.class)</span>
+<span class="fc" id="L296">                                        .setMaxResults(3).getResultList();</span>
+<span class="fc" id="L297">                        List&lt;Subject&gt; allSubs = em</span>
+<span class="fc" id="L298">                                        .createQuery(&quot;SELECT s FROM Subject s ORDER BY s.id ASC&quot;, Subject.class)</span>
+<span class="fc" id="L299">                                        .getResultList();</span>
+
+<span class="pc bpc" id="L301" title="2 of 4 branches missed.">                        if (sems.size() == 3 &amp;&amp; allSubs.size() &gt;= 18) {</span>
+<span class="fc" id="L302">                                int subIndex = 0;</span>
+<span class="fc bfc" id="L303" title="All 2 branches covered.">                                for (int i = 0; i &lt; 3; i++) {</span>
+<span class="fc" id="L304">                                        Semester currentSem = sems.get(i);</span>
+<span class="fc bfc" id="L305" title="All 2 branches covered.">                                        for (int j = 0; j &lt; 6; j++) { // Tạo 6 môn cho mỗi Học kỳ</span>
+<span class="fc" id="L306">                                                Subject sub = allSubs.get(subIndex++);</span>
+<span class="fc" id="L307">                                                Student assignedTeacher = gvCNTT;</span>
+                                                try {
+<span class="fc" id="L309">                                                        Long tid = em.createQuery(</span>
+                                                                        &quot;SELECT ts.teacherId FROM TeacherSubject ts WHERE ts.subjectId = :sid&quot;,
+                                                                        Long.class)
+<span class="fc" id="L312">                                                                        .setParameter(&quot;sid&quot;, sub.getId())</span>
+<span class="fc" id="L313">                                                                        .setMaxResults(1).getSingleResult();</span>
+<span class="fc" id="L314">                                                        Student t = em.find(Student.class, tid);</span>
+<span class="pc bpc" id="L315" title="1 of 2 branches missed.">                                                        if (t != null)</span>
+<span class="fc" id="L316">                                                                assignedTeacher = t;</span>
+<span class="nc" id="L317">                                                } catch (Exception e) {</span>
+<span class="fc" id="L318">                                                }</span>
+
+<span class="fc" id="L320">                                                createClassAndGrades(currentSem, sub, assignedTeacher, students);</span>
+                                        }
+                                }
+
+                                // Khởi tạo Học phí cho 3 học kỳ vừa tạo
+<span class="fc" id="L325">                                generateTuitionFees(sems, students);</span>
+                        }
+                }
+
+<span class="fc" id="L329">                System.out.println(&quot;=============== ĐÃ KHỞI TẠO DỮ LIỆU MẪU THÀNH CÔNG ===============&quot;);</span>
+<span class="fc" id="L330">                System.out.println(&quot;Admin: admin / 123456&quot;);</span>
+<span class="fc" id="L331">                System.out.println(&quot;Giáo viên: teacher_toan, teacher_lyluan, teacher_cntt / 123456&quot;);</span>
+<span class="fc" id="L332">                System.out.println(&quot;Sinh viên: student_1 ... student_20 / 123456&quot;);</span>
+<span class="fc" id="L333">        }</span>
+
+        private Student createUser(String lastName, String firstName, String username, String email, String role,
+                        String password) {
+<span class="fc" id="L337">                Student user = new Student();</span>
+<span class="fc" id="L338">                user.setLastName(lastName);</span>
+<span class="fc" id="L339">                user.setFirstName(firstName);</span>
+<span class="fc" id="L340">                user.setUsername(username);</span>
+<span class="fc" id="L341">                user.setEmail(email);</span>
+<span class="fc" id="L342">                user.setRole(role);</span>
+<span class="fc" id="L343">                user.setPassword(password);</span>
+<span class="fc" id="L344">                userRepository.persist(user);</span>
+<span class="fc" id="L345">                return user;</span>
+        }
+
+        private Subject createSubject(String code, String name, int credits, String description) {
+<span class="fc" id="L349">                Subject sub = new Subject();</span>
+<span class="fc" id="L350">                sub.setCode(code);</span>
+<span class="fc" id="L351">                sub.setName(name);</span>
+<span class="fc" id="L352">                sub.setCredits(credits);</span>
+<span class="fc" id="L353">                sub.setDescription(description);</span>
+
+                // Phân loại nhóm môn học để tính học phí và phân khoa giáo viên
+<span class="fc bfc" id="L356" title="All 4 branches covered.">                if (code.startsWith(&quot;MAT&quot;) || code.startsWith(&quot;PHY&quot;)) {</span>
+<span class="fc" id="L357">                        sub.setCategory(&quot;BASIC&quot;); // Cơ bản (650.000 VND / tín)</span>
+<span class="fc bfc" id="L358" title="All 6 branches covered.">                } else if (code.startsWith(&quot;POL&quot;) || code.startsWith(&quot;FBE&quot;) || code.startsWith(&quot;FTS&quot;)</span>
+<span class="fc bfc" id="L359" title="All 4 branches covered.">                                || code.startsWith(&quot;FFS&quot;) || code.startsWith(&quot;FEL&quot;)) {</span>
+<span class="fc" id="L360">                        sub.setCategory(&quot;GENERAL&quot;); // Đại cương/Lý luận (600.000 VND / tín)</span>
+                } else {
+<span class="fc" id="L362">                        sub.setCategory(&quot;TECHNICAL&quot;); // Khối kỹ thuật/CNTT (750.000 VND / tín)</span>
+                }
+<span class="fc" id="L364">                subjectRepository.persist(sub);</span>
+<span class="fc" id="L365">                return sub;</span>
+        }
+
+        private void assignTeacherToSubject(Long teacherId, Long subjectId) {
+<span class="fc" id="L369">                TeacherSubject ts = new TeacherSubject();</span>
+<span class="fc" id="L370">                ts.setTeacherId(teacherId);</span>
+<span class="fc" id="L371">                ts.setSubjectId(subjectId);</span>
+<span class="fc" id="L372">                em.persist(ts);</span>
+<span class="fc" id="L373">        }</span>
+
+        private Semester createSemester(String name, String startDate, String endDate) {
+<span class="fc" id="L376">                Semester s = new Semester();</span>
+<span class="fc" id="L377">                s.setName(name);</span>
+<span class="fc" id="L378">                s.setStartDate(startDate);</span>
+<span class="fc" id="L379">                s.setEndDate(endDate);</span>
+<span class="fc" id="L380">                em.persist(s);</span>
+<span class="fc" id="L381">                return s;</span>
+        }
+
+        private void createClassAndGrades(Semester sem, Subject sub, Student teacher, List&lt;Student&gt; students) {
+<span class="fc" id="L385">                int batchSize = 10;</span>
+<span class="fc" id="L386">                int totalStudents = students.size();</span>
+<span class="fc" id="L387">                int numClasses = (int) Math.ceil((double) totalStudents / batchSize);</span>
+
+<span class="fc bfc" id="L389" title="All 2 branches covered.">                for (int batch = 0; batch &lt; numClasses; batch++) {</span>
+<span class="fc" id="L390">                        String classCode = String.format(&quot;N%02d&quot;, batch + 1); // VD: N01, N02</span>
+
+<span class="fc" id="L392">                        Classroom c = new Classroom();</span>
+<span class="fc" id="L393">                        c.setName(sub.getName() + &quot; - &quot; + classCode + &quot; (&quot; + sem.getName() + &quot;)&quot;);</span>
+<span class="fc" id="L394">                        c.setDescription(sub.getDescription());</span>
+<span class="fc" id="L395">                        c.setTeacherId(teacher.getId());</span>
+<span class="fc" id="L396">                        c.setSubjectId(sub.getId());</span>
+<span class="fc" id="L397">                        c.setSubjectName(sub.getName());</span>
+<span class="fc" id="L398">                        c.setSemesterId(sem.getId());</span>
+<span class="fc" id="L399">                        c.setSemesterName(sem.getName());</span>
+<span class="fc" id="L400">                        c.setStartDate(sem.getStartDate());</span>
+<span class="fc" id="L401">                        c.setEndDate(sem.getEndDate());</span>
+<span class="fc" id="L402">                        em.persist(c);</span>
+
+<span class="fc" id="L404">                        int startIdx = batch * batchSize;</span>
+<span class="fc" id="L405">                        int endIdx = Math.min(startIdx + batchSize, totalStudents);</span>
+
+<span class="fc bfc" id="L407" title="All 2 branches covered.">                        for (int i = startIdx; i &lt; endIdx; i++) {</span>
+<span class="fc" id="L408">                                Student s = students.get(i);</span>
+<span class="fc" id="L409">                                Enrollment e = new Enrollment();</span>
+<span class="fc" id="L410">                                e.setStudentId(s.getId());</span>
+<span class="fc" id="L411">                                e.setClassroomId(c.getId());</span>
+<span class="fc" id="L412">                                e.setStatus(&quot;APPROVED&quot;);</span>
+<span class="fc" id="L413">                                em.persist(e);</span>
+
+<span class="fc" id="L415">                                Grade g = new Grade();</span>
+<span class="fc" id="L416">                                g.setStudent(s);</span>
+<span class="fc" id="L417">                                g.setSubject(sub);</span>
+
+                                // Năng lực cốt lõi của sinh viên (giúp định hình GPA tổng từ 5.5 đến 9.2)
+<span class="fc" id="L420">                                double[] abilities = { 9.2, 8.8, 8.4, 7.8, 7.5, 7.0, 6.5, 6.0, 5.5, 6.8 };</span>
+<span class="fc" id="L421">                                double ability = abilities[i % 10];</span>
+
+                                // Phong độ ngẫu nhiên của sinh viên trong môn học CỤ THỂ này (dao động -2.5 đến
+                                // +2.5 điểm)
+                                // Giúp 1 sinh viên có môn Giỏi, môn Khá, môn Trung bình, thậm chí môn Kém/Trượt
+<span class="fc" id="L426">                                double subjectAbility = ability + (Math.random() * 5.0 - 2.5);</span>
+
+<span class="fc" id="L428">                                double a = Math.max(0, Math.min(10.0, subjectAbility + (Math.random() * 2 - 1)));</span>
+<span class="fc" id="L429">                                double m = Math.max(0, Math.min(10.0, subjectAbility + (Math.random() * 2 - 1)));</span>
+<span class="fc" id="L430">                                double f = Math.max(0, Math.min(10.0, subjectAbility + (Math.random() * 2 - 1)));</span>
+
+<span class="fc" id="L432">                                a = Math.round(a * 10.0) / 10.0;</span>
+<span class="fc" id="L433">                                m = Math.round(m * 10.0) / 10.0;</span>
+<span class="fc" id="L434">                                f = Math.round(f * 10.0) / 10.0;</span>
+
+<span class="fc" id="L436">                                g.setAttendanceScore(a);</span>
+<span class="fc" id="L437">                                g.setMidtermScore(m);</span>
+<span class="fc" id="L438">                                g.setFinalExamScore(f);</span>
+<span class="fc" id="L439">                                double finalScore = Math.round(((a * 0.1) + (m * 0.3) + (f * 0.6)) * 10.0) / 10.0;</span>
+<span class="fc" id="L440">                                g.setFinalScore(finalScore);</span>
+
+<span class="fc" id="L442">                                em.persist(g);</span>
+                        }
+                }
+<span class="fc" id="L445">        }</span>
+
+        private void generateTuitionFees(List&lt;Semester&gt; sems, List&lt;Student&gt; students) {
+<span class="fc bfc" id="L448" title="All 2 branches covered.">                for (Semester sem : sems) {</span>
+<span class="fc bfc" id="L449" title="All 2 branches covered.">                        for (Student student : students) {</span>
+<span class="fc" id="L450">                                List&lt;Enrollment&gt; enrollments = em.createQuery(</span>
+                                                &quot;SELECT e FROM Enrollment e JOIN Classroom c ON e.classroomId = c.id WHERE e.studentId = :sid AND c.semesterId = :semId AND e.status = 'APPROVED'&quot;,
+                                                Enrollment.class)
+<span class="fc" id="L453">                                                .setParameter(&quot;sid&quot;, student.getId())</span>
+<span class="fc" id="L454">                                                .setParameter(&quot;semId&quot;, sem.getId())</span>
+<span class="fc" id="L455">                                                .getResultList();</span>
+
+<span class="pc bpc" id="L457" title="1 of 2 branches missed.">                                if (enrollments.isEmpty())</span>
+<span class="nc" id="L458">                                        continue;</span>
+
+<span class="fc" id="L460">                                int totalCredits = 0;</span>
+<span class="fc" id="L461">                                double totalAmount = 0.0;</span>
+
+<span class="fc bfc" id="L463" title="All 2 branches covered.">                                for (Enrollment e : enrollments) {</span>
+<span class="fc" id="L464">                                        Classroom c = em.find(Classroom.class, e.getClassroomId());</span>
+<span class="fc" id="L465">                                        Subject sub = em.find(Subject.class, c.getSubjectId());</span>
+<span class="fc" id="L466">                                        int credits = sub.getCredits();</span>
+<span class="fc" id="L467">                                        totalCredits += credits;</span>
+
+<span class="fc" id="L469">                                        String category = sub.getCategory();</span>
+<span class="fc bfc" id="L470" title="All 2 branches covered.">                                        if (&quot;TECHNICAL&quot;.equals(category)) {</span>
+<span class="fc" id="L471">                                                totalAmount += credits * 750000.0;</span>
+<span class="fc bfc" id="L472" title="All 2 branches covered.">                                        } else if (&quot;BASIC&quot;.equals(category)) {</span>
+<span class="fc" id="L473">                                                totalAmount += credits * 650000.0;</span>
+<span class="pc bpc" id="L474" title="1 of 2 branches missed.">                                        } else if (&quot;GENERAL&quot;.equals(category)) {</span>
+<span class="fc" id="L475">                                                totalAmount += credits * 600000.0;</span>
+                                        } else {
+<span class="nc" id="L477">                                                totalAmount += credits * 750000.0;</span>
+                                        }
+<span class="fc" id="L479">                                }</span>
+
+<span class="fc" id="L481">                                TuitionFee fee = new TuitionFee();</span>
+<span class="fc" id="L482">                                fee.setStudentId(student.getId());</span>
+<span class="fc" id="L483">                                fee.setSemesterId(sem.getId());</span>
+<span class="fc" id="L484">                                fee.setTotalCredits(totalCredits);</span>
+<span class="fc" id="L485">                                fee.setTotalAmount(totalAmount);</span>
+
+<span class="fc" id="L487">                                fee.setPaidAmount(totalAmount);</span>
+<span class="fc" id="L488">                                fee.setStatus(&quot;PAID&quot;);</span>
+<span class="fc" id="L489">                                em.persist(fee);</span>
+
+<span class="pc bpc" id="L491" title="1 of 2 branches missed.">                                if (fee.getPaidAmount() &gt; 0) {</span>
+<span class="fc" id="L492">                                        PaymentTransaction pt = new PaymentTransaction();</span>
+<span class="fc" id="L493">                                        pt.setTuitionFeeId(fee.getId());</span>
+<span class="fc" id="L494">                                        pt.setAmount(fee.getPaidAmount());</span>
+<span class="fc" id="L495">                                        pt.setPaymentDate(java.time.LocalDate.now()</span>
+<span class="fc" id="L496">                                                        .minusDays((long) (Math.random() * 30)).toString());</span>
+<span class="fc" id="L497">                                        pt.setMethod(&quot;Chuyển khoản&quot;);</span>
+<span class="fc" id="L498">                                        em.persist(pt);</span>
+                                }
+<span class="fc" id="L500">                        }</span>
+<span class="fc" id="L501">                }</span>
+<span class="fc" id="L502">        }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
