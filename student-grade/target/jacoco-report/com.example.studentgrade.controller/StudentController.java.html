@@ -74,27 +74,27 @@ import java.util.Map;
     EntityManager em;
 
     private Student getLoggedStudent(String cookieUsername) {
-<span class="nc bnc" id="L77" title="All 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;student_1&quot;;</span>
-<span class="nc" id="L78">        Student s = repository.findByUsername(username);</span>
-<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (s == null) {</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;student_1&quot;;</span>
+<span class="fc" id="L78">        Student s = repository.findByUsername(username);</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if (s == null) {</span>
 <span class="nc" id="L80">            s = new Student();</span>
 <span class="nc" id="L81">            s.setFirstName(&quot;User&quot;);</span>
 <span class="nc" id="L82">            s.setLastName(&quot;Student&quot;);</span>
 <span class="nc" id="L83">            s.setUsername(username);</span>
         }
-<span class="nc" id="L85">        return s;</span>
+<span class="fc" id="L85">        return s;</span>
     }
 
     private Student getLoggedTeacher(String cookieUsername) {
-<span class="nc bnc" id="L89" title="All 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
-<span class="nc" id="L90">        Student t = repository.findByUsername(username);</span>
-<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (t == null) {</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
+<span class="fc" id="L90">        Student t = repository.findByUsername(username);</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (t == null) {</span>
 <span class="nc" id="L92">            t = new Student();</span>
 <span class="nc" id="L93">            t.setFirstName(&quot;User&quot;);</span>
 <span class="nc" id="L94">            t.setLastName(&quot;Teacher&quot;);</span>
 <span class="nc" id="L95">            t.setUsername(username);</span>
         }
-<span class="nc" id="L97">        return t;</span>
+<span class="fc" id="L97">        return t;</span>
     }
 
     // Route mặc định trang chủ &quot;/&quot; gọi trang index mới
@@ -121,12 +121,12 @@ import java.util.Map;
 <span class="fc" id="L121">        NewCookie cookie = new NewCookie.Builder(&quot;logged_in_username&quot;).value(username).path(&quot;/&quot;).build();</span>
 
 <span class="pc bpc" id="L123" title="1 of 4 branches missed.">        if (user != null &amp;&amp; user.getPassword().equals(password)) {</span>
-<span class="pc bpc" id="L124" title="1 of 2 branches missed.">            if (&quot;ADMIN&quot;.equalsIgnoreCase(user.getRole()))</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">            if (&quot;ADMIN&quot;.equalsIgnoreCase(user.getRole()))</span>
 <span class="fc" id="L125">                return Response.seeOther(URI.create(&quot;/dashboard&quot;)).cookie(cookie).build();</span>
-<span class="nc bnc" id="L126" title="All 2 branches missed.">            if (&quot;TEACHER&quot;.equalsIgnoreCase(user.getRole()))</span>
-<span class="nc" id="L127">                return Response.seeOther(URI.create(&quot;/teacher&quot;)).cookie(cookie).build();</span>
-<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (&quot;STUDENT&quot;.equalsIgnoreCase(user.getRole()))</span>
-<span class="nc" id="L129">                return Response.seeOther(URI.create(&quot;/student&quot;)).cookie(cookie).build();</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            if (&quot;TEACHER&quot;.equalsIgnoreCase(user.getRole()))</span>
+<span class="fc" id="L127">                return Response.seeOther(URI.create(&quot;/teacher&quot;)).cookie(cookie).build();</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">            if (&quot;STUDENT&quot;.equalsIgnoreCase(user.getRole()))</span>
+<span class="fc" id="L129">                return Response.seeOther(URI.create(&quot;/student&quot;)).cookie(cookie).build();</span>
         }
 
         // Backdoor cho Admin để dễ test
@@ -156,7 +156,7 @@ import java.util.Map;
 <span class="nc" id="L156">            return Response.seeOther(URI.create(&quot;/teacher&quot;)).cookie(cookie).build();</span>
         }
         // Backdoor cho Student để dễ test (bắt đầu bằng student...)
-<span class="pc bpc" id="L159" title="4 of 6 branches missed.">        if (username != null &amp;&amp; username.startsWith(&quot;student_&quot;) &amp;&amp; &quot;123456&quot;.equals(password)) {</span>
+<span class="pc bpc" id="L159" title="3 of 6 branches missed.">        if (username != null &amp;&amp; username.startsWith(&quot;student_&quot;) &amp;&amp; &quot;123456&quot;.equals(password)) {</span>
 <span class="nc bnc" id="L160" title="All 2 branches missed.">            if (user == null) {</span>
 <span class="nc" id="L161">                user = new Student();</span>
 <span class="nc" id="L162">                user.setUsername(username);</span>
@@ -347,126 +347,126 @@ import java.util.Map;
             @QueryParam(&quot;search&quot;) String search,
             @QueryParam(&quot;page&quot;) @DefaultValue(&quot;1&quot;) int page) {
 
-<span class="nc" id="L350">        Student teacher = getLoggedTeacher(cookieUsername);</span>
-<span class="nc" id="L351">        int pageSize = 5; // Hiển thị 5 lớp mỗi trang</span>
+<span class="fc" id="L350">        Student teacher = getLoggedTeacher(cookieUsername);</span>
+<span class="fc" id="L351">        int pageSize = 5; // Hiển thị 5 lớp mỗi trang</span>
 
-<span class="nc" id="L353">        String qlString = &quot;SELECT c FROM Classroom c WHERE c.teacherId = :tid&quot;;</span>
-<span class="nc" id="L354">        String countQlString = &quot;SELECT COUNT(c) FROM Classroom c WHERE c.teacherId = :tid&quot;;</span>
+<span class="fc" id="L353">        String qlString = &quot;SELECT c FROM Classroom c WHERE c.teacherId = :tid&quot;;</span>
+<span class="fc" id="L354">        String countQlString = &quot;SELECT COUNT(c) FROM Classroom c WHERE c.teacherId = :tid&quot;;</span>
 
-<span class="nc bnc" id="L356" title="All 4 branches missed.">        if (search != null &amp;&amp; !search.trim().isEmpty()) {</span>
+<span class="pc bpc" id="L356" title="3 of 4 branches missed.">        if (search != null &amp;&amp; !search.trim().isEmpty()) {</span>
 <span class="nc" id="L357">            qlString += &quot; AND lower(c.name) LIKE lower(:search)&quot;;</span>
 <span class="nc" id="L358">            countQlString += &quot; AND lower(c.name) LIKE lower(:search)&quot;;</span>
         }
-<span class="nc" id="L360">        qlString += &quot; ORDER BY c.startDate DESC&quot;;</span>
+<span class="fc" id="L360">        qlString += &quot; ORDER BY c.startDate DESC&quot;;</span>
 
-<span class="nc" id="L362">        var countQuery = em.createQuery(countQlString, Long.class).setParameter(&quot;tid&quot;, teacher.getId());</span>
-<span class="nc" id="L363">        var query = em.createQuery(qlString, Classroom.class).setParameter(&quot;tid&quot;, teacher.getId());</span>
+<span class="fc" id="L362">        var countQuery = em.createQuery(countQlString, Long.class).setParameter(&quot;tid&quot;, teacher.getId());</span>
+<span class="fc" id="L363">        var query = em.createQuery(qlString, Classroom.class).setParameter(&quot;tid&quot;, teacher.getId());</span>
 
-<span class="nc bnc" id="L365" title="All 4 branches missed.">        if (search != null &amp;&amp; !search.trim().isEmpty()) {</span>
+<span class="pc bpc" id="L365" title="3 of 4 branches missed.">        if (search != null &amp;&amp; !search.trim().isEmpty()) {</span>
 <span class="nc" id="L366">            countQuery.setParameter(&quot;search&quot;, &quot;%&quot; + search + &quot;%&quot;);</span>
 <span class="nc" id="L367">            query.setParameter(&quot;search&quot;, &quot;%&quot; + search + &quot;%&quot;);</span>
         }
 
-<span class="nc" id="L370">        Long totalRecords = countQuery.getSingleResult();</span>
-<span class="nc" id="L371">        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);</span>
+<span class="fc" id="L370">        Long totalRecords = countQuery.getSingleResult();</span>
+<span class="fc" id="L371">        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);</span>
 
-<span class="nc bnc" id="L373" title="All 2 branches missed.">        if (page &lt; 1)</span>
+<span class="pc bpc" id="L373" title="1 of 2 branches missed.">        if (page &lt; 1)</span>
 <span class="nc" id="L374">            page = 1;</span>
-<span class="nc bnc" id="L375" title="All 4 branches missed.">        if (page &gt; totalPages &amp;&amp; totalPages &gt; 0)</span>
+<span class="pc bpc" id="L375" title="3 of 4 branches missed.">        if (page &gt; totalPages &amp;&amp; totalPages &gt; 0)</span>
 <span class="nc" id="L376">            page = totalPages;</span>
 
-<span class="nc" id="L378">        query.setFirstResult((page - 1) * pageSize);</span>
-<span class="nc" id="L379">        query.setMaxResults(pageSize);</span>
-<span class="nc" id="L380">        List&lt;Classroom&gt; classrooms = query.getResultList();</span>
+<span class="fc" id="L378">        query.setFirstResult((page - 1) * pageSize);</span>
+<span class="fc" id="L379">        query.setMaxResults(pageSize);</span>
+<span class="fc" id="L380">        List&lt;Classroom&gt; classrooms = query.getResultList();</span>
 
-<span class="nc" id="L382">        List&lt;TeacherClassDTO&gt; classes = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L383" title="All 2 branches missed.">        for (Classroom c : classrooms) {</span>
-<span class="nc" id="L384">            List&lt;Student&gt; studentsInClass = em.createQuery(</span>
+<span class="fc" id="L382">        List&lt;TeacherClassDTO&gt; classes = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">        for (Classroom c : classrooms) {</span>
+<span class="fc" id="L384">            List&lt;Student&gt; studentsInClass = em.createQuery(</span>
                     &quot;SELECT s FROM Student s WHERE s.id IN (SELECT e.studentId FROM Enrollment e WHERE e.classroomId = :cid AND e.status = 'APPROVED')&quot;,
                     Student.class)
-<span class="nc" id="L387">                    .setParameter(&quot;cid&quot;, c.getId())</span>
-<span class="nc" id="L388">                    .getResultList();</span>
+<span class="fc" id="L387">                    .setParameter(&quot;cid&quot;, c.getId())</span>
+<span class="fc" id="L388">                    .getResultList();</span>
 
-<span class="nc" id="L390">            List&lt;StudentGradeDTO&gt; studentGrades = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L391" title="All 2 branches missed.">            for (Student s : studentsInClass) {</span>
-<span class="nc" id="L392">                Grade g = null;</span>
+<span class="fc" id="L390">            List&lt;StudentGradeDTO&gt; studentGrades = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L391" title="All 2 branches covered.">            for (Student s : studentsInClass) {</span>
+<span class="fc" id="L392">                Grade g = null;</span>
                 try {
-<span class="nc" id="L394">                    g = em.createQuery(&quot;SELECT g FROM Grade g WHERE g.student.id = :sid AND g.subject.id = :subId&quot;,</span>
+<span class="fc" id="L394">                    g = em.createQuery(&quot;SELECT g FROM Grade g WHERE g.student.id = :sid AND g.subject.id = :subId&quot;,</span>
                             Grade.class)
-<span class="nc" id="L396">                            .setParameter(&quot;sid&quot;, s.getId())</span>
-<span class="nc" id="L397">                            .setParameter(&quot;subId&quot;, c.getSubjectId())</span>
-<span class="nc" id="L398">                            .getSingleResult();</span>
+<span class="fc" id="L396">                            .setParameter(&quot;sid&quot;, s.getId())</span>
+<span class="fc" id="L397">                            .setParameter(&quot;subId&quot;, c.getSubjectId())</span>
+<span class="fc" id="L398">                            .getSingleResult();</span>
 <span class="nc" id="L399">                } catch (Exception e) {</span>
-<span class="nc" id="L400">                }</span>
+<span class="fc" id="L400">                }</span>
 
-<span class="nc bnc" id="L402" title="All 2 branches missed.">                if (g != null) {</span>
-<span class="nc" id="L403">                    studentGrades</span>
-<span class="nc" id="L404">                            .add(new StudentGradeDTO(s.getId(), s.getFullName(), s.getEmail(), g.getAttendanceScore(),</span>
-<span class="nc" id="L405">                                    g.getMidtermScore(), g.getFinalExamScore(), g.getFinalScore(), c.getSubjectId()));</span>
+<span class="pc bpc" id="L402" title="1 of 2 branches missed.">                if (g != null) {</span>
+<span class="fc" id="L403">                    studentGrades</span>
+<span class="fc" id="L404">                            .add(new StudentGradeDTO(s.getId(), s.getFullName(), s.getEmail(), g.getAttendanceScore(),</span>
+<span class="fc" id="L405">                                    g.getMidtermScore(), g.getFinalExamScore(), g.getFinalScore(), c.getSubjectId()));</span>
                 } else {
 <span class="nc" id="L407">                    studentGrades.add(new StudentGradeDTO(s.getId(), s.getFullName(), s.getEmail(), null, null, null,</span>
 <span class="nc" id="L408">                            null, c.getSubjectId()));</span>
                 }
-<span class="nc" id="L410">            }</span>
+<span class="fc" id="L410">            }</span>
 
-<span class="nc bnc" id="L412" title="All 2 branches missed.">            String semName = c.getSemesterName() != null ? c.getSemesterName() : &quot;Không xác định&quot;;</span>
-<span class="nc bnc" id="L413" title="All 2 branches missed.">            String schedule = (c.getStartDate() != null ? c.getStartDate() : &quot;Chưa rõ&quot;) + &quot; - &quot;</span>
-<span class="nc bnc" id="L414" title="All 2 branches missed.">                    + (c.getEndDate() != null ? c.getEndDate() : &quot;Chưa rõ&quot;);</span>
-<span class="nc" id="L415">            classes.add(new TeacherClassDTO(c.getName(), semName, schedule, studentGrades));</span>
-<span class="nc" id="L416">        }</span>
+<span class="pc bpc" id="L412" title="1 of 2 branches missed.">            String semName = c.getSemesterName() != null ? c.getSemesterName() : &quot;Không xác định&quot;;</span>
+<span class="pc bpc" id="L413" title="1 of 2 branches missed.">            String schedule = (c.getStartDate() != null ? c.getStartDate() : &quot;Chưa rõ&quot;) + &quot; - &quot;</span>
+<span class="pc bpc" id="L414" title="1 of 2 branches missed.">                    + (c.getEndDate() != null ? c.getEndDate() : &quot;Chưa rõ&quot;);</span>
+<span class="fc" id="L415">            classes.add(new TeacherClassDTO(c.getName(), semName, schedule, studentGrades));</span>
+<span class="fc" id="L416">        }</span>
 
         // Tính tổng số lớp (tất cả) của giáo viên này
-<span class="nc" id="L419">        Long totalClasses = em.createQuery(&quot;SELECT COUNT(c) FROM Classroom c WHERE c.teacherId = :tid&quot;, Long.class)</span>
-<span class="nc" id="L420">                .setParameter(&quot;tid&quot;, teacher.getId())</span>
-<span class="nc" id="L421">                .getSingleResult();</span>
+<span class="fc" id="L419">        Long totalClasses = em.createQuery(&quot;SELECT COUNT(c) FROM Classroom c WHERE c.teacherId = :tid&quot;, Long.class)</span>
+<span class="fc" id="L420">                .setParameter(&quot;tid&quot;, teacher.getId())</span>
+<span class="fc" id="L421">                .getSingleResult();</span>
 
         // Tính tổng số sinh viên (DUY NHẤT) của giáo viên này để không bị trùng lặp dẫn
         // tới con số 100
-<span class="nc" id="L425">        Long totalUniqueStudents = em.createQuery(</span>
+<span class="fc" id="L425">        Long totalUniqueStudents = em.createQuery(</span>
                 &quot;SELECT COUNT(DISTINCT e.studentId) FROM Enrollment e WHERE e.status = 'APPROVED' AND e.classroomId IN (SELECT c.id FROM Classroom c WHERE c.teacherId = :tid)&quot;,
                 Long.class)
-<span class="nc" id="L428">                .setParameter(&quot;tid&quot;, teacher.getId())</span>
-<span class="nc" id="L429">                .getSingleResult();</span>
+<span class="fc" id="L428">                .setParameter(&quot;tid&quot;, teacher.getId())</span>
+<span class="fc" id="L429">                .getSingleResult();</span>
 
-<span class="nc" id="L431">        return this.teacher.data(&quot;classes&quot;, classes)</span>
-<span class="nc" id="L432">                .data(&quot;totalClasses&quot;, totalClasses)</span>
-<span class="nc" id="L433">                .data(&quot;totalStudents&quot;, totalUniqueStudents)</span>
-<span class="nc bnc" id="L434" title="All 2 branches missed.">                .data(&quot;search&quot;, search == null ? &quot;&quot; : search)</span>
-<span class="nc" id="L435">                .data(&quot;currentPage&quot;, page)</span>
-<span class="nc" id="L436">                .data(&quot;totalPages&quot;, totalPages)</span>
-<span class="nc" id="L437">                .data(&quot;user&quot;, teacher)</span>
-<span class="nc" id="L438">                .render();</span>
+<span class="fc" id="L431">        return this.teacher.data(&quot;classes&quot;, classes)</span>
+<span class="fc" id="L432">                .data(&quot;totalClasses&quot;, totalClasses)</span>
+<span class="fc" id="L433">                .data(&quot;totalStudents&quot;, totalUniqueStudents)</span>
+<span class="pc bpc" id="L434" title="1 of 2 branches missed.">                .data(&quot;search&quot;, search == null ? &quot;&quot; : search)</span>
+<span class="fc" id="L435">                .data(&quot;currentPage&quot;, page)</span>
+<span class="fc" id="L436">                .data(&quot;totalPages&quot;, totalPages)</span>
+<span class="fc" id="L437">                .data(&quot;user&quot;, teacher)</span>
+<span class="fc" id="L438">                .render();</span>
     }
 
     @GET
     @Path(&quot;/teacher/enrollments&quot;)
     @Produces(MediaType.TEXT_HTML)
     public String getTeacherEnrollments(@CookieParam(&quot;logged_in_username&quot;) String cookieUsername) {
-<span class="nc" id="L445">        Student teacher = getLoggedTeacher(cookieUsername);</span>
-<span class="nc" id="L446">        List&lt;Classroom&gt; classrooms = em</span>
-<span class="nc" id="L447">                .createQuery(&quot;SELECT c FROM Classroom c WHERE c.teacherId = :tid ORDER BY c.startDate DESC&quot;,</span>
+<span class="fc" id="L445">        Student teacher = getLoggedTeacher(cookieUsername);</span>
+<span class="fc" id="L446">        List&lt;Classroom&gt; classrooms = em</span>
+<span class="fc" id="L447">                .createQuery(&quot;SELECT c FROM Classroom c WHERE c.teacherId = :tid ORDER BY c.startDate DESC&quot;,</span>
                         Classroom.class)
-<span class="nc" id="L449">                .setParameter(&quot;tid&quot;, teacher.getId())</span>
-<span class="nc" id="L450">                .getResultList();</span>
+<span class="fc" id="L449">                .setParameter(&quot;tid&quot;, teacher.getId())</span>
+<span class="fc" id="L450">                .getResultList();</span>
 
-<span class="nc" id="L452">        List&lt;PendingEnrollmentDTO&gt; pendingEnrollments = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L453" title="All 2 branches missed.">        for (Classroom c : classrooms) {</span>
-<span class="nc" id="L454">            List&lt;Enrollment&gt; pending = em.createQuery(</span>
+<span class="fc" id="L452">        List&lt;PendingEnrollmentDTO&gt; pendingEnrollments = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L453" title="All 2 branches covered.">        for (Classroom c : classrooms) {</span>
+<span class="fc" id="L454">            List&lt;Enrollment&gt; pending = em.createQuery(</span>
                     &quot;SELECT e FROM Enrollment e WHERE e.classroomId = :cid AND e.status = 'PENDING'&quot;, Enrollment.class)
-<span class="nc" id="L456">                    .setParameter(&quot;cid&quot;, c.getId())</span>
-<span class="nc" id="L457">                    .getResultList();</span>
+<span class="fc" id="L456">                    .setParameter(&quot;cid&quot;, c.getId())</span>
+<span class="fc" id="L457">                    .getResultList();</span>
 
-<span class="nc bnc" id="L459" title="All 2 branches missed.">            for (Enrollment e : pending) {</span>
-<span class="nc" id="L460">                Student s = em.find(Student.class, e.getStudentId());</span>
-<span class="nc bnc" id="L461" title="All 2 branches missed.">                if (s != null) {</span>
-<span class="nc" id="L462">                    pendingEnrollments.add(new PendingEnrollmentDTO(e.getId(), s.getFullName(), c.getName()));</span>
+<span class="fc bfc" id="L459" title="All 2 branches covered.">            for (Enrollment e : pending) {</span>
+<span class="fc" id="L460">                Student s = em.find(Student.class, e.getStudentId());</span>
+<span class="pc bpc" id="L461" title="1 of 2 branches missed.">                if (s != null) {</span>
+<span class="fc" id="L462">                    pendingEnrollments.add(new PendingEnrollmentDTO(e.getId(), s.getFullName(), c.getName()));</span>
                 }
-<span class="nc" id="L464">            }</span>
-<span class="nc" id="L465">        }</span>
+<span class="fc" id="L464">            }</span>
+<span class="fc" id="L465">        }</span>
 
-<span class="nc" id="L467">        return teacherEnrollments.data(&quot;pendingEnrollments&quot;, pendingEnrollments)</span>
-<span class="nc" id="L468">                .data(&quot;user&quot;, teacher)</span>
-<span class="nc" id="L469">                .render();</span>
+<span class="fc" id="L467">        return teacherEnrollments.data(&quot;pendingEnrollments&quot;, pendingEnrollments)</span>
+<span class="fc" id="L468">                .data(&quot;user&quot;, teacher)</span>
+<span class="fc" id="L469">                .render();</span>
     }
 
     @POST
@@ -530,7 +530,7 @@ import java.util.Map;
 
         // Tính lại điểm tổng kết nếu cả 3 cột điểm thành phần đều đã có
 <span class="pc bpc" id="L532" title="2 of 4 branches missed.">        if (grade.getAttendanceScore() != null &amp;&amp; grade.getMidtermScore() != null</span>
-<span class="pc bpc" id="L533" title="1 of 2 branches missed.">                &amp;&amp; grade.getFinalExamScore() != null) {</span>
+<span class="fc bfc" id="L533" title="All 2 branches covered.">                &amp;&amp; grade.getFinalExamScore() != null) {</span>
 <span class="fc" id="L534">            double finalScoreValue = (grade.getAttendanceScore() * 0.1) + (grade.getMidtermScore() * 0.3)</span>
 <span class="fc" id="L535">                    + (grade.getFinalExamScore() * 0.6);</span>
 <span class="fc" id="L536">            grade.setFinalScore(Math.round(finalScoreValue * 10.0) / 10.0);</span>
@@ -545,73 +545,73 @@ import java.util.Map;
     @Path(&quot;/student&quot;)
     @Produces(MediaType.TEXT_HTML)
     public String getStudentDashboard(@CookieParam(&quot;logged_in_username&quot;) String cookieUsername) {
-<span class="nc" id="L548">        Student student = getLoggedStudent(cookieUsername);</span>
-<span class="nc" id="L549">        List&lt;Grade&gt; grades = em.createQuery(&quot;SELECT g FROM Grade g WHERE g.student.id = :sid&quot;, Grade.class)</span>
-<span class="nc" id="L550">                .setParameter(&quot;sid&quot;, student.getId())</span>
-<span class="nc" id="L551">                .getResultList();</span>
+<span class="fc" id="L548">        Student student = getLoggedStudent(cookieUsername);</span>
+<span class="fc" id="L549">        List&lt;Grade&gt; grades = em.createQuery(&quot;SELECT g FROM Grade g WHERE g.student.id = :sid&quot;, Grade.class)</span>
+<span class="fc" id="L550">                .setParameter(&quot;sid&quot;, student.getId())</span>
+<span class="fc" id="L551">                .getResultList();</span>
 
         // Chỉ hiển thị các Học kỳ đã qua hoặc sắp bắt đầu (trước 30 ngày)
-<span class="nc" id="L554">        String thresholdDate = java.time.LocalDate.now().plusDays(30).toString();</span>
-<span class="nc" id="L555">        List&lt;com.example.studentgrade.model.Semester&gt; dbSemesters = em</span>
-<span class="nc" id="L556">                .createQuery(&quot;SELECT s FROM Semester s WHERE s.startDate &lt;= :thresholdDate ORDER BY s.startDate DESC&quot;,</span>
+<span class="fc" id="L554">        String thresholdDate = java.time.LocalDate.now().plusDays(30).toString();</span>
+<span class="fc" id="L555">        List&lt;com.example.studentgrade.model.Semester&gt; dbSemesters = em</span>
+<span class="fc" id="L556">                .createQuery(&quot;SELECT s FROM Semester s WHERE s.startDate &lt;= :thresholdDate ORDER BY s.startDate DESC&quot;,</span>
                         com.example.studentgrade.model.Semester.class)
-<span class="nc" id="L558">                .setParameter(&quot;thresholdDate&quot;, thresholdDate)</span>
-<span class="nc" id="L559">                .getResultList();</span>
-<span class="nc" id="L560">        List&lt;SemesterDTO&gt; semesters = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L561">        List&lt;Grade&gt; processedGrades = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L558">                .setParameter(&quot;thresholdDate&quot;, thresholdDate)</span>
+<span class="fc" id="L559">                .getResultList();</span>
+<span class="fc" id="L560">        List&lt;SemesterDTO&gt; semesters = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L561">        List&lt;Grade&gt; processedGrades = new ArrayList&lt;&gt;();</span>
 
-<span class="nc bnc" id="L563" title="All 2 branches missed.">        for (com.example.studentgrade.model.Semester sem : dbSemesters) {</span>
-<span class="nc" id="L564">            List&lt;Long&gt; subjectIdsInSem = em.createQuery(</span>
+<span class="fc bfc" id="L563" title="All 2 branches covered.">        for (com.example.studentgrade.model.Semester sem : dbSemesters) {</span>
+<span class="fc" id="L564">            List&lt;Long&gt; subjectIdsInSem = em.createQuery(</span>
                     &quot;SELECT c.subjectId FROM Classroom c WHERE c.semesterId = :semId AND c.id IN (SELECT e.classroomId FROM Enrollment e WHERE e.studentId = :sid AND e.status = 'APPROVED')&quot;,
                     Long.class)
-<span class="nc" id="L567">                    .setParameter(&quot;semId&quot;, sem.getId())</span>
-<span class="nc" id="L568">                    .setParameter(&quot;sid&quot;, student.getId())</span>
-<span class="nc" id="L569">                    .getResultList();</span>
+<span class="fc" id="L567">                    .setParameter(&quot;semId&quot;, sem.getId())</span>
+<span class="fc" id="L568">                    .setParameter(&quot;sid&quot;, student.getId())</span>
+<span class="fc" id="L569">                    .getResultList();</span>
 
-<span class="nc" id="L571">            List&lt;GradeDTO&gt; semGrades = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L572">            java.util.Set&lt;Long&gt; processedSubIds = new java.util.HashSet&lt;&gt;();</span>
-<span class="nc bnc" id="L573" title="All 2 branches missed.">            for (Long subId : subjectIdsInSem) {</span>
-<span class="nc bnc" id="L574" title="All 2 branches missed.">                if (processedSubIds.contains(subId)) continue;</span>
-<span class="nc" id="L575">                processedSubIds.add(subId);</span>
+<span class="fc" id="L571">            List&lt;GradeDTO&gt; semGrades = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L572">            java.util.Set&lt;Long&gt; processedSubIds = new java.util.HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L573" title="All 2 branches covered.">            for (Long subId : subjectIdsInSem) {</span>
+<span class="pc bpc" id="L574" title="1 of 2 branches missed.">                if (processedSubIds.contains(subId)) continue;</span>
+<span class="fc" id="L575">                processedSubIds.add(subId);</span>
                 
-<span class="nc" id="L577">                Subject sub = em.find(Subject.class, subId);</span>
-<span class="nc bnc" id="L578" title="All 2 branches missed.">                if (sub == null) continue;</span>
+<span class="fc" id="L577">                Subject sub = em.find(Subject.class, subId);</span>
+<span class="pc bpc" id="L578" title="1 of 2 branches missed.">                if (sub == null) continue;</span>
                 
-<span class="nc" id="L580">                Double finalScore = null;</span>
-<span class="nc" id="L581">                Grade foundGrade = null;</span>
-<span class="nc bnc" id="L582" title="All 2 branches missed.">                for (Grade g : grades) {</span>
-<span class="nc bnc" id="L583" title="All 2 branches missed.">                    if (g.getSubject().getId().equals(subId)) {</span>
-<span class="nc" id="L584">                        finalScore = g.getFinalScore();</span>
-<span class="nc" id="L585">                        foundGrade = g;</span>
-<span class="nc" id="L586">                        break;</span>
+<span class="fc" id="L580">                Double finalScore = null;</span>
+<span class="fc" id="L581">                Grade foundGrade = null;</span>
+<span class="pc bpc" id="L582" title="1 of 2 branches missed.">                for (Grade g : grades) {</span>
+<span class="fc bfc" id="L583" title="All 2 branches covered.">                    if (g.getSubject().getId().equals(subId)) {</span>
+<span class="fc" id="L584">                        finalScore = g.getFinalScore();</span>
+<span class="fc" id="L585">                        foundGrade = g;</span>
+<span class="fc" id="L586">                        break;</span>
                     }
-<span class="nc" id="L588">                }</span>
-<span class="nc bnc" id="L589" title="All 2 branches missed.">                if (foundGrade != null) {</span>
-<span class="nc" id="L590">                    processedGrades.add(foundGrade);</span>
+<span class="fc" id="L588">                }</span>
+<span class="pc bpc" id="L589" title="1 of 2 branches missed.">                if (foundGrade != null) {</span>
+<span class="fc" id="L590">                    processedGrades.add(foundGrade);</span>
                 }
-<span class="nc" id="L592">                semGrades.add(new GradeDTO(sub.getCode(), sub.getName(), sub.getCredits(), finalScore));</span>
-<span class="nc" id="L593">            }</span>
+<span class="fc" id="L592">                semGrades.add(new GradeDTO(sub.getCode(), sub.getName(), sub.getCredits(), finalScore));</span>
+<span class="fc" id="L593">            }</span>
             
-<span class="nc bnc" id="L595" title="All 2 branches missed.">            if (!semGrades.isEmpty()) {</span>
-<span class="nc" id="L596">                semesters.add(new SemesterDTO(sem.getName(), sem.getStartDate(), sem.getEndDate(), semGrades));</span>
+<span class="fc bfc" id="L595" title="All 2 branches covered.">            if (!semGrades.isEmpty()) {</span>
+<span class="fc" id="L596">                semesters.add(new SemesterDTO(sem.getName(), sem.getStartDate(), sem.getEndDate(), semGrades));</span>
             }
-<span class="nc" id="L598">        }</span>
+<span class="fc" id="L598">        }</span>
 
         // Gom các điểm không thuộc lớp học nào (dữ liệu mồ côi nếu có)
-<span class="nc" id="L601">        List&lt;GradeDTO&gt; orphanGrades = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L602" title="All 2 branches missed.">        for (Grade g : grades) {</span>
-<span class="nc bnc" id="L603" title="All 2 branches missed.">            if (!processedGrades.contains(g)) {</span>
-<span class="nc" id="L604">                orphanGrades.add(new GradeDTO(g.getSubject().getCode(), g.getSubject().getName(),</span>
-<span class="nc" id="L605">                        g.getSubject().getCredits(), g.getFinalScore()));</span>
+<span class="fc" id="L601">        List&lt;GradeDTO&gt; orphanGrades = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L602" title="All 2 branches covered.">        for (Grade g : grades) {</span>
+<span class="fc bfc" id="L603" title="All 2 branches covered.">            if (!processedGrades.contains(g)) {</span>
+<span class="fc" id="L604">                orphanGrades.add(new GradeDTO(g.getSubject().getCode(), g.getSubject().getName(),</span>
+<span class="fc" id="L605">                        g.getSubject().getCredits(), g.getFinalScore()));</span>
             }
-<span class="nc" id="L607">        }</span>
-<span class="nc bnc" id="L608" title="All 2 branches missed.">        if (!orphanGrades.isEmpty()) {</span>
-<span class="nc" id="L609">            semesters.add(new SemesterDTO(&quot;Học kỳ Khác (Tự do)&quot;, &quot;&quot;, &quot;&quot;, orphanGrades));</span>
+<span class="fc" id="L607">        }</span>
+<span class="pc bpc" id="L608" title="1 of 2 branches missed.">        if (!orphanGrades.isEmpty()) {</span>
+<span class="fc" id="L609">            semesters.add(new SemesterDTO(&quot;Học kỳ Khác (Tự do)&quot;, &quot;&quot;, &quot;&quot;, orphanGrades));</span>
         }
 
-<span class="nc" id="L612">        return this.student.data(&quot;semesters&quot;, semesters)</span>
-<span class="nc" id="L613">                .data(&quot;user&quot;, student)</span>
-<span class="nc" id="L614">                .render();</span>
+<span class="fc" id="L612">        return this.student.data(&quot;semesters&quot;, semesters)</span>
+<span class="fc" id="L613">                .data(&quot;user&quot;, student)</span>
+<span class="fc" id="L614">                .render();</span>
     }
 
     @GET
@@ -684,60 +684,60 @@ import java.util.Map;
     @Path(&quot;/student/enroll&quot;)
     @Produces(MediaType.TEXT_HTML)
     public String getStudentEnroll(@CookieParam(&quot;logged_in_username&quot;) String cookieUsername) {
-<span class="nc" id="L687">        Student student = getLoggedStudent(cookieUsername);</span>
-<span class="nc bnc" id="L688" title="All 2 branches missed.">        Long sid = student.getId() != null ? student.getId() : -1L;</span>
+<span class="fc" id="L687">        Student student = getLoggedStudent(cookieUsername);</span>
+<span class="pc bpc" id="L688" title="1 of 2 branches missed.">        Long sid = student.getId() != null ? student.getId() : -1L;</span>
 
-<span class="nc" id="L690">        String maxThresholdDate = java.time.LocalDate.now().plusDays(35).toString(); // Mở đăng ký trước 35 ngày</span>
-<span class="nc" id="L691">        String minThresholdDate = java.time.LocalDate.now().plusDays(7).toString();</span>
+<span class="fc" id="L690">        String maxThresholdDate = java.time.LocalDate.now().plusDays(35).toString(); // Mở đăng ký trước 35 ngày</span>
+<span class="fc" id="L691">        String minThresholdDate = java.time.LocalDate.now().plusDays(7).toString();</span>
 
-<span class="nc" id="L693">        List&lt;Classroom&gt; availableClassrooms = em.createQuery(</span>
+<span class="fc" id="L693">        List&lt;Classroom&gt; availableClassrooms = em.createQuery(</span>
                 &quot;SELECT c FROM Classroom c WHERE c.id NOT IN (SELECT e.classroomId FROM Enrollment e WHERE e.studentId = :sid AND e.status IN ('APPROVED', 'PENDING')) &quot;
                         +
                         &quot;AND c.startDate &lt;= :maxThresholdDate AND c.startDate &gt;= :minThresholdDate ORDER BY c.startDate DESC&quot;,
                 Classroom.class)
-<span class="nc" id="L698">                .setParameter(&quot;sid&quot;, sid)</span>
-<span class="nc" id="L699">                .setParameter(&quot;maxThresholdDate&quot;, maxThresholdDate)</span>
-<span class="nc" id="L700">                .setParameter(&quot;minThresholdDate&quot;, minThresholdDate)</span>
-<span class="nc" id="L701">                .getResultList();</span>
-<span class="nc" id="L702">        List&lt;StudentClassDTO&gt; availableClasses = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L703" title="All 2 branches missed.">        for (Classroom c : availableClassrooms) {</span>
-<span class="nc bnc" id="L704" title="All 2 branches missed.">            Student teacher = c.getTeacherId() != null ? em.find(Student.class, c.getTeacherId()) : null;</span>
-<span class="nc bnc" id="L705" title="All 2 branches missed.">            String teacherName = teacher != null ? teacher.getFullName() : &quot;Chưa có&quot;;</span>
-<span class="nc bnc" id="L706" title="All 2 branches missed.">            String schedule = (c.getStartDate() != null ? c.getStartDate() : &quot;Chưa rõ&quot;) + &quot; đến &quot;</span>
-<span class="nc bnc" id="L707" title="All 2 branches missed.">                    + (c.getEndDate() != null ? c.getEndDate() : &quot;Chưa rõ&quot;);</span>
-<span class="nc" id="L708">            Long enrolledCount = (Long) em</span>
-<span class="nc" id="L709">                    .createQuery(</span>
+<span class="fc" id="L698">                .setParameter(&quot;sid&quot;, sid)</span>
+<span class="fc" id="L699">                .setParameter(&quot;maxThresholdDate&quot;, maxThresholdDate)</span>
+<span class="fc" id="L700">                .setParameter(&quot;minThresholdDate&quot;, minThresholdDate)</span>
+<span class="fc" id="L701">                .getResultList();</span>
+<span class="fc" id="L702">        List&lt;StudentClassDTO&gt; availableClasses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L703" title="All 2 branches covered.">        for (Classroom c : availableClassrooms) {</span>
+<span class="pc bpc" id="L704" title="1 of 2 branches missed.">            Student teacher = c.getTeacherId() != null ? em.find(Student.class, c.getTeacherId()) : null;</span>
+<span class="pc bpc" id="L705" title="1 of 2 branches missed.">            String teacherName = teacher != null ? teacher.getFullName() : &quot;Chưa có&quot;;</span>
+<span class="pc bpc" id="L706" title="1 of 2 branches missed.">            String schedule = (c.getStartDate() != null ? c.getStartDate() : &quot;Chưa rõ&quot;) + &quot; đến &quot;</span>
+<span class="pc bpc" id="L707" title="1 of 2 branches missed.">                    + (c.getEndDate() != null ? c.getEndDate() : &quot;Chưa rõ&quot;);</span>
+<span class="fc" id="L708">            Long enrolledCount = (Long) em</span>
+<span class="fc" id="L709">                    .createQuery(</span>
                             &quot;SELECT COUNT(e) FROM Enrollment e WHERE e.classroomId = :cid AND e.status = 'APPROVED'&quot;)
-<span class="nc" id="L711">                    .setParameter(&quot;cid&quot;, c.getId())</span>
-<span class="nc" id="L712">                    .getSingleResult();</span>
-<span class="nc" id="L713">            availableClasses.add(new StudentClassDTO(c.getId().toString(), c.getName(), c.getSubjectName(), teacherName,</span>
-<span class="nc" id="L714">                    schedule, enrolledCount, 10)); // 10 là sỉ số tối đa</span>
-<span class="nc" id="L715">        }</span>
+<span class="fc" id="L711">                    .setParameter(&quot;cid&quot;, c.getId())</span>
+<span class="fc" id="L712">                    .getSingleResult();</span>
+<span class="fc" id="L713">            availableClasses.add(new StudentClassDTO(c.getId().toString(), c.getName(), c.getSubjectName(), teacherName,</span>
+<span class="fc" id="L714">                    schedule, enrolledCount, 10)); // 10 là sỉ số tối đa</span>
+<span class="fc" id="L715">        }</span>
 
-<span class="nc" id="L717">        List&lt;Classroom&gt; pendingClassrooms = em.createQuery(</span>
+<span class="fc" id="L717">        List&lt;Classroom&gt; pendingClassrooms = em.createQuery(</span>
                 &quot;SELECT c FROM Classroom c WHERE c.id IN (SELECT e.classroomId FROM Enrollment e WHERE e.studentId = :sid AND e.status = 'PENDING') ORDER BY c.startDate DESC&quot;,
                 Classroom.class)
-<span class="nc" id="L720">                .setParameter(&quot;sid&quot;, sid)</span>
-<span class="nc" id="L721">                .getResultList();</span>
-<span class="nc" id="L722">        List&lt;StudentClassDTO&gt; pendingClasses = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L723" title="All 2 branches missed.">        for (Classroom c : pendingClassrooms) {</span>
-<span class="nc bnc" id="L724" title="All 2 branches missed.">            Student teacher = c.getTeacherId() != null ? em.find(Student.class, c.getTeacherId()) : null;</span>
-<span class="nc bnc" id="L725" title="All 2 branches missed.">            String teacherName = teacher != null ? teacher.getFullName() : &quot;Chưa có&quot;;</span>
-<span class="nc bnc" id="L726" title="All 2 branches missed.">            String schedule = (c.getStartDate() != null ? c.getStartDate() : &quot;Chưa rõ&quot;) + &quot; đến &quot;</span>
-<span class="nc bnc" id="L727" title="All 2 branches missed.">                    + (c.getEndDate() != null ? c.getEndDate() : &quot;Chưa rõ&quot;);</span>
-<span class="nc" id="L728">            Long enrolledCount = (Long) em</span>
-<span class="nc" id="L729">                    .createQuery(</span>
+<span class="fc" id="L720">                .setParameter(&quot;sid&quot;, sid)</span>
+<span class="fc" id="L721">                .getResultList();</span>
+<span class="fc" id="L722">        List&lt;StudentClassDTO&gt; pendingClasses = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L723" title="All 2 branches covered.">        for (Classroom c : pendingClassrooms) {</span>
+<span class="pc bpc" id="L724" title="1 of 2 branches missed.">            Student teacher = c.getTeacherId() != null ? em.find(Student.class, c.getTeacherId()) : null;</span>
+<span class="pc bpc" id="L725" title="1 of 2 branches missed.">            String teacherName = teacher != null ? teacher.getFullName() : &quot;Chưa có&quot;;</span>
+<span class="pc bpc" id="L726" title="1 of 2 branches missed.">            String schedule = (c.getStartDate() != null ? c.getStartDate() : &quot;Chưa rõ&quot;) + &quot; đến &quot;</span>
+<span class="pc bpc" id="L727" title="1 of 2 branches missed.">                    + (c.getEndDate() != null ? c.getEndDate() : &quot;Chưa rõ&quot;);</span>
+<span class="fc" id="L728">            Long enrolledCount = (Long) em</span>
+<span class="fc" id="L729">                    .createQuery(</span>
                             &quot;SELECT COUNT(e) FROM Enrollment e WHERE e.classroomId = :cid AND e.status = 'APPROVED'&quot;)
-<span class="nc" id="L731">                    .setParameter(&quot;cid&quot;, c.getId())</span>
-<span class="nc" id="L732">                    .getSingleResult();</span>
-<span class="nc" id="L733">            pendingClasses.add(new StudentClassDTO(c.getId().toString(), c.getName(), c.getSubjectName(), teacherName,</span>
-<span class="nc" id="L734">                    schedule, enrolledCount, 10));</span>
-<span class="nc" id="L735">        }</span>
+<span class="fc" id="L731">                    .setParameter(&quot;cid&quot;, c.getId())</span>
+<span class="fc" id="L732">                    .getSingleResult();</span>
+<span class="fc" id="L733">            pendingClasses.add(new StudentClassDTO(c.getId().toString(), c.getName(), c.getSubjectName(), teacherName,</span>
+<span class="fc" id="L734">                    schedule, enrolledCount, 10));</span>
+<span class="fc" id="L735">        }</span>
 
-<span class="nc" id="L737">        return studentEnroll.data(&quot;availableClasses&quot;, availableClasses)</span>
-<span class="nc" id="L738">                .data(&quot;pendingClasses&quot;, pendingClasses)</span>
-<span class="nc" id="L739">                .data(&quot;user&quot;, student)</span>
-<span class="nc" id="L740">                .render();</span>
+<span class="fc" id="L737">        return studentEnroll.data(&quot;availableClasses&quot;, availableClasses)</span>
+<span class="fc" id="L738">                .data(&quot;pendingClasses&quot;, pendingClasses)</span>
+<span class="fc" id="L739">                .data(&quot;user&quot;, student)</span>
+<span class="fc" id="L740">                .render();</span>
     }
 
     @POST
@@ -747,15 +747,15 @@ import java.util.Map;
     public Response cancelEnrollment(
             @CookieParam(&quot;logged_in_username&quot;) String cookieUsername,
             @FormParam(&quot;classroomId&quot;) Long classroomId) {
-<span class="nc" id="L750">        Student student = getLoggedStudent(cookieUsername);</span>
-<span class="nc bnc" id="L751" title="All 4 branches missed.">        if (student != null &amp;&amp; classroomId != null) {</span>
-<span class="nc" id="L752">            em.createQuery(</span>
+<span class="fc" id="L750">        Student student = getLoggedStudent(cookieUsername);</span>
+<span class="pc bpc" id="L751" title="2 of 4 branches missed.">        if (student != null &amp;&amp; classroomId != null) {</span>
+<span class="fc" id="L752">            em.createQuery(</span>
                     &quot;DELETE FROM Enrollment e WHERE e.studentId = :sid AND e.classroomId = :cid AND e.status = 'PENDING'&quot;)
-<span class="nc" id="L754">                    .setParameter(&quot;sid&quot;, student.getId())</span>
-<span class="nc" id="L755">                    .setParameter(&quot;cid&quot;, classroomId)</span>
-<span class="nc" id="L756">                    .executeUpdate();</span>
+<span class="fc" id="L754">                    .setParameter(&quot;sid&quot;, student.getId())</span>
+<span class="fc" id="L755">                    .setParameter(&quot;cid&quot;, classroomId)</span>
+<span class="fc" id="L756">                    .executeUpdate();</span>
         }
-<span class="nc" id="L758">        return Response.seeOther(URI.create(&quot;/student/enroll&quot;)).build();</span>
+<span class="fc" id="L758">        return Response.seeOther(URI.create(&quot;/student/enroll&quot;)).build();</span>
     }
 
     @GET
@@ -820,29 +820,29 @@ import java.util.Map;
             @CookieParam(&quot;logged_in_username&quot;) String cookieUsername,
             @FormParam(&quot;tuitionFeeId&quot;) Long tuitionFeeId,
             @FormParam(&quot;amount&quot;) Double amount) {
-<span class="nc" id="L823">        Student student = getLoggedStudent(cookieUsername);</span>
-<span class="nc" id="L824">        TuitionFee fee = em.find(TuitionFee.class, tuitionFeeId);</span>
-<span class="nc bnc" id="L825" title="All 8 branches missed.">        if (fee != null &amp;&amp; fee.getStudentId().equals(student.getId()) &amp;&amp; amount != null &amp;&amp; amount &gt; 0) {</span>
-<span class="nc bnc" id="L826" title="All 2 branches missed.">            double currentPaid = fee.getPaidAmount() != null ? fee.getPaidAmount() : 0.0;</span>
-<span class="nc" id="L827">            double newPaid = currentPaid + amount;</span>
+<span class="fc" id="L823">        Student student = getLoggedStudent(cookieUsername);</span>
+<span class="fc" id="L824">        TuitionFee fee = em.find(TuitionFee.class, tuitionFeeId);</span>
+<span class="pc bpc" id="L825" title="3 of 8 branches missed.">        if (fee != null &amp;&amp; fee.getStudentId().equals(student.getId()) &amp;&amp; amount != null &amp;&amp; amount &gt; 0) {</span>
+<span class="pc bpc" id="L826" title="1 of 2 branches missed.">            double currentPaid = fee.getPaidAmount() != null ? fee.getPaidAmount() : 0.0;</span>
+<span class="fc" id="L827">            double newPaid = currentPaid + amount;</span>
 
-<span class="nc bnc" id="L829" title="All 2 branches missed.">            if (newPaid &gt;= fee.getTotalAmount()) {</span>
-<span class="nc" id="L830">                fee.setPaidAmount(fee.getTotalAmount());</span>
-<span class="nc" id="L831">                fee.setStatus(&quot;PAID&quot;);</span>
+<span class="fc bfc" id="L829" title="All 2 branches covered.">            if (newPaid &gt;= fee.getTotalAmount()) {</span>
+<span class="fc" id="L830">                fee.setPaidAmount(fee.getTotalAmount());</span>
+<span class="fc" id="L831">                fee.setStatus(&quot;PAID&quot;);</span>
             } else {
-<span class="nc" id="L833">                fee.setPaidAmount(newPaid);</span>
-<span class="nc" id="L834">                fee.setStatus(&quot;UNPAID&quot;);</span>
+<span class="fc" id="L833">                fee.setPaidAmount(newPaid);</span>
+<span class="fc" id="L834">                fee.setStatus(&quot;UNPAID&quot;);</span>
             }
-<span class="nc" id="L836">            em.merge(fee);</span>
+<span class="fc" id="L836">            em.merge(fee);</span>
 
-<span class="nc" id="L838">            PaymentTransaction tx = new PaymentTransaction();</span>
-<span class="nc" id="L839">            tx.setTuitionFeeId(fee.getId());</span>
-<span class="nc" id="L840">            tx.setAmount(amount);</span>
-<span class="nc" id="L841">            tx.setPaymentDate(java.time.LocalDate.now().toString());</span>
-<span class="nc" id="L842">            tx.setMethod(&quot;Thanh toán trực tuyến (Mô phỏng)&quot;);</span>
-<span class="nc" id="L843">            em.persist(tx);</span>
+<span class="fc" id="L838">            PaymentTransaction tx = new PaymentTransaction();</span>
+<span class="fc" id="L839">            tx.setTuitionFeeId(fee.getId());</span>
+<span class="fc" id="L840">            tx.setAmount(amount);</span>
+<span class="fc" id="L841">            tx.setPaymentDate(java.time.LocalDate.now().toString());</span>
+<span class="fc" id="L842">            tx.setMethod(&quot;Thanh toán trực tuyến (Mô phỏng)&quot;);</span>
+<span class="fc" id="L843">            em.persist(tx);</span>
         }
-<span class="nc" id="L845">        return Response.seeOther(URI.create(&quot;/student/tuition&quot;)).build();</span>
+<span class="fc" id="L845">        return Response.seeOther(URI.create(&quot;/student/tuition&quot;)).build();</span>
     }
 
     @GET
@@ -1059,52 +1059,52 @@ import java.util.Map;
         public int credits;
         public Double score;
 
-<span class="nc" id="L1062">        public GradeDTO(String subjectCode, String subjectName, int credits, Double score) {</span>
-<span class="nc" id="L1063">            this.subjectCode = subjectCode;</span>
-<span class="nc" id="L1064">            this.subjectName = subjectName;</span>
-<span class="nc" id="L1065">            this.credits = credits;</span>
-<span class="nc" id="L1066">            this.score = score;</span>
-<span class="nc" id="L1067">        }</span>
+<span class="fc" id="L1062">        public GradeDTO(String subjectCode, String subjectName, int credits, Double score) {</span>
+<span class="fc" id="L1063">            this.subjectCode = subjectCode;</span>
+<span class="fc" id="L1064">            this.subjectName = subjectName;</span>
+<span class="fc" id="L1065">            this.credits = credits;</span>
+<span class="fc" id="L1066">            this.score = score;</span>
+<span class="fc" id="L1067">        }</span>
 
         public Double getScore4() {
-<span class="nc bnc" id="L1070" title="All 2 branches missed.">            if (score == null)</span>
-<span class="nc" id="L1071">                return null;</span>
-<span class="nc bnc" id="L1072" title="All 2 branches missed.">            if (score &gt;= 9.0)</span>
-<span class="nc" id="L1073">                return 4.0;</span>
-<span class="nc bnc" id="L1074" title="All 2 branches missed.">            if (score &gt;= 8.0)</span>
-<span class="nc" id="L1075">                return 3.5;</span>
-<span class="nc bnc" id="L1076" title="All 2 branches missed.">            if (score &gt;= 7.0)</span>
-<span class="nc" id="L1077">                return 3.0;</span>
-<span class="nc bnc" id="L1078" title="All 2 branches missed.">            if (score &gt;= 5.0)</span>
-<span class="nc" id="L1079">                return 2.0;</span>
+<span class="fc bfc" id="L1070" title="All 2 branches covered.">            if (score == null)</span>
+<span class="fc" id="L1071">                return null;</span>
+<span class="fc bfc" id="L1072" title="All 2 branches covered.">            if (score &gt;= 9.0)</span>
+<span class="fc" id="L1073">                return 4.0;</span>
+<span class="fc bfc" id="L1074" title="All 2 branches covered.">            if (score &gt;= 8.0)</span>
+<span class="fc" id="L1075">                return 3.5;</span>
+<span class="fc bfc" id="L1076" title="All 2 branches covered.">            if (score &gt;= 7.0)</span>
+<span class="fc" id="L1077">                return 3.0;</span>
+<span class="pc bpc" id="L1078" title="1 of 2 branches missed.">            if (score &gt;= 5.0)</span>
+<span class="fc" id="L1079">                return 2.0;</span>
 <span class="nc bnc" id="L1080" title="All 2 branches missed.">            if (score &gt;= 4.0)</span>
 <span class="nc" id="L1081">                return 1.0;</span>
 <span class="nc" id="L1082">            return 0.0;</span>
         }
 
         public String getLetterGrade() {
-<span class="nc bnc" id="L1086" title="All 2 branches missed.">            if (score == null)</span>
-<span class="nc" id="L1087">                return &quot;N/A&quot;;</span>
-<span class="nc bnc" id="L1088" title="All 2 branches missed.">            if (score &gt;= 9.0)</span>
-<span class="nc" id="L1089">                return &quot;Xuất sắc&quot;;</span>
-<span class="nc bnc" id="L1090" title="All 2 branches missed.">            if (score &gt;= 8.0)</span>
-<span class="nc" id="L1091">                return &quot;Giỏi&quot;;</span>
-<span class="nc bnc" id="L1092" title="All 2 branches missed.">            if (score &gt;= 7.0)</span>
-<span class="nc" id="L1093">                return &quot;Khá&quot;;</span>
-<span class="nc bnc" id="L1094" title="All 2 branches missed.">            if (score &gt;= 5.0)</span>
-<span class="nc" id="L1095">                return &quot;Trung bình&quot;;</span>
+<span class="fc bfc" id="L1086" title="All 2 branches covered.">            if (score == null)</span>
+<span class="fc" id="L1087">                return &quot;N/A&quot;;</span>
+<span class="fc bfc" id="L1088" title="All 2 branches covered.">            if (score &gt;= 9.0)</span>
+<span class="fc" id="L1089">                return &quot;Xuất sắc&quot;;</span>
+<span class="fc bfc" id="L1090" title="All 2 branches covered.">            if (score &gt;= 8.0)</span>
+<span class="fc" id="L1091">                return &quot;Giỏi&quot;;</span>
+<span class="fc bfc" id="L1092" title="All 2 branches covered.">            if (score &gt;= 7.0)</span>
+<span class="fc" id="L1093">                return &quot;Khá&quot;;</span>
+<span class="pc bpc" id="L1094" title="1 of 2 branches missed.">            if (score &gt;= 5.0)</span>
+<span class="fc" id="L1095">                return &quot;Trung bình&quot;;</span>
 <span class="nc bnc" id="L1096" title="All 2 branches missed.">            if (score &gt;= 4.0)</span>
 <span class="nc" id="L1097">                return &quot;Yếu&quot;;</span>
 <span class="nc" id="L1098">            return &quot;Kém&quot;;</span>
         }
 
         public String getBadgeClass() {
-<span class="nc bnc" id="L1102" title="All 2 branches missed.">            if (score == null)</span>
-<span class="nc" id="L1103">                return &quot;na&quot;;</span>
-<span class="nc bnc" id="L1104" title="All 2 branches missed.">            if (score &gt;= 8.0)</span>
-<span class="nc" id="L1105">                return &quot;good&quot;;</span>
-<span class="nc bnc" id="L1106" title="All 2 branches missed.">            if (score &gt;= 5.0)</span>
-<span class="nc" id="L1107">                return &quot;average&quot;;</span>
+<span class="fc bfc" id="L1102" title="All 2 branches covered.">            if (score == null)</span>
+<span class="fc" id="L1103">                return &quot;na&quot;;</span>
+<span class="fc bfc" id="L1104" title="All 2 branches covered.">            if (score &gt;= 8.0)</span>
+<span class="fc" id="L1105">                return &quot;good&quot;;</span>
+<span class="pc bpc" id="L1106" title="1 of 2 branches missed.">            if (score &gt;= 5.0)</span>
+<span class="fc" id="L1107">                return &quot;average&quot;;</span>
 <span class="nc" id="L1108">            return &quot;bad&quot;;</span>
         }
     }
@@ -1117,41 +1117,41 @@ import java.util.Map;
         public Double semesterGPA;
         public Double semesterGPA4;
 
-<span class="nc" id="L1120">        public SemesterDTO(String name, String startDate, String endDate, List&lt;GradeDTO&gt; grades) {</span>
-<span class="nc" id="L1121">            this.name = name;</span>
-<span class="nc" id="L1122">            this.startDate = startDate;</span>
-<span class="nc" id="L1123">            this.endDate = endDate;</span>
-<span class="nc" id="L1124">            this.grades = grades;</span>
-<span class="nc" id="L1125">            this.semesterGPA = calculateGPA();</span>
-<span class="nc" id="L1126">            this.semesterGPA4 = calculateGPA4();</span>
-<span class="nc" id="L1127">        }</span>
+<span class="fc" id="L1120">        public SemesterDTO(String name, String startDate, String endDate, List&lt;GradeDTO&gt; grades) {</span>
+<span class="fc" id="L1121">            this.name = name;</span>
+<span class="fc" id="L1122">            this.startDate = startDate;</span>
+<span class="fc" id="L1123">            this.endDate = endDate;</span>
+<span class="fc" id="L1124">            this.grades = grades;</span>
+<span class="fc" id="L1125">            this.semesterGPA = calculateGPA();</span>
+<span class="fc" id="L1126">            this.semesterGPA4 = calculateGPA4();</span>
+<span class="fc" id="L1127">        }</span>
 
         private Double calculateGPA() {
-<span class="nc bnc" id="L1130" title="All 4 branches missed.">            if (grades == null || grades.isEmpty())</span>
+<span class="pc bpc" id="L1130" title="2 of 4 branches missed.">            if (grades == null || grades.isEmpty())</span>
 <span class="nc" id="L1131">                return 0.0;</span>
-<span class="nc" id="L1132">            double totalScore = 0;</span>
-<span class="nc" id="L1133">            int totalCredits = 0;</span>
-<span class="nc bnc" id="L1134" title="All 2 branches missed.">            for (GradeDTO g : grades) {</span>
-<span class="nc bnc" id="L1135" title="All 2 branches missed.">                if (g.score != null) {</span>
-<span class="nc" id="L1136">                    totalScore += (g.score * g.credits);</span>
-<span class="nc" id="L1137">                    totalCredits += g.credits;</span>
+<span class="fc" id="L1132">            double totalScore = 0;</span>
+<span class="fc" id="L1133">            int totalCredits = 0;</span>
+<span class="fc bfc" id="L1134" title="All 2 branches covered.">            for (GradeDTO g : grades) {</span>
+<span class="fc bfc" id="L1135" title="All 2 branches covered.">                if (g.score != null) {</span>
+<span class="fc" id="L1136">                    totalScore += (g.score * g.credits);</span>
+<span class="fc" id="L1137">                    totalCredits += g.credits;</span>
                 }
-<span class="nc" id="L1139">            }</span>
-<span class="nc bnc" id="L1140" title="All 2 branches missed.">            return totalCredits == 0 ? 0.0 : Math.round((totalScore / totalCredits) * 100.0) / 100.0;</span>
+<span class="fc" id="L1139">            }</span>
+<span class="fc bfc" id="L1140" title="All 2 branches covered.">            return totalCredits == 0 ? 0.0 : Math.round((totalScore / totalCredits) * 100.0) / 100.0;</span>
         }
 
         private Double calculateGPA4() {
-<span class="nc bnc" id="L1144" title="All 4 branches missed.">            if (grades == null || grades.isEmpty())</span>
+<span class="pc bpc" id="L1144" title="2 of 4 branches missed.">            if (grades == null || grades.isEmpty())</span>
 <span class="nc" id="L1145">                return 0.0;</span>
-<span class="nc" id="L1146">            double totalScore4 = 0;</span>
-<span class="nc" id="L1147">            int totalCredits = 0;</span>
-<span class="nc bnc" id="L1148" title="All 2 branches missed.">            for (GradeDTO g : grades) {</span>
-<span class="nc bnc" id="L1149" title="All 2 branches missed.">                if (g.score != null) {</span>
-<span class="nc" id="L1150">                    totalScore4 += (g.getScore4() * g.credits);</span>
-<span class="nc" id="L1151">                    totalCredits += g.credits;</span>
+<span class="fc" id="L1146">            double totalScore4 = 0;</span>
+<span class="fc" id="L1147">            int totalCredits = 0;</span>
+<span class="fc bfc" id="L1148" title="All 2 branches covered.">            for (GradeDTO g : grades) {</span>
+<span class="fc bfc" id="L1149" title="All 2 branches covered.">                if (g.score != null) {</span>
+<span class="fc" id="L1150">                    totalScore4 += (g.getScore4() * g.credits);</span>
+<span class="fc" id="L1151">                    totalCredits += g.credits;</span>
                 }
-<span class="nc" id="L1153">            }</span>
-<span class="nc bnc" id="L1154" title="All 2 branches missed.">            return totalCredits == 0 ? 0.0 : Math.round((totalScore4 / totalCredits) * 100.0) / 100.0;</span>
+<span class="fc" id="L1153">            }</span>
+<span class="fc bfc" id="L1154" title="All 2 branches covered.">            return totalCredits == 0 ? 0.0 : Math.round((totalScore4 / totalCredits) * 100.0) / 100.0;</span>
         }
     }
 
@@ -1175,18 +1175,18 @@ import java.util.Map;
 <span class="nc" id="L1175">        }</span>
 
         public StudentClassDTO(String id, String name, String subject, String teacher, String schedule,
-<span class="nc" id="L1178">                long enrolledCount, int maxCapacity) {</span>
-<span class="nc" id="L1179">            this.id = id;</span>
-<span class="nc" id="L1180">            this.name = name;</span>
-<span class="nc" id="L1181">            this.subject = subject;</span>
-<span class="nc" id="L1182">            this.teacher = teacher;</span>
-<span class="nc" id="L1183">            this.schedule = schedule;</span>
-<span class="nc" id="L1184">            this.enrolledCount = enrolledCount;</span>
-<span class="nc" id="L1185">            this.maxCapacity = maxCapacity;</span>
-<span class="nc" id="L1186">        }</span>
+<span class="fc" id="L1178">                long enrolledCount, int maxCapacity) {</span>
+<span class="fc" id="L1179">            this.id = id;</span>
+<span class="fc" id="L1180">            this.name = name;</span>
+<span class="fc" id="L1181">            this.subject = subject;</span>
+<span class="fc" id="L1182">            this.teacher = teacher;</span>
+<span class="fc" id="L1183">            this.schedule = schedule;</span>
+<span class="fc" id="L1184">            this.enrolledCount = enrolledCount;</span>
+<span class="fc" id="L1185">            this.maxCapacity = maxCapacity;</span>
+<span class="fc" id="L1186">        }</span>
 
         public boolean isFull() {
-<span class="nc bnc" id="L1189" title="All 2 branches missed.">            return enrolledCount &gt;= maxCapacity;</span>
+<span class="pc bpc" id="L1189" title="1 of 2 branches missed.">            return enrolledCount &gt;= maxCapacity;</span>
         }
     }
 
@@ -1259,12 +1259,12 @@ import java.util.Map;
         public String schedule;
         public List&lt;StudentGradeDTO&gt; students;
 
-<span class="nc" id="L1262">        public TeacherClassDTO(String className, String semesterName, String schedule, List&lt;StudentGradeDTO&gt; students) {</span>
-<span class="nc" id="L1263">            this.className = className;</span>
-<span class="nc" id="L1264">            this.semesterName = semesterName;</span>
-<span class="nc" id="L1265">            this.schedule = schedule;</span>
-<span class="nc" id="L1266">            this.students = students;</span>
-<span class="nc" id="L1267">        }</span>
+<span class="fc" id="L1262">        public TeacherClassDTO(String className, String semesterName, String schedule, List&lt;StudentGradeDTO&gt; students) {</span>
+<span class="fc" id="L1263">            this.className = className;</span>
+<span class="fc" id="L1264">            this.semesterName = semesterName;</span>
+<span class="fc" id="L1265">            this.schedule = schedule;</span>
+<span class="fc" id="L1266">            this.students = students;</span>
+<span class="fc" id="L1267">        }</span>
     }
 
     public static class StudentGradeDTO {
@@ -1278,57 +1278,57 @@ import java.util.Map;
         public Long subjectId;
 
         public StudentGradeDTO(Long id, String name, String email, Double att, Double mid, Double exam, Double fin,
-<span class="nc" id="L1281">                Long subjectId) {</span>
-<span class="nc" id="L1282">            this.id = id;</span>
-<span class="nc" id="L1283">            this.name = name;</span>
-<span class="nc" id="L1284">            this.email = email;</span>
-<span class="nc" id="L1285">            this.attendanceScore = att;</span>
-<span class="nc" id="L1286">            this.midtermScore = mid;</span>
-<span class="nc" id="L1287">            this.finalExamScore = exam;</span>
-<span class="nc" id="L1288">            this.finalScore = fin;</span>
-<span class="nc" id="L1289">            this.subjectId = subjectId;</span>
-<span class="nc" id="L1290">        }</span>
+<span class="fc" id="L1281">                Long subjectId) {</span>
+<span class="fc" id="L1282">            this.id = id;</span>
+<span class="fc" id="L1283">            this.name = name;</span>
+<span class="fc" id="L1284">            this.email = email;</span>
+<span class="fc" id="L1285">            this.attendanceScore = att;</span>
+<span class="fc" id="L1286">            this.midtermScore = mid;</span>
+<span class="fc" id="L1287">            this.finalExamScore = exam;</span>
+<span class="fc" id="L1288">            this.finalScore = fin;</span>
+<span class="fc" id="L1289">            this.subjectId = subjectId;</span>
+<span class="fc" id="L1290">        }</span>
 
         public Double getScore4() {
-<span class="nc bnc" id="L1293" title="All 2 branches missed.">            if (finalScore == null)</span>
+<span class="pc bpc" id="L1293" title="1 of 2 branches missed.">            if (finalScore == null)</span>
 <span class="nc" id="L1294">                return null;</span>
-<span class="nc bnc" id="L1295" title="All 2 branches missed.">            if (finalScore &gt;= 9.0)</span>
-<span class="nc" id="L1296">                return 4.0;</span>
-<span class="nc bnc" id="L1297" title="All 2 branches missed.">            if (finalScore &gt;= 8.0)</span>
-<span class="nc" id="L1298">                return 3.5;</span>
-<span class="nc bnc" id="L1299" title="All 2 branches missed.">            if (finalScore &gt;= 7.0)</span>
-<span class="nc" id="L1300">                return 3.0;</span>
-<span class="nc bnc" id="L1301" title="All 2 branches missed.">            if (finalScore &gt;= 5.0)</span>
-<span class="nc" id="L1302">                return 2.0;</span>
-<span class="nc bnc" id="L1303" title="All 2 branches missed.">            if (finalScore &gt;= 4.0)</span>
-<span class="nc" id="L1304">                return 1.0;</span>
-<span class="nc" id="L1305">            return 0.0;</span>
+<span class="fc bfc" id="L1295" title="All 2 branches covered.">            if (finalScore &gt;= 9.0)</span>
+<span class="fc" id="L1296">                return 4.0;</span>
+<span class="fc bfc" id="L1297" title="All 2 branches covered.">            if (finalScore &gt;= 8.0)</span>
+<span class="fc" id="L1298">                return 3.5;</span>
+<span class="fc bfc" id="L1299" title="All 2 branches covered.">            if (finalScore &gt;= 7.0)</span>
+<span class="fc" id="L1300">                return 3.0;</span>
+<span class="fc bfc" id="L1301" title="All 2 branches covered.">            if (finalScore &gt;= 5.0)</span>
+<span class="fc" id="L1302">                return 2.0;</span>
+<span class="fc bfc" id="L1303" title="All 2 branches covered.">            if (finalScore &gt;= 4.0)</span>
+<span class="fc" id="L1304">                return 1.0;</span>
+<span class="fc" id="L1305">            return 0.0;</span>
         }
 
         public String getLetterGrade() {
-<span class="nc bnc" id="L1309" title="All 2 branches missed.">            if (finalScore == null)</span>
+<span class="pc bpc" id="L1309" title="1 of 2 branches missed.">            if (finalScore == null)</span>
 <span class="nc" id="L1310">                return &quot;N/A&quot;;</span>
-<span class="nc bnc" id="L1311" title="All 2 branches missed.">            if (finalScore &gt;= 9.0)</span>
-<span class="nc" id="L1312">                return &quot;Xuất sắc&quot;;</span>
-<span class="nc bnc" id="L1313" title="All 2 branches missed.">            if (finalScore &gt;= 8.0)</span>
-<span class="nc" id="L1314">                return &quot;Giỏi&quot;;</span>
-<span class="nc bnc" id="L1315" title="All 2 branches missed.">            if (finalScore &gt;= 7.0)</span>
-<span class="nc" id="L1316">                return &quot;Khá&quot;;</span>
-<span class="nc bnc" id="L1317" title="All 2 branches missed.">            if (finalScore &gt;= 5.0)</span>
-<span class="nc" id="L1318">                return &quot;Trung bình&quot;;</span>
-<span class="nc bnc" id="L1319" title="All 2 branches missed.">            if (finalScore &gt;= 4.0)</span>
-<span class="nc" id="L1320">                return &quot;Yếu&quot;;</span>
-<span class="nc" id="L1321">            return &quot;Kém&quot;;</span>
+<span class="fc bfc" id="L1311" title="All 2 branches covered.">            if (finalScore &gt;= 9.0)</span>
+<span class="fc" id="L1312">                return &quot;Xuất sắc&quot;;</span>
+<span class="fc bfc" id="L1313" title="All 2 branches covered.">            if (finalScore &gt;= 8.0)</span>
+<span class="fc" id="L1314">                return &quot;Giỏi&quot;;</span>
+<span class="fc bfc" id="L1315" title="All 2 branches covered.">            if (finalScore &gt;= 7.0)</span>
+<span class="fc" id="L1316">                return &quot;Khá&quot;;</span>
+<span class="fc bfc" id="L1317" title="All 2 branches covered.">            if (finalScore &gt;= 5.0)</span>
+<span class="fc" id="L1318">                return &quot;Trung bình&quot;;</span>
+<span class="fc bfc" id="L1319" title="All 2 branches covered.">            if (finalScore &gt;= 4.0)</span>
+<span class="fc" id="L1320">                return &quot;Yếu&quot;;</span>
+<span class="fc" id="L1321">            return &quot;Kém&quot;;</span>
         }
 
         public String getBadgeClass() {
-<span class="nc bnc" id="L1325" title="All 2 branches missed.">            if (finalScore == null)</span>
+<span class="pc bpc" id="L1325" title="1 of 2 branches missed.">            if (finalScore == null)</span>
 <span class="nc" id="L1326">                return &quot;na&quot;;</span>
-<span class="nc bnc" id="L1327" title="All 2 branches missed.">            if (finalScore &gt;= 8.0)</span>
-<span class="nc" id="L1328">                return &quot;good&quot;;</span>
-<span class="nc bnc" id="L1329" title="All 2 branches missed.">            if (finalScore &gt;= 5.0)</span>
-<span class="nc" id="L1330">                return &quot;average&quot;;</span>
-<span class="nc" id="L1331">            return &quot;bad&quot;;</span>
+<span class="fc bfc" id="L1327" title="All 2 branches covered.">            if (finalScore &gt;= 8.0)</span>
+<span class="fc" id="L1328">                return &quot;good&quot;;</span>
+<span class="fc bfc" id="L1329" title="All 2 branches covered.">            if (finalScore &gt;= 5.0)</span>
+<span class="fc" id="L1330">                return &quot;average&quot;;</span>
+<span class="fc" id="L1331">            return &quot;bad&quot;;</span>
         }
     }
 
@@ -1337,11 +1337,11 @@ import java.util.Map;
         public String studentName;
         public String className;
 
-<span class="nc" id="L1340">        public PendingEnrollmentDTO(Long enrollmentId, String studentName, String className) {</span>
-<span class="nc" id="L1341">            this.enrollmentId = enrollmentId;</span>
-<span class="nc" id="L1342">            this.studentName = studentName;</span>
-<span class="nc" id="L1343">            this.className = className;</span>
-<span class="nc" id="L1344">        }</span>
+<span class="fc" id="L1340">        public PendingEnrollmentDTO(Long enrollmentId, String studentName, String className) {</span>
+<span class="fc" id="L1341">            this.enrollmentId = enrollmentId;</span>
+<span class="fc" id="L1342">            this.studentName = studentName;</span>
+<span class="fc" id="L1343">            this.className = className;</span>
+<span class="fc" id="L1344">        }</span>
     }
 
     public static class TuitionFeeDTO {

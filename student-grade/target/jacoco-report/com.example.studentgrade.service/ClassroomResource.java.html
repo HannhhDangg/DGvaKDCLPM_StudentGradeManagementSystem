@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 @Path(&quot;/classes&quot;)
 @Produces(MediaType.TEXT_HTML)
-<span class="nc" id="L21">public class ClassroomResource {</span>
+<span class="fc" id="L21">public class ClassroomResource {</span>
 
     @Inject
     ClassroomService classroomService;
@@ -33,57 +33,57 @@ import java.util.ArrayList;
             @QueryParam(&quot;subjectId&quot;) Long subjectId,
             @QueryParam(&quot;semesterId&quot;) Long semesterId) {
 
-<span class="nc bnc" id="L36" title="All 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
-<span class="nc" id="L37">        Student teacher = classroomService.getTeacherByUsername(username);</span>
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
+<span class="fc" id="L37">        Student teacher = classroomService.getTeacherByUsername(username);</span>
 
-<span class="nc" id="L39">        Long loggedTeacherId = teacher.getId();</span>
+<span class="fc" id="L39">        Long loggedTeacherId = teacher.getId();</span>
 
-<span class="nc" id="L41">        int pageSize = 10;</span>
-<span class="nc" id="L42">        Long totalRecords = classroomService.countClassesByTeacher(loggedTeacherId, subjectId, semesterId);</span>
-<span class="nc" id="L43">        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);</span>
+<span class="fc" id="L41">        int pageSize = 10;</span>
+<span class="fc" id="L42">        Long totalRecords = classroomService.countClassesByTeacher(loggedTeacherId, subjectId, semesterId);</span>
+<span class="fc" id="L43">        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);</span>
 
-<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (page &lt; 1)</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (page &lt; 1)</span>
 <span class="nc" id="L46">            page = 1;</span>
-<span class="nc bnc" id="L47" title="All 4 branches missed.">        if (page &gt; totalPages &amp;&amp; totalPages &gt; 0)</span>
+<span class="pc bpc" id="L47" title="3 of 4 branches missed.">        if (page &gt; totalPages &amp;&amp; totalPages &gt; 0)</span>
 <span class="nc" id="L48">            page = totalPages;</span>
 
-<span class="nc" id="L50">        List&lt;Classroom&gt; classesOnPage = classroomService.getClassesByTeacher(loggedTeacherId, subjectId, semesterId,</span>
+<span class="fc" id="L50">        List&lt;Classroom&gt; classesOnPage = classroomService.getClassesByTeacher(loggedTeacherId, subjectId, semesterId,</span>
                 page, pageSize);
-<span class="nc" id="L52">        List&lt;Subject&gt; subjects = classroomService.getSubjectsByTeacher(loggedTeacherId);</span>
-<span class="nc" id="L53">        List&lt;Semester&gt; semesters = classroomService.getAllSemesters();</span>
+<span class="fc" id="L52">        List&lt;Subject&gt; subjects = classroomService.getSubjectsByTeacher(loggedTeacherId);</span>
+<span class="fc" id="L53">        List&lt;Semester&gt; semesters = classroomService.getAllSemesters();</span>
 
         // Phân loại lớp học thành các nhóm: sắp diễn ra, đang diễn ra và đã kết thúc
         // để giao diện có thể hiển thị rõ ràng hơn cho giáo viên.
-<span class="nc" id="L57">        List&lt;Classroom&gt; upcomingClasses = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L58">        List&lt;Classroom&gt; ongoingClasses = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L59">        List&lt;Classroom&gt; pastClasses = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L60">        String currentDate = LocalDate.now().toString();</span>
+<span class="fc" id="L57">        List&lt;Classroom&gt; upcomingClasses = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L58">        List&lt;Classroom&gt; ongoingClasses = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L59">        List&lt;Classroom&gt; pastClasses = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L60">        String currentDate = LocalDate.now().toString();</span>
 
-<span class="nc bnc" id="L62" title="All 2 branches missed.">        for (Classroom c : classesOnPage) {</span>
-<span class="nc" id="L63">            String startDate = c.getStartDate();</span>
-<span class="nc" id="L64">            String endDate = c.getEndDate();</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        for (Classroom c : classesOnPage) {</span>
+<span class="fc" id="L63">            String startDate = c.getStartDate();</span>
+<span class="fc" id="L64">            String endDate = c.getEndDate();</span>
 
-<span class="nc bnc" id="L66" title="All 6 branches missed.">            if (endDate != null &amp;&amp; !endDate.isEmpty() &amp;&amp; endDate.compareTo(currentDate) &lt; 0) {</span>
-<span class="nc" id="L67">                pastClasses.add(c);</span>
-<span class="nc bnc" id="L68" title="All 6 branches missed.">            } else if (startDate != null &amp;&amp; !startDate.isEmpty() &amp;&amp; startDate.compareTo(currentDate) &gt; 0) {</span>
-<span class="nc" id="L69">                upcomingClasses.add(c);</span>
+<span class="pc bpc" id="L66" title="2 of 6 branches missed.">            if (endDate != null &amp;&amp; !endDate.isEmpty() &amp;&amp; endDate.compareTo(currentDate) &lt; 0) {</span>
+<span class="fc" id="L67">                pastClasses.add(c);</span>
+<span class="pc bpc" id="L68" title="3 of 6 branches missed.">            } else if (startDate != null &amp;&amp; !startDate.isEmpty() &amp;&amp; startDate.compareTo(currentDate) &gt; 0) {</span>
+<span class="fc" id="L69">                upcomingClasses.add(c);</span>
             } else {
 <span class="nc" id="L71">                ongoingClasses.add(c);</span>
             }
-<span class="nc" id="L73">        }</span>
+<span class="fc" id="L73">        }</span>
 
-<span class="nc" id="L75">        return classesTemplate.data(&quot;classes&quot;, classesOnPage) // Giữ lại &quot;classes&quot; để tương thích ngược với template cũ</span>
-<span class="nc" id="L76">                .data(&quot;upcomingClasses&quot;, upcomingClasses)</span>
-<span class="nc" id="L77">                .data(&quot;ongoingClasses&quot;, ongoingClasses)</span>
-<span class="nc" id="L78">                .data(&quot;pastClasses&quot;, pastClasses)</span>
-<span class="nc" id="L79">                .data(&quot;subjects&quot;, subjects)</span>
-<span class="nc" id="L80">                .data(&quot;semesters&quot;, semesters)</span>
-<span class="nc" id="L81">                .data(&quot;user&quot;, teacher) // Truyền thông tin user thực tế ra giao diện</span>
-<span class="nc" id="L82">                .data(&quot;currentPage&quot;, page)</span>
-<span class="nc" id="L83">                .data(&quot;totalPages&quot;, totalPages)</span>
-<span class="nc" id="L84">                .data(&quot;selectedSubjectId&quot;, subjectId)</span>
-<span class="nc" id="L85">                .data(&quot;selectedSemesterId&quot;, semesterId)</span>
-<span class="nc" id="L86">                .render();</span>
+<span class="fc" id="L75">        return classesTemplate.data(&quot;classes&quot;, classesOnPage) // Giữ lại &quot;classes&quot; để tương thích ngược với template cũ</span>
+<span class="fc" id="L76">                .data(&quot;upcomingClasses&quot;, upcomingClasses)</span>
+<span class="fc" id="L77">                .data(&quot;ongoingClasses&quot;, ongoingClasses)</span>
+<span class="fc" id="L78">                .data(&quot;pastClasses&quot;, pastClasses)</span>
+<span class="fc" id="L79">                .data(&quot;subjects&quot;, subjects)</span>
+<span class="fc" id="L80">                .data(&quot;semesters&quot;, semesters)</span>
+<span class="fc" id="L81">                .data(&quot;user&quot;, teacher) // Truyền thông tin user thực tế ra giao diện</span>
+<span class="fc" id="L82">                .data(&quot;currentPage&quot;, page)</span>
+<span class="fc" id="L83">                .data(&quot;totalPages&quot;, totalPages)</span>
+<span class="fc" id="L84">                .data(&quot;selectedSubjectId&quot;, subjectId)</span>
+<span class="fc" id="L85">                .data(&quot;selectedSemesterId&quot;, semesterId)</span>
+<span class="fc" id="L86">                .render();</span>
     }
 
     @POST
@@ -97,10 +97,10 @@ import java.util.ArrayList;
             @FormParam(&quot;semesterId&quot;) Long semesterId,
             @FormParam(&quot;description&quot;) String description) {
 
-<span class="nc bnc" id="L100" title="All 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
-<span class="nc" id="L101">        classroomService.addClassroom(username, subjectId, subjectName, classCode, semesterId, description);</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;teacher_toan&quot;;</span>
+<span class="fc" id="L101">        classroomService.addClassroom(username, subjectId, subjectName, classCode, semesterId, description);</span>
 
-<span class="nc" id="L103">        return Response.seeOther(URI.create(&quot;/classes&quot;)).build();</span>
+<span class="fc" id="L103">        return Response.seeOther(URI.create(&quot;/classes&quot;)).build();</span>
     }
 
     @POST

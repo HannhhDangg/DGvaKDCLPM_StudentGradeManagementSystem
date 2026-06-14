@@ -27,16 +27,16 @@ import java.net.URI;
             @CookieParam(&quot;logged_in_username&quot;) String cookieUsername,
             @FormParam(&quot;classroomId&quot;) String classroomIdStr) {
 
-<span class="nc bnc" id="L30" title="All 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;student_1&quot;;</span>
-<span class="nc" id="L31">        Student student = null;</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">        String username = cookieUsername != null ? cookieUsername : &quot;student_1&quot;;</span>
+<span class="fc" id="L31">        Student student = null;</span>
         try {
-<span class="nc" id="L33">            student = em.createQuery(&quot;SELECT s FROM Student s WHERE s.username = :username&quot;, Student.class)</span>
-<span class="nc" id="L34">                    .setParameter(&quot;username&quot;, username)</span>
-<span class="nc" id="L35">                    .setMaxResults(1).getSingleResult();</span>
+<span class="fc" id="L33">            student = em.createQuery(&quot;SELECT s FROM Student s WHERE s.username = :username&quot;, Student.class)</span>
+<span class="fc" id="L34">                    .setParameter(&quot;username&quot;, username)</span>
+<span class="fc" id="L35">                    .setMaxResults(1).getSingleResult();</span>
 <span class="nc" id="L36">        } catch (Exception e) {</span>
-<span class="nc" id="L37">        }</span>
+<span class="fc" id="L37">        }</span>
 
-<span class="nc bnc" id="L39" title="All 4 branches missed.">        if (student == null || student.getId() == null) {</span>
+<span class="pc bpc" id="L39" title="2 of 4 branches missed.">        if (student == null || student.getId() == null) {</span>
 <span class="nc" id="L40">            student = new Student();</span>
 <span class="nc" id="L41">            student.setUsername(username);</span>
 <span class="nc" id="L42">            student.setLastName(&quot;Sinh viên&quot;);</span>
@@ -44,64 +44,64 @@ import java.net.URI;
 <span class="nc" id="L44">            student.setRole(&quot;STUDENT&quot;);</span>
 <span class="nc" id="L45">            em.persist(student);</span>
         }
-<span class="nc" id="L47">        Long studentId = student.getId();</span>
+<span class="fc" id="L47">        Long studentId = student.getId();</span>
 
-<span class="nc bnc" id="L49" title="All 6 branches missed.">        if (classroomIdStr == null || classroomIdStr.trim().isEmpty() || &quot;null&quot;.equals(classroomIdStr)) {</span>
+<span class="pc bpc" id="L49" title="3 of 6 branches missed.">        if (classroomIdStr == null || classroomIdStr.trim().isEmpty() || &quot;null&quot;.equals(classroomIdStr)) {</span>
 <span class="nc" id="L50">            return Response.seeOther(URI.create(&quot;/student/enroll?error=notfound&quot;)).build();</span>
         }
 
         Long classroomId;
         try {
-<span class="nc" id="L55">            classroomId = Long.parseLong(classroomIdStr);</span>
+<span class="fc" id="L55">            classroomId = Long.parseLong(classroomIdStr);</span>
 <span class="nc" id="L56">        } catch (NumberFormatException ex) {</span>
 <span class="nc" id="L57">            return Response.seeOther(URI.create(&quot;/student/enroll?error=notfound&quot;)).build();</span>
-<span class="nc" id="L58">        }</span>
+<span class="fc" id="L58">        }</span>
 
-<span class="nc" id="L60">        Classroom classroom = em.find(Classroom.class, classroomId);</span>
-<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (classroom == null) {</span>
+<span class="fc" id="L60">        Classroom classroom = em.find(Classroom.class, classroomId);</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        if (classroom == null) {</span>
 <span class="nc" id="L62">            return Response.seeOther(URI.create(&quot;/student/enroll?error=notfound&quot;)).build();</span>
         }
 
         // Kiểm tra thời gian đăng ký (đóng trước khi lớp bắt đầu 7 ngày)
-<span class="nc bnc" id="L66" title="All 4 branches missed.">        if (classroom.getStartDate() != null &amp;&amp; !classroom.getStartDate().isEmpty()) {</span>
+<span class="pc bpc" id="L66" title="2 of 4 branches missed.">        if (classroom.getStartDate() != null &amp;&amp; !classroom.getStartDate().isEmpty()) {</span>
             try {
-<span class="nc" id="L68">                java.time.LocalDate startDate = java.time.LocalDate.parse(classroom.getStartDate());</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">                if (java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), startDate) &lt; 7) {</span>
+<span class="fc" id="L68">                java.time.LocalDate startDate = java.time.LocalDate.parse(classroom.getStartDate());</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">                if (java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), startDate) &lt; 7) {</span>
 <span class="nc" id="L70">                    return Response.seeOther(URI.create(&quot;/student/enroll?error=deadline&quot;)).build();</span>
                 }
 <span class="nc" id="L72">            } catch (Exception e) {</span>
-<span class="nc" id="L73">            }</span>
+<span class="fc" id="L73">            }</span>
         }
 
         // Kiểm tra giới hạn 10 sinh viên trong một lớp (chỉ tính những bạn đã được
         // duyệt)
-<span class="nc" id="L78">        Long count = em</span>
-<span class="nc" id="L79">                .createQuery(&quot;SELECT COUNT(e) FROM Enrollment e WHERE e.classroomId = :cid AND e.status = 'APPROVED'&quot;,</span>
+<span class="fc" id="L78">        Long count = em</span>
+<span class="fc" id="L79">                .createQuery(&quot;SELECT COUNT(e) FROM Enrollment e WHERE e.classroomId = :cid AND e.status = 'APPROVED'&quot;,</span>
                         Long.class)
-<span class="nc" id="L81">                .setParameter(&quot;cid&quot;, classroomId)</span>
-<span class="nc" id="L82">                .getSingleResult();</span>
+<span class="fc" id="L81">                .setParameter(&quot;cid&quot;, classroomId)</span>
+<span class="fc" id="L82">                .getSingleResult();</span>
 
-<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (count &gt;= 10) {</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (count &gt;= 10) {</span>
 <span class="nc" id="L85">            return Response.seeOther(URI.create(&quot;/student/enroll?error=limit&quot;)).build();</span>
         }
 
         // Kiểm tra sinh viên đã có trong lớp chưa
-<span class="nc" id="L89">        Long existing = em</span>
-<span class="nc" id="L90">                .createQuery(&quot;SELECT COUNT(e) FROM Enrollment e WHERE e.classroomId = :cid AND e.studentId = :sid&quot;,</span>
+<span class="fc" id="L89">        Long existing = em</span>
+<span class="fc" id="L90">                .createQuery(&quot;SELECT COUNT(e) FROM Enrollment e WHERE e.classroomId = :cid AND e.studentId = :sid&quot;,</span>
                         Long.class)
-<span class="nc" id="L92">                .setParameter(&quot;cid&quot;, classroomId)</span>
-<span class="nc" id="L93">                .setParameter(&quot;sid&quot;, studentId)</span>
-<span class="nc" id="L94">                .getSingleResult();</span>
+<span class="fc" id="L92">                .setParameter(&quot;cid&quot;, classroomId)</span>
+<span class="fc" id="L93">                .setParameter(&quot;sid&quot;, studentId)</span>
+<span class="fc" id="L94">                .getSingleResult();</span>
 
-<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (existing == 0) {</span>
-<span class="nc" id="L97">            Enrollment enrollment = new Enrollment();</span>
-<span class="nc" id="L98">            enrollment.setStudentId(studentId);</span>
-<span class="nc" id="L99">            enrollment.setClassroomId(classroomId);</span>
-<span class="nc" id="L100">            enrollment.setStatus(&quot;PENDING&quot;);</span>
-<span class="nc" id="L101">            em.persist(enrollment);</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if (existing == 0) {</span>
+<span class="fc" id="L97">            Enrollment enrollment = new Enrollment();</span>
+<span class="fc" id="L98">            enrollment.setStudentId(studentId);</span>
+<span class="fc" id="L99">            enrollment.setClassroomId(classroomId);</span>
+<span class="fc" id="L100">            enrollment.setStatus(&quot;PENDING&quot;);</span>
+<span class="fc" id="L101">            em.persist(enrollment);</span>
         }
 
-<span class="nc" id="L104">        return Response.seeOther(URI.create(&quot;/student/enroll&quot;)).build();</span>
+<span class="fc" id="L104">        return Response.seeOther(URI.create(&quot;/student/enroll&quot;)).build();</span>
     }
 
     @POST
@@ -113,21 +113,21 @@ import java.net.URI;
 <span class="fc" id="L113">        Enrollment e = em.find(Enrollment.class, enrollmentId);</span>
 <span class="pc bpc" id="L114" title="1 of 2 branches missed.">        if (e != null) {</span>
 <span class="fc" id="L115">            String oldStatus = e.getStatus();</span>
-<span class="pc bpc" id="L116" title="2 of 4 branches missed.">            if (&quot;APPROVED&quot;.equals(status) &amp;&amp; !&quot;APPROVED&quot;.equals(oldStatus)) {</span>
-<span class="nc" id="L117">                Long count = em.createQuery(</span>
+<span class="pc bpc" id="L116" title="1 of 4 branches missed.">            if (&quot;APPROVED&quot;.equals(status) &amp;&amp; !&quot;APPROVED&quot;.equals(oldStatus)) {</span>
+<span class="fc" id="L117">                Long count = em.createQuery(</span>
                         &quot;SELECT COUNT(en) FROM Enrollment en WHERE en.classroomId = :cid AND en.status = 'APPROVED'&quot;,
                         Long.class)
-<span class="nc" id="L120">                        .setParameter(&quot;cid&quot;, e.getClassroomId())</span>
-<span class="nc" id="L121">                        .getSingleResult();</span>
-<span class="nc bnc" id="L122" title="All 2 branches missed.">                if (count &gt;= 10)</span>
+<span class="fc" id="L120">                        .setParameter(&quot;cid&quot;, e.getClassroomId())</span>
+<span class="fc" id="L121">                        .getSingleResult();</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">                if (count &gt;= 10)</span>
 <span class="nc" id="L123">                    return Response.seeOther(URI.create(&quot;/teacher/enrollments?error=limit&quot;)).build();</span>
             }
 <span class="fc" id="L125">            e.setStatus(status);</span>
 <span class="fc" id="L126">            em.merge(e);</span>
 
             // Tự động tính toán &amp; cập nhật Học phí cho Sinh viên
-<span class="pc bpc" id="L129" title="2 of 4 branches missed.">            if (&quot;APPROVED&quot;.equals(status) &amp;&amp; !&quot;APPROVED&quot;.equals(oldStatus)) {</span>
-<span class="nc" id="L130">                updateTuitionFee(e.getStudentId(), e.getClassroomId(), 1); // Sinh viên được duyệt -&gt; Tăng công nợ</span>
+<span class="pc bpc" id="L129" title="1 of 4 branches missed.">            if (&quot;APPROVED&quot;.equals(status) &amp;&amp; !&quot;APPROVED&quot;.equals(oldStatus)) {</span>
+<span class="fc" id="L130">                updateTuitionFee(e.getStudentId(), e.getClassroomId(), 1); // Sinh viên được duyệt -&gt; Tăng công nợ</span>
 <span class="pc bpc" id="L131" title="2 of 4 branches missed.">            } else if (&quot;APPROVED&quot;.equals(oldStatus) &amp;&amp; !&quot;APPROVED&quot;.equals(status)) {</span>
 <span class="nc" id="L132">                updateTuitionFee(e.getStudentId(), e.getClassroomId(), -1); // Bị huỷ duyệt -&gt; Trừ bớt công nợ</span>
             }
@@ -136,16 +136,16 @@ import java.net.URI;
     }
 
     private void updateTuitionFee(Long studentId, Long classroomId, int sign) {
-<span class="nc" id="L139">        Classroom c = em.find(Classroom.class, classroomId);</span>
-<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (c == null) return;</span>
-<span class="nc" id="L141">        com.example.studentgrade.model.Subject sub = em.find(com.example.studentgrade.model.Subject.class, c.getSubjectId());</span>
-<span class="nc bnc" id="L142" title="All 2 branches missed.">        if (sub == null) return;</span>
+<span class="fc" id="L139">        Classroom c = em.find(Classroom.class, classroomId);</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (c == null) return;</span>
+<span class="fc" id="L141">        com.example.studentgrade.model.Subject sub = em.find(com.example.studentgrade.model.Subject.class, c.getSubjectId());</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">        if (sub == null) return;</span>
         
-<span class="nc" id="L144">        int credits = sub.getCredits();</span>
-<span class="nc" id="L145">        double amount = 0.0;</span>
-<span class="nc" id="L146">        String category = sub.getCategory();</span>
-<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (&quot;TECHNICAL&quot;.equals(category)) {</span>
-<span class="nc" id="L148">            amount = credits * 750000.0;</span>
+<span class="fc" id="L144">        int credits = sub.getCredits();</span>
+<span class="fc" id="L145">        double amount = 0.0;</span>
+<span class="fc" id="L146">        String category = sub.getCategory();</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        if (&quot;TECHNICAL&quot;.equals(category)) {</span>
+<span class="fc" id="L148">            amount = credits * 750000.0;</span>
 <span class="nc bnc" id="L149" title="All 2 branches missed.">        } else if (&quot;BASIC&quot;.equals(category)) {</span>
 <span class="nc" id="L150">            amount = credits * 650000.0;</span>
 <span class="nc bnc" id="L151" title="All 2 branches missed.">        } else if (&quot;GENERAL&quot;.equals(category)) {</span>
@@ -154,24 +154,24 @@ import java.net.URI;
 <span class="nc" id="L154">            amount = credits * 750000.0;</span>
         }
         
-<span class="nc" id="L157">        java.util.List&lt;com.example.studentgrade.model.TuitionFee&gt; fees = em.createQuery(</span>
+<span class="fc" id="L157">        java.util.List&lt;com.example.studentgrade.model.TuitionFee&gt; fees = em.createQuery(</span>
             &quot;SELECT t FROM TuitionFee t WHERE t.studentId = :sid AND t.semesterId = :semId&quot;,
             com.example.studentgrade.model.TuitionFee.class)
-<span class="nc" id="L160">            .setParameter(&quot;sid&quot;, studentId)</span>
-<span class="nc" id="L161">            .setParameter(&quot;semId&quot;, c.getSemesterId())</span>
-<span class="nc" id="L162">            .getResultList();</span>
+<span class="fc" id="L160">            .setParameter(&quot;sid&quot;, studentId)</span>
+<span class="fc" id="L161">            .setParameter(&quot;semId&quot;, c.getSemesterId())</span>
+<span class="fc" id="L162">            .getResultList();</span>
             
         com.example.studentgrade.model.TuitionFee fee;
-<span class="nc bnc" id="L165" title="All 2 branches missed.">        if (fees.isEmpty()) {</span>
-<span class="nc bnc" id="L166" title="All 2 branches missed.">            if (sign &lt; 0) return;</span>
-<span class="nc" id="L167">            fee = new com.example.studentgrade.model.TuitionFee();</span>
-<span class="nc" id="L168">            fee.setStudentId(studentId);</span>
-<span class="nc" id="L169">            fee.setSemesterId(c.getSemesterId());</span>
-<span class="nc" id="L170">            fee.setTotalCredits(credits);</span>
-<span class="nc" id="L171">            fee.setTotalAmount(amount);</span>
-<span class="nc" id="L172">            fee.setPaidAmount(0.0);</span>
-<span class="nc" id="L173">            fee.setStatus(&quot;UNPAID&quot;);</span>
-<span class="nc" id="L174">            em.persist(fee);</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">        if (fees.isEmpty()) {</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">            if (sign &lt; 0) return;</span>
+<span class="fc" id="L167">            fee = new com.example.studentgrade.model.TuitionFee();</span>
+<span class="fc" id="L168">            fee.setStudentId(studentId);</span>
+<span class="fc" id="L169">            fee.setSemesterId(c.getSemesterId());</span>
+<span class="fc" id="L170">            fee.setTotalCredits(credits);</span>
+<span class="fc" id="L171">            fee.setTotalAmount(amount);</span>
+<span class="fc" id="L172">            fee.setPaidAmount(0.0);</span>
+<span class="fc" id="L173">            fee.setStatus(&quot;UNPAID&quot;);</span>
+<span class="fc" id="L174">            em.persist(fee);</span>
         } else {
 <span class="nc" id="L176">            fee = fees.get(0);</span>
 <span class="nc" id="L177">            fee.setTotalCredits(fee.getTotalCredits() + (credits * sign));</span>
@@ -189,6 +189,6 @@ import java.net.URI;
             }
 <span class="nc" id="L190">            em.merge(fee);</span>
         }
-<span class="nc" id="L192">    }</span>
+<span class="fc" id="L192">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

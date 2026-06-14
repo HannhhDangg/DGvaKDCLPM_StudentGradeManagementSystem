@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.example.studentgrade.service.StudentServiceTest" time="0.018" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.example.studentgrade.ui.CoreLogicWhiteBoxTest" time="0.32" tests="6" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -72,24 +72,478 @@
     <property name="java.class.version" value="65.0"/>
     <property name="jacoco-agent.destfile" value="D:\Student grade management system\student-grade\target\jacoco-quarkus.exec"/>
   </properties>
-  <testcase name="testUserCreationAndCount" classname="com.example.studentgrade.service.StudentServiceTest" time="0.013">
+  <testcase name="testGrade_WhenAllScoresProvided_ShouldCalculateFinalScoreCorrectly" classname="com.example.studentgrade.ui.CoreLogicWhiteBoxTest" time="0.088">
     <system-out><![CDATA[Hibernate: 
     select
-        count(*) 
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
     from
-        users s1_0
+        users s1_0 
+    where
+        s1_0.username='student_1' 
+    fetch
+        first ? rows only
 Hibernate: 
     insert 
     into
-        users
-        (avatar, email, firstName, lastName, password, role, username, id) 
+        subjects
+        (category, code, credits, description, name, id) 
+    values
+        (?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        grades
+        (attendanceScore, finalExamScore, finalScore, gradeText, midtermScore, student_id, subject_id, id) 
     values
         (?, ?, ?, ?, ?, ?, ?, default)
 Hibernate: 
     select
-        count(*) 
+        g1_0.id,
+        g1_0.attendanceScore,
+        g1_0.finalExamScore,
+        g1_0.finalScore,
+        g1_0.gradeText,
+        g1_0.midtermScore,
+        g1_0.student_id,
+        g1_0.subject_id 
     from
-        users s1_0
+        grades g1_0 
+    where
+        g1_0.student_id=? 
+        and g1_0.subject_id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.category,
+        s1_0.code,
+        s1_0.credits,
+        s1_0.description,
+        s1_0.name 
+    from
+        subjects s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    update
+        grades 
+    set
+        attendanceScore=?,
+        finalExamScore=?,
+        finalScore=?,
+        gradeText=?,
+        midtermScore=?,
+        student_id=?,
+        subject_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        g1_0.id,
+        g1_0.attendanceScore,
+        g1_0.finalExamScore,
+        g1_0.finalScore,
+        g1_0.gradeText,
+        g1_0.midtermScore,
+        g1_0.student_id,
+        g1_0.subject_id 
+    from
+        grades g1_0 
+    where
+        g1_0.student_id=? 
+        and g1_0.subject_id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testTuition_FullPayment_ShouldChangeToPaid" classname="com.example.studentgrade.ui.CoreLogicWhiteBoxTest" time="0.035">
+    <system-out><![CDATA[Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.username='student_1' 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        subjects
+        (category, code, credits, description, name, id) 
+    values
+        (?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        grades
+        (attendanceScore, finalExamScore, finalScore, gradeText, midtermScore, student_id, subject_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        tuition_fees
+        (paidAmount, semesterId, status, studentId, totalAmount, totalCredits, id) 
+    values
+        (?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.username=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        payment_transactions
+        (amount, method, paymentDate, tuitionFeeId, id) 
+    values
+        (?, ?, ?, ?, default)
+Hibernate: 
+    update
+        tuition_fees 
+    set
+        paidAmount=?,
+        semesterId=?,
+        status=?,
+        studentId=?,
+        totalAmount=?,
+        totalCredits=? 
+    where
+        id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testEnrollment_CancelApprovedClass_ShouldBePrevented" classname="com.example.studentgrade.ui.CoreLogicWhiteBoxTest" time="0.071">
+    <system-out><![CDATA[Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.username='student_1' 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        subjects
+        (category, code, credits, description, name, id) 
+    values
+        (?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        grades
+        (attendanceScore, finalExamScore, finalScore, gradeText, midtermScore, student_id, subject_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        enrollments
+        (classroomId, status, studentId, id) 
+    values
+        (?, ?, ?, default)
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.username=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    delete 
+    from
+        enrollments 
+    where
+        studentId=? 
+        and classroomId=? 
+        and status='PENDING'
+]]></system-out>
+  </testcase>
+  <testcase name="testTuition_NegativePaymentAmount_ShouldNotProcess" classname="com.example.studentgrade.ui.CoreLogicWhiteBoxTest" time="0.034">
+    <system-out><![CDATA[Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.username='student_1' 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        subjects
+        (category, code, credits, description, name, id) 
+    values
+        (?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        grades
+        (attendanceScore, finalExamScore, finalScore, gradeText, midtermScore, student_id, subject_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        tuition_fees
+        (paidAmount, semesterId, status, studentId, totalAmount, totalCredits, id) 
+    values
+        (?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.username=? 
+    fetch
+        first ? rows only
+]]></system-out>
+  </testcase>
+  <testcase name="testTuition_PartialPayment_ShouldRemainUnpaid" classname="com.example.studentgrade.ui.CoreLogicWhiteBoxTest" time="0.025">
+    <system-out><![CDATA[Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.username='student_1' 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        subjects
+        (category, code, credits, description, name, id) 
+    values
+        (?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        grades
+        (attendanceScore, finalExamScore, finalScore, gradeText, midtermScore, student_id, subject_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        tuition_fees
+        (paidAmount, semesterId, status, studentId, totalAmount, totalCredits, id) 
+    values
+        (?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.username=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        payment_transactions
+        (amount, method, paymentDate, tuitionFeeId, id) 
+    values
+        (?, ?, ?, ?, default)
+Hibernate: 
+    update
+        tuition_fees 
+    set
+        paidAmount=?,
+        semesterId=?,
+        status=?,
+        studentId=?,
+        totalAmount=?,
+        totalCredits=? 
+    where
+        id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testGrade_WhenMissingFinalExamScore_ShouldNotCalculateFinalScore" classname="com.example.studentgrade.ui.CoreLogicWhiteBoxTest" time="0.028">
+    <system-out><![CDATA[Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.username='student_1' 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        subjects
+        (category, code, credits, description, name, id) 
+    values
+        (?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        grades
+        (attendanceScore, finalExamScore, finalScore, gradeText, midtermScore, student_id, subject_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    select
+        g1_0.id,
+        g1_0.attendanceScore,
+        g1_0.finalExamScore,
+        g1_0.finalScore,
+        g1_0.gradeText,
+        g1_0.midtermScore,
+        g1_0.student_id,
+        g1_0.subject_id 
+    from
+        grades g1_0 
+    where
+        g1_0.student_id=? 
+        and g1_0.subject_id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.avatar,
+        s1_0.email,
+        s1_0.firstName,
+        s1_0.lastName,
+        s1_0.password,
+        s1_0.role,
+        s1_0.username 
+    from
+        users s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.category,
+        s1_0.code,
+        s1_0.credits,
+        s1_0.description,
+        s1_0.name 
+    from
+        subjects s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    update
+        grades 
+    set
+        attendanceScore=?,
+        finalExamScore=?,
+        finalScore=?,
+        gradeText=?,
+        midtermScore=?,
+        student_id=?,
+        subject_id=? 
+    where
+        id=?
+Hibernate: 
+    select
+        g1_0.id,
+        g1_0.attendanceScore,
+        g1_0.finalExamScore,
+        g1_0.finalScore,
+        g1_0.gradeText,
+        g1_0.midtermScore,
+        g1_0.student_id,
+        g1_0.subject_id 
+    from
+        grades g1_0 
+    where
+        g1_0.student_id=? 
+        and g1_0.subject_id=?
 ]]></system-out>
   </testcase>
 </testsuite>

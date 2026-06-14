@@ -1,3 +1,4 @@
+com\example\studentgrade\ui\CoreLogicWhiteBoxTest.class
 com\example\studentgrade\ui\SeleniumUITest.class
 com\example\studentgrade\ui\GradeBlackBoxTest.class
 com\example\studentgrade\service\EnrollmentWhiteBoxTest.class

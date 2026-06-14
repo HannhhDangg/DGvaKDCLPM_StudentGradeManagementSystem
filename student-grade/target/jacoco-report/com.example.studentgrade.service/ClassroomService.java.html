@@ -12,16 +12,16 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 
 @ApplicationScoped
-<span class="nc" id="L15">public class ClassroomService {</span>
+<span class="fc" id="L15">public class ClassroomService {</span>
 
     @Inject
     EntityManager em;
 
     public Student getTeacherByUsername(String username) {
         try {
-<span class="nc" id="L22">            return em.createQuery(&quot;SELECT s FROM Student s WHERE s.username = :username&quot;, Student.class)</span>
-<span class="nc" id="L23">                    .setParameter(&quot;username&quot;, username)</span>
-<span class="nc" id="L24">                    .setMaxResults(1).getSingleResult();</span>
+<span class="fc" id="L22">            return em.createQuery(&quot;SELECT s FROM Student s WHERE s.username = :username&quot;, Student.class)</span>
+<span class="fc" id="L23">                    .setParameter(&quot;username&quot;, username)</span>
+<span class="fc" id="L24">                    .setMaxResults(1).getSingleResult();</span>
 <span class="nc" id="L25">        } catch (Exception e) {</span>
 <span class="nc" id="L26">            Student teacher = new Student();</span>
 <span class="nc" id="L27">            teacher.setId(0L);</span>
@@ -32,71 +32,71 @@ import java.util.List;
     }
 
     public Long countClassesByTeacher(Long teacherId, Long subjectId, Long semesterId) {
-<span class="nc" id="L35">        String qlString = &quot;SELECT COUNT(c) FROM Classroom c WHERE c.teacherId = :tid&quot;;</span>
-<span class="nc bnc" id="L36" title="All 4 branches missed.">        if (subjectId != null &amp;&amp; subjectId &gt; 0)</span>
+<span class="fc" id="L35">        String qlString = &quot;SELECT COUNT(c) FROM Classroom c WHERE c.teacherId = :tid&quot;;</span>
+<span class="pc bpc" id="L36" title="3 of 4 branches missed.">        if (subjectId != null &amp;&amp; subjectId &gt; 0)</span>
 <span class="nc" id="L37">            qlString += &quot; AND c.subjectId = :subId&quot;;</span>
-<span class="nc bnc" id="L38" title="All 4 branches missed.">        if (semesterId != null &amp;&amp; semesterId &gt; 0)</span>
+<span class="pc bpc" id="L38" title="3 of 4 branches missed.">        if (semesterId != null &amp;&amp; semesterId &gt; 0)</span>
 <span class="nc" id="L39">            qlString += &quot; AND c.semesterId = :semId&quot;;</span>
 
-<span class="nc" id="L41">        var query = em.createQuery(qlString, Long.class).setParameter(&quot;tid&quot;, teacherId);</span>
-<span class="nc bnc" id="L42" title="All 4 branches missed.">        if (subjectId != null &amp;&amp; subjectId &gt; 0)</span>
+<span class="fc" id="L41">        var query = em.createQuery(qlString, Long.class).setParameter(&quot;tid&quot;, teacherId);</span>
+<span class="pc bpc" id="L42" title="3 of 4 branches missed.">        if (subjectId != null &amp;&amp; subjectId &gt; 0)</span>
 <span class="nc" id="L43">            query.setParameter(&quot;subId&quot;, subjectId);</span>
-<span class="nc bnc" id="L44" title="All 4 branches missed.">        if (semesterId != null &amp;&amp; semesterId &gt; 0)</span>
+<span class="pc bpc" id="L44" title="3 of 4 branches missed.">        if (semesterId != null &amp;&amp; semesterId &gt; 0)</span>
 <span class="nc" id="L45">            query.setParameter(&quot;semId&quot;, semesterId);</span>
 
-<span class="nc" id="L47">        return query.getSingleResult();</span>
+<span class="fc" id="L47">        return query.getSingleResult();</span>
     }
 
     public List&lt;Classroom&gt; getClassesByTeacher(Long teacherId, Long subjectId, Long semesterId, int page,
             int pageSize) {
-<span class="nc" id="L52">        String qlString = &quot;SELECT c FROM Classroom c WHERE c.teacherId = :tid&quot;;</span>
-<span class="nc bnc" id="L53" title="All 4 branches missed.">        if (subjectId != null &amp;&amp; subjectId &gt; 0)</span>
+<span class="fc" id="L52">        String qlString = &quot;SELECT c FROM Classroom c WHERE c.teacherId = :tid&quot;;</span>
+<span class="pc bpc" id="L53" title="3 of 4 branches missed.">        if (subjectId != null &amp;&amp; subjectId &gt; 0)</span>
 <span class="nc" id="L54">            qlString += &quot; AND c.subjectId = :subId&quot;;</span>
-<span class="nc bnc" id="L55" title="All 4 branches missed.">        if (semesterId != null &amp;&amp; semesterId &gt; 0)</span>
+<span class="pc bpc" id="L55" title="3 of 4 branches missed.">        if (semesterId != null &amp;&amp; semesterId &gt; 0)</span>
 <span class="nc" id="L56">            qlString += &quot; AND c.semesterId = :semId&quot;;</span>
-<span class="nc" id="L57">        qlString += &quot; ORDER BY c.startDate DESC&quot;;</span>
+<span class="fc" id="L57">        qlString += &quot; ORDER BY c.startDate DESC&quot;;</span>
 
-<span class="nc" id="L59">        var query = em.createQuery(qlString, Classroom.class).setParameter(&quot;tid&quot;, teacherId);</span>
-<span class="nc bnc" id="L60" title="All 4 branches missed.">        if (subjectId != null &amp;&amp; subjectId &gt; 0)</span>
+<span class="fc" id="L59">        var query = em.createQuery(qlString, Classroom.class).setParameter(&quot;tid&quot;, teacherId);</span>
+<span class="pc bpc" id="L60" title="3 of 4 branches missed.">        if (subjectId != null &amp;&amp; subjectId &gt; 0)</span>
 <span class="nc" id="L61">            query.setParameter(&quot;subId&quot;, subjectId);</span>
-<span class="nc bnc" id="L62" title="All 4 branches missed.">        if (semesterId != null &amp;&amp; semesterId &gt; 0)</span>
+<span class="pc bpc" id="L62" title="3 of 4 branches missed.">        if (semesterId != null &amp;&amp; semesterId &gt; 0)</span>
 <span class="nc" id="L63">            query.setParameter(&quot;semId&quot;, semesterId);</span>
 
-<span class="nc" id="L65">        return query.setFirstResult((page - 1) * pageSize)</span>
-<span class="nc" id="L66">                .setMaxResults(pageSize)</span>
-<span class="nc" id="L67">                .getResultList();</span>
+<span class="fc" id="L65">        return query.setFirstResult((page - 1) * pageSize)</span>
+<span class="fc" id="L66">                .setMaxResults(pageSize)</span>
+<span class="fc" id="L67">                .getResultList();</span>
     }
 
     public List&lt;Subject&gt; getSubjectsByTeacher(Long teacherId) {
-<span class="nc" id="L71">        return em.createQuery(</span>
+<span class="fc" id="L71">        return em.createQuery(</span>
                 &quot;SELECT s FROM Subject s JOIN TeacherSubject ts ON s.id = ts.subjectId WHERE ts.teacherId = :tid&quot;,
                 Subject.class)
-<span class="nc" id="L74">                .setParameter(&quot;tid&quot;, teacherId)</span>
-<span class="nc" id="L75">                .getResultList();</span>
+<span class="fc" id="L74">                .setParameter(&quot;tid&quot;, teacherId)</span>
+<span class="fc" id="L75">                .getResultList();</span>
     }
 
     public List&lt;Semester&gt; getAllSemesters() {
-<span class="nc" id="L79">        return em.createQuery(&quot;SELECT s FROM Semester s ORDER BY s.startDate DESC&quot;, Semester.class)</span>
-<span class="nc" id="L80">                .getResultList();</span>
+<span class="fc" id="L79">        return em.createQuery(&quot;SELECT s FROM Semester s ORDER BY s.startDate DESC&quot;, Semester.class)</span>
+<span class="fc" id="L80">                .getResultList();</span>
     }
 
     @Transactional
     public void addClassroom(String username, Long subjectId, String subjectName, String classCode, Long semesterId,
             String description) {
-<span class="nc" id="L86">        Student creator = getTeacherByUsername(username);</span>
-<span class="nc" id="L87">        Classroom classroom = new Classroom();</span>
-<span class="nc" id="L88">        classroom.setName(subjectName + &quot; (&quot; + classCode + &quot;)&quot;);</span>
-<span class="nc" id="L89">        classroom.setSubjectId(subjectId);</span>
-<span class="nc" id="L90">        classroom.setSubjectName(subjectName);</span>
-<span class="nc" id="L91">        classroom.setDescription(description);</span>
+<span class="fc" id="L86">        Student creator = getTeacherByUsername(username);</span>
+<span class="fc" id="L87">        Classroom classroom = new Classroom();</span>
+<span class="fc" id="L88">        classroom.setName(subjectName + &quot; (&quot; + classCode + &quot;)&quot;);</span>
+<span class="fc" id="L89">        classroom.setSubjectId(subjectId);</span>
+<span class="fc" id="L90">        classroom.setSubjectName(subjectName);</span>
+<span class="fc" id="L91">        classroom.setDescription(description);</span>
 
-<span class="nc" id="L93">        setSemesterInfo(classroom, semesterId);</span>
+<span class="fc" id="L93">        setSemesterInfo(classroom, semesterId);</span>
 
-<span class="nc bnc" id="L95" title="All 4 branches missed.">        if (creator != null &amp;&amp; creator.getId() != 0L) {</span>
-<span class="nc" id="L96">            classroom.setTeacherId(creator.getId());</span>
+<span class="pc bpc" id="L95" title="2 of 4 branches missed.">        if (creator != null &amp;&amp; creator.getId() != 0L) {</span>
+<span class="fc" id="L96">            classroom.setTeacherId(creator.getId());</span>
         }
-<span class="nc" id="L98">        em.persist(classroom);</span>
-<span class="nc" id="L99">    }</span>
+<span class="fc" id="L98">        em.persist(classroom);</span>
+<span class="fc" id="L99">    }</span>
 
     @Transactional
     public void deleteClassroom(String username, Long id) {
@@ -120,15 +120,15 @@ import java.util.List;
 <span class="nc" id="L120">    }</span>
 
     private void setSemesterInfo(Classroom classroom, Long semesterId) {
-<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (semesterId != null) {</span>
-<span class="nc" id="L124">            Semester sem = em.find(Semester.class, semesterId);</span>
-<span class="nc bnc" id="L125" title="All 2 branches missed.">            if (sem != null) {</span>
-<span class="nc" id="L126">                classroom.setSemesterId(sem.getId());</span>
-<span class="nc" id="L127">                classroom.setSemesterName(sem.getName());</span>
-<span class="nc" id="L128">                classroom.setStartDate(sem.getStartDate());</span>
-<span class="nc" id="L129">                classroom.setEndDate(sem.getEndDate());</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        if (semesterId != null) {</span>
+<span class="fc" id="L124">            Semester sem = em.find(Semester.class, semesterId);</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">            if (sem != null) {</span>
+<span class="fc" id="L126">                classroom.setSemesterId(sem.getId());</span>
+<span class="fc" id="L127">                classroom.setSemesterName(sem.getName());</span>
+<span class="fc" id="L128">                classroom.setStartDate(sem.getStartDate());</span>
+<span class="fc" id="L129">                classroom.setEndDate(sem.getEndDate());</span>
             }
-<span class="nc bnc" id="L131" title="All 2 branches missed.">        } else if (classroom.getSemesterId() == null) {</span>
+<span class="pc bnc" id="L131" title="All 2 branches missed.">        } else if (classroom.getSemesterId() == null) {</span>
             // Tự động gán cho học kỳ đầu tiên
 <span class="nc" id="L133">            List&lt;Semester&gt; sems = getAllSemesters();</span>
 <span class="nc bnc" id="L134" title="All 2 branches missed.">            if (!sems.isEmpty()) {</span>
@@ -138,6 +138,6 @@ import java.util.List;
 <span class="nc" id="L138">                classroom.setEndDate(sems.get(0).getEndDate());</span>
             }
         }
-<span class="nc" id="L141">    }</span>
+<span class="fc" id="L141">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

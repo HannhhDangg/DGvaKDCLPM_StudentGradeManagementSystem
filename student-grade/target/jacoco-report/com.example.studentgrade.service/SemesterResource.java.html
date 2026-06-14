@@ -21,7 +21,7 @@ import java.util.HashMap;
 @Path(&quot;/semesters&quot;)
 @Produces(MediaType.TEXT_HTML)
 @Blocking
-<span class="nc" id="L24">public class SemesterResource {</span>
+<span class="fc" id="L24">public class SemesterResource {</span>
 
     @Inject
     EntityManager em;
@@ -36,92 +36,92 @@ import java.util.HashMap;
             @QueryParam(&quot;success&quot;) String success,
             @QueryParam(&quot;page&quot;) @DefaultValue(&quot;1&quot;) int page) {
 
-<span class="nc" id="L39">        int pageSize = 10;</span>
+<span class="fc" id="L39">        int pageSize = 10;</span>
 
-<span class="nc" id="L41">        String qlString = &quot;SELECT s FROM Semester s&quot;;</span>
-<span class="nc" id="L42">        Map&lt;String, Object&gt; params = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L43">        List&lt;String&gt; whereClauses = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L44">        String currentDate = java.time.LocalDate.now().toString();</span>
+<span class="fc" id="L41">        String qlString = &quot;SELECT s FROM Semester s&quot;;</span>
+<span class="fc" id="L42">        Map&lt;String, Object&gt; params = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L43">        List&lt;String&gt; whereClauses = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L44">        String currentDate = java.time.LocalDate.now().toString();</span>
 
-<span class="nc bnc" id="L46" title="All 4 branches missed.">        if (search != null &amp;&amp; !search.trim().isEmpty()) {</span>
+<span class="pc bpc" id="L46" title="3 of 4 branches missed.">        if (search != null &amp;&amp; !search.trim().isEmpty()) {</span>
 <span class="nc" id="L47">            whereClauses.add(&quot;lower(s.name) LIKE :search&quot;);</span>
 <span class="nc" id="L48">            params.put(&quot;search&quot;, &quot;%&quot; + search.toLowerCase() + &quot;%&quot;);</span>
         }
 
-<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (&quot;ongoing&quot;.equals(status)) {</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (&quot;ongoing&quot;.equals(status)) {</span>
 <span class="nc" id="L52">            whereClauses.add(&quot;s.endDate &gt;= :currentDate&quot;);</span>
 <span class="nc" id="L53">            params.put(&quot;currentDate&quot;, currentDate);</span>
-<span class="nc bnc" id="L54" title="All 2 branches missed.">        } else if (&quot;completed&quot;.equals(status)) {</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        } else if (&quot;completed&quot;.equals(status)) {</span>
 <span class="nc" id="L55">            whereClauses.add(&quot;s.endDate &lt; :currentDate&quot;);</span>
 <span class="nc" id="L56">            params.put(&quot;currentDate&quot;, currentDate);</span>
         }
 
-<span class="nc bnc" id="L59" title="All 2 branches missed.">        if (!whereClauses.isEmpty()) {</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if (!whereClauses.isEmpty()) {</span>
 <span class="nc" id="L60">            qlString += &quot; WHERE &quot; + String.join(&quot; AND &quot;, whereClauses);</span>
         }
 
         // Đếm tổng số lượng bản ghi để phân trang
         String countQlString = &quot;SELECT COUNT(s) FROM Semester s&quot;
-<span class="nc bnc" id="L65" title="All 2 branches missed.">                + (whereClauses.isEmpty() ? &quot;&quot; : &quot; WHERE &quot; + String.join(&quot; AND &quot;, whereClauses));</span>
-<span class="nc" id="L66">        jakarta.persistence.TypedQuery&lt;Long&gt; countQuery = em.createQuery(countQlString, Long.class);</span>
-<span class="nc" id="L67">        params.forEach(countQuery::setParameter);</span>
-<span class="nc" id="L68">        Long totalRecords = countQuery.getSingleResult();</span>
-<span class="nc" id="L69">        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">                + (whereClauses.isEmpty() ? &quot;&quot; : &quot; WHERE &quot; + String.join(&quot; AND &quot;, whereClauses));</span>
+<span class="fc" id="L66">        jakarta.persistence.TypedQuery&lt;Long&gt; countQuery = em.createQuery(countQlString, Long.class);</span>
+<span class="fc" id="L67">        params.forEach(countQuery::setParameter);</span>
+<span class="fc" id="L68">        Long totalRecords = countQuery.getSingleResult();</span>
+<span class="fc" id="L69">        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);</span>
 
-<span class="nc bnc" id="L71" title="All 2 branches missed.">        if (page &lt; 1)</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        if (page &lt; 1)</span>
 <span class="nc" id="L72">            page = 1;</span>
-<span class="nc bnc" id="L73" title="All 4 branches missed.">        if (page &gt; totalPages &amp;&amp; totalPages &gt; 0)</span>
+<span class="pc bpc" id="L73" title="3 of 4 branches missed.">        if (page &gt; totalPages &amp;&amp; totalPages &gt; 0)</span>
 <span class="nc" id="L74">            page = totalPages;</span>
 
-<span class="nc" id="L76">        qlString += &quot; ORDER BY s.startDate DESC&quot;;</span>
+<span class="fc" id="L76">        qlString += &quot; ORDER BY s.startDate DESC&quot;;</span>
 
-<span class="nc" id="L78">        jakarta.persistence.TypedQuery&lt;Semester&gt; query = em.createQuery(qlString, Semester.class);</span>
-<span class="nc" id="L79">        params.forEach(query::setParameter);</span>
-<span class="nc" id="L80">        query.setFirstResult((page - 1) * pageSize);</span>
-<span class="nc" id="L81">        query.setMaxResults(pageSize);</span>
-<span class="nc" id="L82">        List&lt;Semester&gt; semesters = query.getResultList();</span>
+<span class="fc" id="L78">        jakarta.persistence.TypedQuery&lt;Semester&gt; query = em.createQuery(qlString, Semester.class);</span>
+<span class="fc" id="L79">        params.forEach(query::setParameter);</span>
+<span class="fc" id="L80">        query.setFirstResult((page - 1) * pageSize);</span>
+<span class="fc" id="L81">        query.setMaxResults(pageSize);</span>
+<span class="fc" id="L82">        List&lt;Semester&gt; semesters = query.getResultList();</span>
 
-<span class="nc" id="L84">        Map&lt;Long, Long&gt; classCounts = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L85">        Map&lt;Long, Long&gt; completedCounts = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L86">        Map&lt;Long, Integer&gt; progressMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L87">        Map&lt;Long, List&lt;Classroom&gt;&gt; classesBySemester = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L84">        Map&lt;Long, Long&gt; classCounts = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L85">        Map&lt;Long, Long&gt; completedCounts = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L86">        Map&lt;Long, Integer&gt; progressMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L87">        Map&lt;Long, List&lt;Classroom&gt;&gt; classesBySemester = new HashMap&lt;&gt;();</span>
 
-<span class="nc bnc" id="L89" title="All 2 branches missed.">        for (Semester s : semesters) {</span>
-<span class="nc" id="L90">            Long count = em.createQuery(&quot;SELECT COUNT(c) FROM Classroom c WHERE c.semesterId = :sid&quot;, Long.class)</span>
-<span class="nc" id="L91">                    .setParameter(&quot;sid&quot;, s.getId())</span>
-<span class="nc" id="L92">                    .getSingleResult();</span>
-<span class="nc" id="L93">            classCounts.put(s.getId(), count);</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        for (Semester s : semesters) {</span>
+<span class="fc" id="L90">            Long count = em.createQuery(&quot;SELECT COUNT(c) FROM Classroom c WHERE c.semesterId = :sid&quot;, Long.class)</span>
+<span class="fc" id="L91">                    .setParameter(&quot;sid&quot;, s.getId())</span>
+<span class="fc" id="L92">                    .getSingleResult();</span>
+<span class="fc" id="L93">            classCounts.put(s.getId(), count);</span>
 
-<span class="nc" id="L95">            Long completed = em</span>
-<span class="nc" id="L96">                    .createQuery(</span>
+<span class="fc" id="L95">            Long completed = em</span>
+<span class="fc" id="L96">                    .createQuery(</span>
                             &quot;SELECT COUNT(c) FROM Classroom c WHERE c.semesterId = :sid AND c.endDate &lt; :currentDate&quot;,
                             Long.class)
-<span class="nc" id="L99">                    .setParameter(&quot;sid&quot;, s.getId())</span>
-<span class="nc" id="L100">                    .setParameter(&quot;currentDate&quot;, currentDate)</span>
-<span class="nc" id="L101">                    .getSingleResult();</span>
-<span class="nc" id="L102">            completedCounts.put(s.getId(), completed);</span>
+<span class="fc" id="L99">                    .setParameter(&quot;sid&quot;, s.getId())</span>
+<span class="fc" id="L100">                    .setParameter(&quot;currentDate&quot;, currentDate)</span>
+<span class="fc" id="L101">                    .getSingleResult();</span>
+<span class="fc" id="L102">            completedCounts.put(s.getId(), completed);</span>
 
-<span class="nc bnc" id="L104" title="All 2 branches missed.">            int progress = count &gt; 0 ? (int) ((completed * 100) / count) : 0;</span>
-<span class="nc" id="L105">            progressMap.put(s.getId(), progress);</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            int progress = count &gt; 0 ? (int) ((completed * 100) / count) : 0;</span>
+<span class="fc" id="L105">            progressMap.put(s.getId(), progress);</span>
 
-<span class="nc" id="L107">            List&lt;Classroom&gt; semClasses = em</span>
-<span class="nc" id="L108">                    .createQuery(&quot;SELECT c FROM Classroom c WHERE c.semesterId = :sid&quot;, Classroom.class)</span>
-<span class="nc" id="L109">                    .setParameter(&quot;sid&quot;, s.getId())</span>
-<span class="nc" id="L110">                    .getResultList();</span>
-<span class="nc" id="L111">            classesBySemester.put(s.getId(), semClasses);</span>
-<span class="nc" id="L112">        }</span>
+<span class="fc" id="L107">            List&lt;Classroom&gt; semClasses = em</span>
+<span class="fc" id="L108">                    .createQuery(&quot;SELECT c FROM Classroom c WHERE c.semesterId = :sid&quot;, Classroom.class)</span>
+<span class="fc" id="L109">                    .setParameter(&quot;sid&quot;, s.getId())</span>
+<span class="fc" id="L110">                    .getResultList();</span>
+<span class="fc" id="L111">            classesBySemester.put(s.getId(), semClasses);</span>
+<span class="fc" id="L112">        }</span>
 
-<span class="nc" id="L114">        return semestersTemplate.data(&quot;semesters&quot;, semesters)</span>
-<span class="nc" id="L115">                .data(&quot;classCounts&quot;, classCounts)</span>
-<span class="nc" id="L116">                .data(&quot;completedCounts&quot;, completedCounts)</span>
-<span class="nc" id="L117">                .data(&quot;progressMap&quot;, progressMap)</span>
-<span class="nc" id="L118">                .data(&quot;classesBySemester&quot;, classesBySemester)</span>
-<span class="nc bnc" id="L119" title="All 2 branches missed.">                .data(&quot;search&quot;, search == null ? &quot;&quot; : search)</span>
-<span class="nc bnc" id="L120" title="All 2 branches missed.">                .data(&quot;status&quot;, status == null ? &quot;all&quot; : status)</span>
-<span class="nc bnc" id="L121" title="All 2 branches missed.">                .data(&quot;error&quot;, error != null ? error : &quot;&quot;)</span>
-<span class="nc bnc" id="L122" title="All 2 branches missed.">                .data(&quot;success&quot;, success != null ? success : &quot;&quot;)</span>
-<span class="nc" id="L123">                .data(&quot;currentPage&quot;, page)</span>
-<span class="nc" id="L124">                .data(&quot;totalPages&quot;, totalPages).render();</span>
+<span class="fc" id="L114">        return semestersTemplate.data(&quot;semesters&quot;, semesters)</span>
+<span class="fc" id="L115">                .data(&quot;classCounts&quot;, classCounts)</span>
+<span class="fc" id="L116">                .data(&quot;completedCounts&quot;, completedCounts)</span>
+<span class="fc" id="L117">                .data(&quot;progressMap&quot;, progressMap)</span>
+<span class="fc" id="L118">                .data(&quot;classesBySemester&quot;, classesBySemester)</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">                .data(&quot;search&quot;, search == null ? &quot;&quot; : search)</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">                .data(&quot;status&quot;, status == null ? &quot;all&quot; : status)</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">                .data(&quot;error&quot;, error != null ? error : &quot;&quot;)</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">                .data(&quot;success&quot;, success != null ? success : &quot;&quot;)</span>
+<span class="fc" id="L123">                .data(&quot;currentPage&quot;, page)</span>
+<span class="fc" id="L124">                .data(&quot;totalPages&quot;, totalPages).render();</span>
     }
 
     @POST
@@ -130,12 +130,12 @@ import java.util.HashMap;
     @Transactional
     public Response addSemester(@FormParam(&quot;name&quot;) String name, @FormParam(&quot;startDate&quot;) String startDate,
             @FormParam(&quot;endDate&quot;) String endDate) {
-<span class="nc" id="L133">        Semester semester = new Semester();</span>
-<span class="nc" id="L134">        semester.setName(name);</span>
-<span class="nc" id="L135">        semester.setStartDate(startDate);</span>
-<span class="nc" id="L136">        semester.setEndDate(endDate);</span>
-<span class="nc" id="L137">        em.persist(semester);</span>
-<span class="nc" id="L138">        return Response.seeOther(URI.create(&quot;/semesters&quot;)).build();</span>
+<span class="fc" id="L133">        Semester semester = new Semester();</span>
+<span class="fc" id="L134">        semester.setName(name);</span>
+<span class="fc" id="L135">        semester.setStartDate(startDate);</span>
+<span class="fc" id="L136">        semester.setEndDate(endDate);</span>
+<span class="fc" id="L137">        em.persist(semester);</span>
+<span class="fc" id="L138">        return Response.seeOther(URI.create(&quot;/semesters&quot;)).build();</span>
     }
 
     @POST
