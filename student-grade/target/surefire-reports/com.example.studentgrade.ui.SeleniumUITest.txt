@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.example.studentgrade.ui.SeleniumUITest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 44.19 s -- in com.example.studentgrade.ui.SeleniumUITest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 41.64 s -- in com.example.studentgrade.ui.SeleniumUITest

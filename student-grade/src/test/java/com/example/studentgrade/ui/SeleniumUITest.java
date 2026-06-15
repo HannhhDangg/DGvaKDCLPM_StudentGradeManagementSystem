@@ -129,9 +129,9 @@ public class SeleniumUITest {
         btnRegister.click();
         
         // Xử lý hộp thoại Xác nhận (Confirm Alert) của JS sinh ra do có thẻ onsubmit
-        wait.until(ExpectedConditions.alertIsPresent());
-        sleep(1000); // Chờ 1s xem cảnh báo
-        driver.switchTo().alert().accept();
+        org.openqa.selenium.Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+        alert.accept(); // Accept ngay lập tức để tránh lỗi mất alert do reload trang
+        sleep(1000); // Chờ 1s sau khi đã accept để hệ thống xử lý
         
         // Chờ lớp học nhảy lên bảng "Chờ duyệt"
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(text(), 'Chờ duyệt')]")));
